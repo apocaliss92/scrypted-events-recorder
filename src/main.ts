@@ -1,4 +1,4 @@
-import sdk, { MixinDeviceBase, MixinProvider, ObjectDetection, ObjectDetectionModel, ScryptedDevice, ScryptedDeviceBase, ScryptedDeviceType, ScryptedInterface, ScryptedNativeId, Setting, SettingValue, Settings, VideoCamera, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { ScryptedDeviceType, ScryptedInterface, ScryptedNativeId, Setting, SettingValue, Settings, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { EventsRecorderMixin } from './eventsRecorderMixin';
 import fs from 'fs';
