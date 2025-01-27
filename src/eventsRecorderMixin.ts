@@ -47,6 +47,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     running = false;
     forceClosedCapture = false;
     lastRunStart: number;
+    lastExtendLogged: number;
+    ffmpegPath: string;
 
     recording = false;
     saveRecordingListener: NodeJS.Timeout;
@@ -128,6 +130,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             try {
                 if (!this.killed) {
                     try {
+                        this.ffmpegPath = await sdk.mediaManager.getFFmpegPath();
                         const processPid = this.storageSettings.values.processPid;
                         processPid && process.kill(processPid, 'SIGTERM');
                         await sleep(5000);
@@ -184,26 +187,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             this.detectionListener = undefined;
         }
 
-        if (this.segmentsFfmpegProcess && !this.segmentsFfmpegProcess.killed) {
-            await new Promise<void>((resolve, reject) => {
-                try {
-                    this.segmentsFfmpegProcess.kill('SIGTERM');
-
-                    const forceKillTimeout = setTimeout(() => {
-                        this.segmentsFfmpegProcess.kill('SIGKILL');
-                        resolve();
-                    }, 5000);
-
-                    this.segmentsFfmpegProcess.on('exit', () => {
-                        clearTimeout(forceKillTimeout);
-                        resolve();
-                    });
-                } catch (error) {
-                    logger.log('Error stopping FFmpeg:', error);
-                    reject();
-                }
-            });
-        }
+        await this.stopCapture();
 
         this.segmentsListener && clearInterval(this.segmentsListener);
         this.segmentsListener = undefined;
@@ -213,12 +197,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const { tmpFolder } = this.getStorageDirs();
         if (fs.existsSync(tmpFolder)) {
             fs.rmSync(tmpFolder, { recursive: true, force: true });
-            // const files = fs.readdirSync(tmpFolder);
-            // for (const file of files) {
-            //     const filePath = path.join(tmpFolder, file);
-            //     fs.unlinkSync(filePath);
-            // }
         }
+        fs.mkdirSync(tmpFolder, { recursive: true });
     }
 
     async init() {
@@ -248,7 +228,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             }
 
             this.cleanupTmpFiles();
-            fs.mkdirSync(tmpFolder, { recursive: true });
         } catch (e) {
             logger.log('Error in init', e);
         }
@@ -278,12 +257,13 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 } else if (!pluginEnabled) {
                     await this.resetListeners({ skipMainLoop: true });
                 } else {
-                    const shouldRestartCapture = (this.lastRunStart && (Date.now() - this.lastRunStart)) >= 1000 * 60 * 5;
+                    const shouldRestartCapture = (this.lastRunStart && (Date.now() - this.lastRunStart)) >= 1000 * 60 * 60 * 2;
 
 
                     if (shouldRestartCapture && this.segmentsFfmpegProcess) {
                         logger.log(`Restarting capture process. ${JSON.stringify({ shouldRestartCapture })}`);
                         await this.resetListeners({ skipDetectionListener: true, skipMainLoop: true });
+                        this.cleanupTmpFiles();
                     }
 
                     if (!this.running || !this.lastRunStart || this.forceClosedCapture) {
@@ -357,7 +337,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const detectionsHash = detectionsHashComponents.join('');
         const filename = `${this.recordingTimeStart}_${endTime}_${detectionsHash}`;
 
-        logger.debug(`Filename calculated: ${JSON.stringify({
+        logger.log(`Filename calculated: ${JSON.stringify({
             filename,
             detectionsHashComponents,
             classesDetected: this.classesDetected,
@@ -368,22 +348,42 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         return filename;
     }
 
+    async saveThumbnail(filename: string) {
+        const logger = this.getLogger();
+        return new Promise<void>((resolve) => {
+            const { preEventSeconds } = this.storageSettings.values;
+            const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
+
+            const snapshotFfmpeg = spawn(this.ffmpegPath, [
+                '-ss', (preEventSeconds + 1).toString(),
+                // '-ss', '00:00:05',
+                '-i', `${videoClipPath}`,
+                thumbnailPath
+            ]);
+
+            snapshotFfmpeg.stdout.on('data', (data) => {
+                logger.debug('Snapshot stdout:', data.toString());
+            });
+
+            snapshotFfmpeg.stderr.on('data', (data) => {
+                logger.debug('Snapshot nstderr:', data.toString());
+            });
+
+            snapshotFfmpeg.on('close', () => {
+                logger.log(`Snapshot stored ${thumbnailPath}`);
+                resolve();
+            });
+        });
+    }
+
     async saveVideoClip() {
+        await this.stopCapture();
         const { preEventSeconds } = this.storageSettings.values;
-        const { videoClipsFolder, tmpFolder } = this.getStorageDirs();
         const logger = this.getLogger();
         const endTime = Date.now();
-        const videoclipDuration = Math.floor((endTime - this.recordingTimeStart) * 1000);
-
-        logger.log(`Saving videoclip. ${JSON.stringify({
-            currentSegment: this.currentSegment,
-            eventSegment: this.eventSegment,
-            saveSegment: this.saveSegment,
-            videoclipDuration
-        })}`);
 
         const filename = this.getVideoClipName(endTime);
-        const outputFile = path.join(videoClipsFolder, `${filename}.mp4`);
+        const { tmpFolder, videoClipPath } = this.getStorageDirs(filename);
 
         const allSegments = fs.readdirSync(tmpFolder);
         const segments = allSegments
@@ -394,7 +394,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             })
             .filter(segment => {
                 const segmentIndex = parseInt(segment.match(/\d+/)[0]);
-                const lowOk = this.eventSegment ? segmentIndex >= this.eventSegment - preEventSeconds : true;
+                const lowOk = this.eventSegment ? segmentIndex >= (this.eventSegment - preEventSeconds) : true;
                 const highOk = this.saveSegment ? segmentIndex <= this.saveSegment : true;
 
                 const matches = lowOk && highOk;
@@ -409,14 +409,19 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 return matches;
             })
-            .slice(allSegments.length - videoclipDuration)
             .map(file => path.join(tmpFolder, file));
 
-        const ffmpegPath = await sdk.mediaManager.getFFmpegPath();
-        const concatFfmpeg = spawn(ffmpegPath, [
+        logger.log(`Saving videoclip. ${JSON.stringify({
+            currentSegment: this.currentSegment,
+            eventSegment: this.eventSegment,
+            saveSegment: this.saveSegment,
+            segments: segments.length
+        })}`);
+
+        const concatFfmpeg = spawn(this.ffmpegPath, [
             '-i', `concat:${segments.join('|')}`,
             '-c', 'copy',
-            outputFile
+            videoClipPath
         ]);
 
         concatFfmpeg.stdout.on('data', (data) => {
@@ -427,13 +432,16 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             logger.debug('Generatio nstderr:', data.toString());
         });
 
-        concatFfmpeg.on('close', () => {
-            logger.log(`Videoclip stored ${outputFile}`);
+        concatFfmpeg.on('close', async () => {
+            logger.log(`Videoclip stored ${videoClipPath}`);
+            await this.saveThumbnail(filename);
             this.recording = false;
             this.saveSegment = undefined;
             this.eventSegment = undefined;
             this.classesDetected = [];
             this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
+            this.cleanupTmpFiles();
+            await this.startCapture();
         });
     }
 
@@ -448,8 +456,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async extendRecording() {
         const logger = this.getLogger();
-        logger.debug(`Extending recording: ${Date.now()}`);
-        this.restartTimeout();
+        const now = Date.now();
+        if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
+            this.lastExtendLogged = now;
+            logger.log(`Extending recording: ${now}`);
+            this.restartTimeout();
+        }
     }
 
     startNewRecording() {
@@ -488,14 +500,40 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }
     }
 
+    async stopCapture() {
+        const logger = this.getLogger();
+        if (this.segmentsFfmpegProcess && !this.segmentsFfmpegProcess.killed) {
+            await new Promise<void>((resolve, reject) => {
+                try {
+                    this.segmentsFfmpegProcess.kill('SIGTERM');
+
+                    const forceKillTimeout = setTimeout(() => {
+                        this.segmentsFfmpegProcess.kill('SIGKILL');
+                        resolve();
+                    }, 5000);
+
+                    this.segmentsFfmpegProcess.on('exit', () => {
+                        clearTimeout(forceKillTimeout);
+                        resolve();
+                    });
+                } catch (error) {
+                    logger.log('Error stopping FFmpeg:', error);
+                    reject();
+                }
+            });
+        }
+        try {
+            process.kill(this.segmentsFfmpegProcess.pid, 'SIGTERM');
+        } catch (e) { }
+    }
+
     async startCapture() {
         const logger = this.getLogger();
 
         const { tmpFolder } = this.getStorageDirs();
         logger.log(`Starting prebuffer capture in folder${tmpFolder}`);
         try {
-            const ffmpegPath = await sdk.mediaManager.getFFmpegPath();
-            this.segmentsFfmpegProcess = spawn(ffmpegPath, [
+            this.segmentsFfmpegProcess = spawn(this.ffmpegPath, [
                 '-rtsp_transport', 'tcp',
                 '-i', this.rtspUrl,
                 '-c:v', 'libx264',
@@ -522,7 +560,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 if (match) {
                     const lastSegment = match[1]; // Nome completo del segmento
                     const segmentNumber = lastSegment.match(/segment(\d+)\.ts/)[1];
-                    this.currentSegment = segmentNumber;
+                    this.currentSegment = parseInt(segmentNumber);
                 }
             });
 
@@ -541,16 +579,10 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 }
             });
 
-            const killFFmpeg = () => {
-                try {
-                    process.kill(this.segmentsFfmpegProcess.pid, 'SIGTERM');
-                } catch (e) { }
-            };
-
-            process.on('exit', killFFmpeg);
-            process.on('SIGINT', killFFmpeg);
-            process.on('SIGTERM', killFFmpeg);
-            process.on('uncaughtException', killFFmpeg);
+            process.on('exit', this.stopCapture);
+            process.on('SIGINT', this.stopCapture);
+            process.on('SIGTERM', this.stopCapture);
+            process.on('uncaughtException', this.stopCapture);
         } catch (e) {
             logger.log('Error in startCapture', e);
         }
