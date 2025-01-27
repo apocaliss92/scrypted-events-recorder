@@ -399,7 +399,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const matches = lowOk && highOk;
 
-                logger.debug(`Filtering segment: ${JSON.stringify({
+                logger.log(`Filtering segment: ${JSON.stringify({
                     segment,
                     segmentIndex,
                     lowOk,
