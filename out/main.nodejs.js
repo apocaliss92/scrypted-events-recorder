@@ -49715,7 +49715,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             for (const entry of entries) {
                 const fullPath = path_1.default.join(currentPath, entry.name);
                 if (entry.isDirectory()) {
-                    calculateSize(fullPath);
+                    await calculateSize(fullPath);
                 }
                 else if (entry.isFile()) {
                     const stats = await fs_1.default.promises.stat(fullPath);
@@ -49723,11 +49723,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 }
             }
         };
-        calculateSize(deviceFolder);
+        await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
-        logger.log(`Occupied space: ${occupiedSpaceInGb} GB`);
+        logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
         const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
         if (freeMemory <= cleanupMemoryThresholderInGb) {
             const files = await fs_1.default.promises.readdir(videoClipsFolder);
@@ -49873,6 +49873,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             stdio: ['pipe', 'pipe', 'pipe'],
             detached: false
         });
+        this.storageSettings.values.processPid = this.saveFfmpegProcess.pid;
         this.saveFfmpegProcess.stdout.on('data', (data) => {
             logger.debug('Generation stdout:', data.toString());
         });
@@ -50102,7 +50103,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             const { deviceId, filename, parameters } = JSON.parse(params);
             const dev = this.currentMixins[deviceId];
             const devConsole = dev.console;
-            devConsole.log(`Request with parameters: ${JSON.stringify({
+            devConsole.debug(`Request with parameters: ${JSON.stringify({
                 webhook,
                 deviceId,
                 filename,
@@ -50114,7 +50115,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                     const stat = fs_1.default.statSync(videoClipPath);
                     const fileSize = stat.size;
                     const range = request.headers.range;
-                    devConsole.log(`Videoclip requested: ${JSON.stringify({
+                    devConsole.debug(`Videoclip requested: ${JSON.stringify({
                         videoClipPath,
                         filename,
                         deviceId,
@@ -50168,7 +50169,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                     return;
                 }
                 else if (webhook === 'thumbnail') {
-                    devConsole.log(`Thumbnail requested: ${JSON.stringify({
+                    devConsole.debug(`Thumbnail requested: ${JSON.stringify({
                         filename,
                         deviceId,
                     })}`);

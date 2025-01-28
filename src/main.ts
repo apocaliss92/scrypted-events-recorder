@@ -63,7 +63,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
       const { deviceId, filename, parameters } = JSON.parse(params);
       const dev: EventsRecorderMixin = this.currentMixins[deviceId];
       const devConsole = dev.console;
-      devConsole.log(`Request with parameters: ${JSON.stringify({
+      devConsole.debug(`Request with parameters: ${JSON.stringify({
         webhook,
         deviceId,
         filename,
@@ -78,7 +78,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
           const fileSize = stat.size;
           const range = request.headers.range;
 
-          devConsole.log(`Videoclip requested: ${JSON.stringify({
+          devConsole.debug(`Videoclip requested: ${JSON.stringify({
             videoClipPath,
             filename,
             deviceId,
@@ -136,7 +136,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
           return;
         } else
           if (webhook === 'thumbnail') {
-            devConsole.log(`Thumbnail requested: ${JSON.stringify({
+            devConsole.debug(`Thumbnail requested: ${JSON.stringify({
               filename,
               deviceId,
             })}`);

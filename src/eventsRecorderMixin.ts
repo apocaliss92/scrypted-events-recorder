@@ -421,7 +421,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             for (const entry of entries) {
                 const fullPath = path.join(currentPath, entry.name);
                 if (entry.isDirectory()) {
-                    calculateSize(fullPath);
+                    await calculateSize(fullPath);
                 } else if (entry.isFile()) {
                     const stats = await fs.promises.stat(fullPath);
                     occupiedSizeInBytes += stats.size;
@@ -429,11 +429,11 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             }
         }
 
-        calculateSize(deviceFolder);
+        await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
-        logger.log(`Occupied space: ${occupiedSpaceInGb} GB`);
+        logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
 
         const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
         if (freeMemory <= cleanupMemoryThresholderInGb) {
