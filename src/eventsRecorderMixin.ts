@@ -80,7 +80,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     mainLoopListener: NodeJS.Timeout;
     detectionListener: EventListenerRegister;
     logger: Console;
-    segmentsFfmpegProcess: ChildProcessWithoutNullStreams;
     saveFfmpegProcess: ChildProcessWithoutNullStreams;
     running = false;
     lastExtendLogged: number;
@@ -608,6 +607,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             detached: false
         });
 
+        this.storageSettings.values.processPid = this.saveFfmpegProcess.pid;
 
         this.saveFfmpegProcess.stdout.on('data', (data) => {
             logger.debug('Generation stdout:', data.toString());
