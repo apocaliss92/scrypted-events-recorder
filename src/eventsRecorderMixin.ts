@@ -432,10 +432,16 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
+        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
 
-        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
+        this.plugin.setMixinOccupancy(this.id, {
+            free: freeMemory,
+            occupied: occupiedSpaceInGbNumber,
+            total: this.storageSettings.values.maxSpaceInGb
+        });
+
         if (freeMemory <= cleanupMemoryThresholderInGb) {
             const files = await fs.promises.readdir(videoClipsFolder);
 

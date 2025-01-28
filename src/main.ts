@@ -4,8 +4,15 @@ import { EventsRecorderMixin } from './eventsRecorderMixin';
 import fs from 'fs';
 import { BasePlugin, getBaseSettings } from '../../scrypted-apocaliss-base/src/basePlugin';
 
+interface MixinStorage {
+  total: number;
+  occupied: number;
+  free: number;
+}
+
 export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRequestHandler {
   currentMixins = new Set<EventsRecorderMixin>();
+  mixinStorage: Record<string, MixinStorage> = {};
 
   storageSettings = new StorageSettings(this, {
     ...getBaseSettings({
@@ -17,6 +24,13 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
       description: 'Disk path where to save the clips',
       type: 'string',
       onPut: async () => await this.start()
+    },
+    occupiedSpaceInGb: {
+      title: 'Memory allocated',
+      type: 'number',
+      range: [0, 250],
+      readonly: true,
+      placeholder: 'GB'
     },
   });
 
@@ -50,6 +64,24 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     } else {
       this.getLogger().error('Storage path not defined');
     }
+  }
+
+  setMixinOccupancy(deviceId: string, data: MixinStorage) {
+    this.mixinStorage[deviceId] = data;
+    const totalData: MixinStorage = {
+      free: 0,
+      occupied: 0,
+      total: 0
+    };
+
+    Object.values(this.mixinStorage).forEach(data => {
+      totalData.free += data.free;
+      totalData.occupied += data.occupied;
+      totalData.total += data.total;
+    });
+
+    this.putSetting('occupiedSpaceInGb', totalData.occupied.toFixed(2));
+    this.storageSettings.settings.occupiedSpaceInGb.range = [0, Number(totalData.total.toFixed(2))];
   }
 
 

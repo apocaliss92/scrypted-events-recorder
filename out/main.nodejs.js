@@ -49726,9 +49726,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
+        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
-        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
+        this.plugin.setMixinOccupancy(this.id, {
+            free: freeMemory,
+            occupied: occupiedSpaceInGbNumber,
+            total: this.storageSettings.values.maxSpaceInGb
+        });
         if (freeMemory <= cleanupMemoryThresholderInGb) {
             const files = await fs_1.default.promises.readdir(videoClipsFolder);
             const fileDetails = files
@@ -50058,6 +50063,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             pluginFriendlyName: 'Events recorder'
         });
         this.currentMixins = new Set();
+        this.mixinStorage = {};
         this.storageSettings = new storage_settings_1.StorageSettings(this, {
             ...(0, basePlugin_1.getBaseSettings)({
                 onPluginSwitch: (_, enabled) => this.startStop(enabled),
@@ -50068,6 +50074,13 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                 description: 'Disk path where to save the clips',
                 type: 'string',
                 onPut: async () => await this.start()
+            },
+            occupiedSpaceInGb: {
+                title: 'Memory allocated',
+                type: 'number',
+                range: [0, 250],
+                readonly: true,
+                placeholder: 'GB'
             },
         });
         this.start().then().catch(this.getLogger().log);
@@ -50093,6 +50106,21 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
         else {
             this.getLogger().error('Storage path not defined');
         }
+    }
+    setMixinOccupancy(deviceId, data) {
+        this.mixinStorage[deviceId] = data;
+        const totalData = {
+            free: 0,
+            occupied: 0,
+            total: 0
+        };
+        Object.values(this.mixinStorage).forEach(data => {
+            totalData.free += data.free;
+            totalData.occupied += data.occupied;
+            totalData.total += data.total;
+        });
+        this.putSetting('occupiedSpaceInGb', totalData.occupied.toFixed(2));
+        this.storageSettings.settings.occupiedSpaceInGb.range = [0, Number(totalData.total.toFixed(2))];
     }
     async onRequest(request, response) {
         const url = new URL(`http://localhost${request.url}`);
