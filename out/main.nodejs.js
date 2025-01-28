@@ -49979,6 +49979,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                         resolve();
                     }, 5000);
                     this.segmentsFfmpegProcess.on('exit', () => {
+                        logger.log('Capture process terminated');
                         clearTimeout(forceKillTimeout);
                         resolve();
                     });
@@ -49994,7 +49995,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         catch (e) { }
     }
-    async startCapture() {
+    async startContinuousCapture() {
         const logger = this.getLogger();
         const { tmpFolder } = this.getStorageDirs();
         logger.log(`Starting prebuffer capture in folder${tmpFolder}`);
@@ -50017,7 +50018,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.segmentsFfmpegProcess.stderr.on('data', (data) => {
                 const output = data.toString();
                 if (output.includes('Error') || output.includes('error')) {
-                    logger.debug('FFmpeg error:', output);
+                    logger.log('FFmpeg error:', output);
                 }
                 const match = output.match(/Opening '(.+?)' for writing/);
                 if (match) {
@@ -50037,6 +50038,63 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     logger.log(`FFmpeg exited with code ${code}, signal: ${signal}`);
                     this.forceClosedCapture = true;
                 }
+            });
+        }
+        catch (e) {
+            logger.log('Error in startCapture', e);
+        }
+    }
+    async startCapture() {
+        const logger = this.getLogger();
+        const { tmpFolder } = this.getStorageDirs();
+        logger.log(`Starting prebuffer capture in folder${tmpFolder}`);
+        try {
+            this.segmentsFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
+                '-rtsp_transport', 'tcp',
+                '-i', this.rtspUrl,
+                '-c:v', 'libx264',
+                '-f', 'segment',
+                '-segment_time', '1',
+                '-segment_format', 'mpegts',
+                '-reset_timestamps', '1',
+                // '-force_key_frames', 'expr:gte(t,n_forced*1)',
+                '-reconnect', '1',
+                '-reconnect_at_eof', '1',
+                '-reconnect_streamed', '1',
+                '-reconnect_delay_max', '2',
+                '-y',
+                `${tmpFolder}/segment%03d.ts`,
+            ], {
+                stdio: ['pipe', 'pipe', 'pipe'],
+                detached: false
+            });
+            this.storageSettings.values.processPid = this.segmentsFfmpegProcess.pid;
+            this.segmentsFfmpegProcess.stderr.on('data', (data) => {
+                const output = data.toString();
+                logger.debug('Capture data: ', output);
+                if (!this.storageSettings.values.debug) {
+                    if (output.includes('Error') || output.includes('error')) {
+                        logger.log('FFmpeg error:', output);
+                    }
+                }
+                const match = output.match(/Opening '(.+?)' for writing/);
+                if (match) {
+                    const lastSegment = match[1]; // Nome completo del segmento
+                    const segmentNumber = lastSegment.match(/segment(\d+)\.ts/)[1];
+                    this.currentSegment = parseInt(segmentNumber);
+                }
+            });
+            this.segmentsFfmpegProcess.on('error', (error) => {
+                logger.log('FFmpeg error:', error);
+            });
+            this.segmentsFfmpegProcess.stdout.on('data', (data) => {
+                logger.log('Capture stdout:', data.toString());
+            });
+            this.segmentsFfmpegProcess.stdout.on('exit', (code, signal) => {
+                // if (code !== 0) {
+                logger.log(`FFmpeg exited with code ${code}, signal: ${signal}`);
+                this.forceClosedCapture = true;
+                // }
             });
         }
         catch (e) {

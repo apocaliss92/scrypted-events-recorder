@@ -738,6 +738,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     }, 5000);
 
                     this.segmentsFfmpegProcess.on('exit', () => {
+                        logger.log('Capture process terminated');
                         clearTimeout(forceKillTimeout);
                         resolve();
                     });
@@ -778,7 +779,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 const output = data.toString();
 
                 if (output.includes('Error') || output.includes('error')) {
-                    logger.debug('FFmpeg error:', output);
+                    logger.log('FFmpeg error:', output);
                 }
 
                 const match = output.match(/Opening '(.+?)' for writing/);
