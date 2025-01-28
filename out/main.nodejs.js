@@ -49436,9 +49436,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             groupKey,
         });
         this.plugin = plugin;
-        this.videoSegments = [];
         this.running = false;
-        this.forceClosedCapture = false;
         this.shouldIndexFs = false;
         this.recording = false;
         this.classesDetected = [];
@@ -49450,12 +49448,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 type: 'boolean',
                 defaultValue: true,
                 onPut: async () => await this.init()
-            },
-            preEventSeconds: {
-                title: 'Pre event seconds',
-                description: 'Seconds to keep before an event occurs.',
-                type: 'number',
-                defaultValue: 5,
             },
             postEventSeconds: {
                 title: 'Post event seconds',
@@ -49511,10 +49503,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             try {
                 if (!this.killed) {
                     try {
-                        process.on('exit', this.stopCapture);
-                        process.on('SIGINT', this.stopCapture);
-                        process.on('SIGTERM', this.stopCapture);
-                        process.on('uncaughtException', this.stopCapture);
+                        process.on('exit', this.resetListeners);
+                        process.on('SIGINT', this.resetListeners);
+                        process.on('SIGTERM', this.resetListeners);
+                        process.on('uncaughtException', this.resetListeners);
                         this.ffmpegPath = await sdk_1.default.mediaManager.getFFmpegPath();
                         const processPid = this.storageSettings.values.processPid;
                         processPid && process.kill(processPid, 'SIGTERM');
@@ -49566,23 +49558,28 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.detectionListener?.removeListener && this.detectionListener.removeListener();
             this.detectionListener = undefined;
         }
-        await this.stopCapture();
-        this.segmentsListener && clearInterval(this.segmentsListener);
-        this.segmentsListener = undefined;
+        this.saveRecordingListener && clearInterval(this.saveRecordingListener);
+        this.saveRecordingListener = undefined;
     }
-    cleanupTmpFiles() {
+    async cleanupTmpFiles() {
         const { tmpFolder } = this.getStorageDirs();
-        if (fs_1.default.existsSync(tmpFolder)) {
-            fs_1.default.rmSync(tmpFolder, { recursive: true, force: true });
+        try {
+            await fs_1.default.promises.access(tmpFolder);
+            await fs_1.default.promises.rm(tmpFolder, { recursive: true, force: true });
         }
-        fs_1.default.mkdirSync(tmpFolder, { recursive: true });
+        finally {
+            await fs_1.default.promises.mkdir(tmpFolder, { recursive: true });
+        }
     }
     async init() {
         const logger = this.getLogger();
-        const { highQualityVideoclips } = this.storageSettings.values;
+        const { highQualityVideoclips, postEventSeconds } = this.storageSettings.values;
         const destination = highQualityVideoclips ? 'local-recorder' : 'remote-recorder';
         const streamConfigs = await this.cameraDevice.getVideoStreamOptions();
-        const streamName = streamConfigs.find(config => config.destinations.includes(destination))?.name;
+        const streamConfig = streamConfigs.find(config => config.destinations.includes(destination));
+        const streamName = streamConfig?.name;
+        this.prebuffer = (streamConfig.prebuffer ?? 10000) / 2;
+        this.clipDurationInMs = this.prebuffer + (postEventSeconds * 1000);
         const deviceSettings = await this.cameraDevice.getSettings();
         const rebroadcastConfig = deviceSettings.find(setting => setting.subgroup === `Stream: ${streamName}` && setting.title === 'RTSP Rebroadcast Url');
         this.rtspUrl = rebroadcastConfig?.value;
@@ -49591,14 +49588,20 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             streamName,
         })}`);
         try {
-            const { thumbnailsFolder, videoClipsFolder, tmpFolder } = this.getStorageDirs();
-            if (!fs_1.default.existsSync(thumbnailsFolder)) {
-                fs_1.default.mkdirSync(thumbnailsFolder, { recursive: true });
+            const { thumbnailsFolder, videoClipsFolder } = this.getStorageDirs();
+            try {
+                await fs_1.default.promises.access(thumbnailsFolder);
             }
-            if (!fs_1.default.existsSync(videoClipsFolder)) {
-                fs_1.default.mkdirSync(videoClipsFolder, { recursive: true });
+            catch (err) {
+                await fs_1.default.promises.mkdir(thumbnailsFolder, { recursive: true });
             }
-            this.cleanupTmpFiles();
+            try {
+                await fs_1.default.promises.access(videoClipsFolder);
+            }
+            catch (err) {
+                await fs_1.default.promises.mkdir(videoClipsFolder, { recursive: true });
+            }
+            await this.cleanupTmpFiles();
         }
         catch (e) {
             logger.log('Error in init', e);
@@ -49608,12 +49611,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const funct = async () => {
             try {
-                this.forceClosedCapture = false;
                 this.running = true;
-                this.lastRunStart = Date.now();
-                await this.startCapture();
                 await this.startListeners();
-                this.watchSegments();
             }
             catch (e) {
                 logger.log('Error in startCheckInterval funct', e);
@@ -49629,24 +49628,18 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     await this.resetListeners({ skipMainLoop: true });
                 }
                 else {
-                    const shouldRestartCapture = (this.lastRunStart && (Date.now() - this.lastRunStart)) >= 1000 * 60 * 60 * 2;
-                    if (shouldRestartCapture && this.segmentsFfmpegProcess) {
-                        logger.log(`Restarting capture process. ${JSON.stringify({ shouldRestartCapture })}`);
-                        await this.resetListeners({ skipDetectionListener: true, skipMainLoop: true });
-                        this.cleanupTmpFiles();
-                    }
-                    if (!this.running || !this.lastRunStart || this.forceClosedCapture) {
+                    if (!this.running) {
                         await funct();
                     }
                     const now = Date.now();
                     if (this.shouldIndexFs || !this.lastIndexFs || (now - this.lastIndexFs) > (1000 * 60 * 5)) {
-                        logger.log(`Indexing FS: ${JSON.stringify({
+                        logger.debug(`Indexing FS: ${JSON.stringify({
                             shouldIndexFs: this.shouldIndexFs,
                             lastIndexFs: this.lastIndexFs,
                         })}`);
-                        this.indexFs();
+                        await this.indexFs();
                         this.lastIndexFs = now;
-                        logger.log(`${this.scanData.length} videoclips found`);
+                        logger.debug(`${this.scanData.length} videoclips found`);
                     }
                 }
             }
@@ -49701,14 +49694,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
         return thumbnailMo;
     }
-    removeVideoClips(...videoClipIds) {
+    async removeVideoClips(...videoClipIds) {
         this.console.log('Removing videoclips ', videoClipIds.join(', '));
         const logger = this.getLogger();
         for (const videoClipId of videoClipIds) {
             const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
-            fs_1.default.rmSync(videoClipPath);
+            await fs_1.default.promises.rm(videoClipPath);
             logger.log(`Videoclip ${videoClipId} removed`);
-            fs_1.default.rmSync(thumbnailPath);
+            await fs_1.default.promises.rm(thumbnailPath);
             logger.log(`Thumbnail ${thumbnailPath} removed`);
         }
         return;
@@ -49717,19 +49710,19 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
         let occupiedSizeInBytes = 0;
-        function calculateSize(currentPath) {
-            const entries = fs_1.default.readdirSync(currentPath, { withFileTypes: true });
+        const calculateSize = async (currentPath) => {
+            const entries = await fs_1.default.promises.readdir(currentPath, { withFileTypes: true });
             for (const entry of entries) {
                 const fullPath = path_1.default.join(currentPath, entry.name);
                 if (entry.isDirectory()) {
                     calculateSize(fullPath);
                 }
                 else if (entry.isFile()) {
-                    const stats = fs_1.default.statSync(fullPath);
+                    const stats = await fs_1.default.promises.stat(fullPath);
                     occupiedSizeInBytes += stats.size;
                 }
             }
-        }
+        };
         calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
@@ -49737,7 +49730,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         logger.log(`Occupied space: ${occupiedSpaceInGb} GB`);
         const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
         if (freeMemory <= cleanupMemoryThresholderInGb) {
-            const files = fs_1.default.readdirSync(videoClipsFolder);
+            const files = await fs_1.default.promises.readdir(videoClipsFolder);
             const fileDetails = files
                 .map((file) => {
                 const match = file.match(videoClipRegex);
@@ -49753,35 +49746,41 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             logger.log(`Deleting ${clipsToCleanup} oldest files...`);
             for (let i = 0; i < clipsToCleanup; i++) {
                 const { fullPath, file } = fileDetails[i];
-                fs_1.default.rmSync(fullPath);
+                await fs_1.default.promises.rm(fullPath);
                 logger.log(`Deleted videoclip: ${file}`);
                 const { thumbnailPath } = this.getStorageDirs(file);
-                fs_1.default.rmSync(thumbnailPath);
+                await fs_1.default.promises.rm(thumbnailPath);
                 logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
         }
     }
-    indexFs() {
+    async indexFs() {
+        const logger = this.getLogger();
         const { videoClipsFolder } = this.getStorageDirs();
         const filesData = [];
-        const entries = fs_1.default.readdirSync(videoClipsFolder, { withFileTypes: true });
-        const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4'));
+        const entries = (await fs_1.default.promises.readdir(videoClipsFolder, { withFileTypes: true })) || [];
+        const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4')) || [];
         for (const entry of filteredEntries) {
-            const { videoClipPath, thumbnailPath, filename } = this.getStorageDirs(entry.name);
-            const stats = fs_1.default.statSync(videoClipPath);
-            const [_, startTime, endTime, detectionsHash] = entry.name.match(videoClipRegex);
-            const detectionClasses = [];
-            const detectionFlags = detectionsHash.split('');
-            detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(detectionClassIndexReversed[index]));
-            filesData.push({
-                detectionClasses,
-                endTime: Number(endTime),
-                startTime: Number(startTime),
-                size: stats.size,
-                filename,
-                thumbnailPath,
-                videoClipPath
-            });
+            try {
+                const { videoClipPath, thumbnailPath, filename } = this.getStorageDirs(entry.name);
+                const stats = await fs_1.default.promises.stat(videoClipPath);
+                const [_, startTime, endTime, detectionsHash] = entry.name.match(videoClipRegex);
+                const detectionClasses = [];
+                const detectionFlags = detectionsHash.split('');
+                detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(detectionClassIndexReversed[index]));
+                filesData.push({
+                    detectionClasses,
+                    endTime: Number(endTime),
+                    startTime: Number(startTime),
+                    size: stats.size,
+                    filename,
+                    thumbnailPath,
+                    videoClipPath
+                });
+            }
+            catch (e) {
+                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`);
+            }
         }
         this.scanData = filesData;
     }
@@ -49798,21 +49797,21 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async triggerMotionRecording() {
         if (!this.recording) {
-            this.startNewRecording();
+            await this.startNewRecording();
         }
         else {
             const logger = this.getLogger();
-            const { postEventSeconds, maxLength } = this.storageSettings.values;
+            const { maxLength } = this.storageSettings.values;
             const currentDuration = Date.now() - this.recordingTimeStart;
-            const shouldExtend = currentDuration <= (postEventSeconds * 1000) && currentDuration < (maxLength * 1000);
+            const shouldExtend = currentDuration <= (this.clipDurationInMs) && currentDuration < (maxLength * 1000);
             logger.debug(`Log extension check: ${JSON.stringify({
                 shouldExtend,
                 currentDuration,
-                postEventSeconds,
+                postEventSeconds: this.clipDurationInMs / 1000,
                 maxLength
             })}`);
             if (shouldExtend) {
-                this.extendRecording();
+                await this.extendRecording();
             }
         }
     }
@@ -49838,10 +49837,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async saveThumbnail(filename) {
         const logger = this.getLogger();
         return new Promise((resolve) => {
-            const { preEventSeconds } = this.storageSettings.values;
             const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
             const snapshotFfmpeg = (0, child_process_1.spawn)(this.ffmpegPath, [
-                '-ss', (preEventSeconds + 1).toString(),
+                '-ss', (this.prebuffer / (2 * 1000)).toString(),
                 // '-ss', '00:00:05',
                 '-i', `${videoClipPath}`,
                 thumbnailPath
@@ -49858,73 +49856,68 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             });
         });
     }
-    async saveVideoClip() {
-        await this.stopCapture();
-        const { preEventSeconds } = this.storageSettings.values;
+    async startSaveVideoClip() {
+        this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
-        const endTime = Date.now();
-        const filename = this.getVideoClipName(endTime);
-        const { tmpFolder, videoClipPath } = this.getStorageDirs(filename);
-        const allSegments = fs_1.default.readdirSync(tmpFolder);
-        const segments = allSegments
-            .sort((a, b) => {
-            const numA = parseInt(a.match(/\d+/)[0]);
-            const numB = parseInt(b.match(/\d+/)[0]);
-            return numA - numB;
-        })
-            .filter(segment => {
-            const segmentIndex = parseInt(segment.match(/\d+/)[0]);
-            const lowOk = this.eventSegment ? segmentIndex >= (this.eventSegment - preEventSeconds) : true;
-            const highOk = this.saveSegment ? segmentIndex <= this.saveSegment : true;
-            const matches = lowOk && highOk;
-            logger.log(`Filtering segment: ${JSON.stringify({
-                segment,
-                segmentIndex,
-                lowOk,
-                highOk,
-                matches,
-            })}`);
-            return matches;
-        })
-            .map(file => path_1.default.join(tmpFolder, file));
-        logger.log(`Saving videoclip. ${JSON.stringify({
-            currentSegment: this.currentSegment,
-            eventSegment: this.eventSegment,
-            saveSegment: this.saveSegment,
-            segments: segments.length
-        })}`);
-        const concatFfmpeg = (0, child_process_1.spawn)(this.ffmpegPath, [
-            '-i', `concat:${segments.join('|')}`,
-            '-c', 'copy',
-            videoClipPath
-        ]);
-        concatFfmpeg.stdout.on('data', (data) => {
+        const now = Date.now();
+        const tmpFilename = 'tmp_clip.mp4';
+        const { videoClipPath: tmpVideoClipPath } = this.getStorageDirs(tmpFilename);
+        logger.log(`Start saving videoclip: ${now}`);
+        this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
+            '-rtsp_transport', 'tcp',
+            '-i', this.rtspUrl,
+            '-c:v', 'copy',
+            '-f', 'mp4',
+            tmpVideoClipPath,
+        ], {
+            stdio: ['pipe', 'pipe', 'pipe'],
+            detached: false
+        });
+        this.saveFfmpegProcess.stdout.on('data', (data) => {
             logger.debug('Generation stdout:', data.toString());
         });
-        concatFfmpeg.stderr.on('data', (data) => {
+        this.saveFfmpegProcess.stderr.on('data', (data) => {
             logger.debug('Generatio nstderr:', data.toString());
         });
-        concatFfmpeg.on('close', async () => {
+        this.saveFfmpegProcess.on('close', async (code) => {
+            let currentChecks = 0;
+            let found = false;
+            while (currentChecks < 5 && !found) {
+                try {
+                    await fs_1.default.promises.access(tmpVideoClipPath);
+                    found = true;
+                }
+                catch {
+                    logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
+                    currentChecks += 1;
+                    await (0, sleep_1.sleep)(1000);
+                }
+            }
+            const endTime = Date.now();
+            const filename = this.getVideoClipName(endTime);
+            const { videoClipPath } = this.getStorageDirs(filename);
+            await fs_1.default.promises.rename(tmpVideoClipPath, videoClipPath);
             logger.log(`Videoclip stored ${videoClipPath}`);
             await this.saveThumbnail(filename);
             this.recording = false;
-            this.saveSegment = undefined;
-            this.eventSegment = undefined;
             this.classesDetected = [];
             this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
-            this.cleanupTmpFiles();
-            await this.startCapture();
+            await this.cleanupTmpFiles();
             this.shouldIndexFs = true;
             this.lastIndexFs = Date.now();
         });
+    }
+    async stopSaveViddeoClip() {
+        const logger = this.getLogger();
+        logger.log('Stopping videoclip');
+        this.saveFfmpegProcess.kill('SIGINT');
     }
     restartTimeout() {
         const logger = this.getLogger();
         this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
         this.saveRecordingListener = setTimeout(async () => {
-            this.saveSegment = this.currentSegment;
-            this.saveVideoClip().catch(logger.log);
-        }, this.storageSettings.values.postEventSeconds * 1000);
+            await this.stopSaveViddeoClip();
+        }, this.clipDurationInMs);
     }
     async extendRecording() {
         const logger = this.getLogger();
@@ -49935,16 +49928,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.restartTimeout();
         }
     }
-    startNewRecording() {
+    async startNewRecording() {
         const logger = this.getLogger();
         this.recordingTimeStart = Date.now();
         this.recording = true;
-        this.eventSegment = this.currentSegment;
         logger.log(`Starting new recording: ${JSON.stringify({
             recordingTimeStart: this.recordingTimeStart,
-            currentSegment: this.currentSegment,
-            eventSegment: this.eventSegment,
         })}`);
+        await this.startSaveVideoClip();
         this.restartTimeout();
     }
     async startListeners() {
@@ -49967,176 +49958,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         catch (e) {
             logger.log('Error in startListeners', e);
         }
-    }
-    async stopCapture() {
-        const logger = this.getLogger();
-        if (this.segmentsFfmpegProcess && !this.segmentsFfmpegProcess.killed) {
-            await new Promise((resolve, reject) => {
-                try {
-                    this.segmentsFfmpegProcess.kill('SIGTERM');
-                    const forceKillTimeout = setTimeout(() => {
-                        this.segmentsFfmpegProcess.kill('SIGKILL');
-                        resolve();
-                    }, 5000);
-                    this.segmentsFfmpegProcess.on('exit', () => {
-                        logger.log('Capture process terminated');
-                        clearTimeout(forceKillTimeout);
-                        resolve();
-                    });
-                }
-                catch (error) {
-                    logger.log('Error stopping FFmpeg:', error);
-                    reject();
-                }
-            });
-        }
-        try {
-            process.kill(this.segmentsFfmpegProcess.pid, 'SIGTERM');
-        }
-        catch (e) { }
-    }
-    async startContinuousCapture() {
-        const logger = this.getLogger();
-        const { tmpFolder } = this.getStorageDirs();
-        logger.log(`Starting prebuffer capture in folder${tmpFolder}`);
-        try {
-            this.segmentsFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
-                '-rtsp_transport', 'tcp',
-                '-i', this.rtspUrl,
-                '-c:v', 'libx264',
-                '-f', 'segment',
-                '-segment_time', '1',
-                '-segment_format', 'mpegts',
-                '-reset_timestamps', '1',
-                '-force_key_frames', 'expr:gte(t,n_forced*1)',
-                `${tmpFolder}/segment%03d.ts`,
-            ], {
-                stdio: ['pipe', 'pipe', 'pipe'],
-                detached: false
-            });
-            this.storageSettings.values.processPid = this.segmentsFfmpegProcess.pid;
-            this.segmentsFfmpegProcess.stderr.on('data', (data) => {
-                const output = data.toString();
-                if (output.includes('Error') || output.includes('error')) {
-                    logger.log('FFmpeg error:', output);
-                }
-                const match = output.match(/Opening '(.+?)' for writing/);
-                if (match) {
-                    const lastSegment = match[1]; // Nome completo del segmento
-                    const segmentNumber = lastSegment.match(/segment(\d+)\.ts/)[1];
-                    this.currentSegment = parseInt(segmentNumber);
-                }
-            });
-            this.segmentsFfmpegProcess.on('error', (error) => {
-                logger.log('FFmpeg error:', error);
-            });
-            this.segmentsFfmpegProcess.stdout.on('data', (data) => {
-                logger.log('Capture stdout:', data.toString());
-            });
-            this.segmentsFfmpegProcess.stdout.on('exit', (code, signal) => {
-                if (code !== 0) {
-                    logger.log(`FFmpeg exited with code ${code}, signal: ${signal}`);
-                    this.forceClosedCapture = true;
-                }
-            });
-        }
-        catch (e) {
-            logger.log('Error in startCapture', e);
-        }
-    }
-    async startCapture() {
-        const logger = this.getLogger();
-        const { tmpFolder } = this.getStorageDirs();
-        logger.log(`Starting prebuffer capture in folder${tmpFolder}`);
-        try {
-            this.segmentsFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
-                '-rtsp_transport', 'tcp',
-                '-i', this.rtspUrl,
-                '-c:v', 'libx264',
-                '-f', 'segment',
-                '-segment_time', '1',
-                '-segment_format', 'mpegts',
-                '-reset_timestamps', '1',
-                // '-force_key_frames', 'expr:gte(t,n_forced*1)',
-                '-reconnect', '1',
-                '-reconnect_at_eof', '1',
-                '-reconnect_streamed', '1',
-                '-reconnect_delay_max', '2',
-                '-y',
-                `${tmpFolder}/segment%03d.ts`,
-            ], {
-                stdio: ['pipe', 'pipe', 'pipe'],
-                detached: false
-            });
-            this.storageSettings.values.processPid = this.segmentsFfmpegProcess.pid;
-            this.segmentsFfmpegProcess.stderr.on('data', (data) => {
-                const output = data.toString();
-                logger.debug('Capture data: ', output);
-                if (!this.storageSettings.values.debug) {
-                    if (output.includes('Error') || output.includes('error')) {
-                        logger.log('FFmpeg error:', output);
-                    }
-                }
-                const match = output.match(/Opening '(.+?)' for writing/);
-                if (match) {
-                    const lastSegment = match[1]; // Nome completo del segmento
-                    const segmentNumber = lastSegment.match(/segment(\d+)\.ts/)[1];
-                    this.currentSegment = parseInt(segmentNumber);
-                }
-            });
-            this.segmentsFfmpegProcess.on('error', (error) => {
-                logger.log('FFmpeg error:', error);
-            });
-            this.segmentsFfmpegProcess.stdout.on('data', (data) => {
-                logger.log('Capture stdout:', data.toString());
-            });
-            this.segmentsFfmpegProcess.stdout.on('exit', (code, signal) => {
-                // if (code !== 0) {
-                logger.log(`FFmpeg exited with code ${code}, signal: ${signal}`);
-                this.forceClosedCapture = true;
-                // }
-            });
-        }
-        catch (e) {
-            logger.log('Error in startCapture', e);
-        }
-    }
-    watchSegments() {
-        const logger = this.getLogger();
-        logger.log('Starting segments watcher');
-        const { tmpFolder } = this.getStorageDirs();
-        this.segmentsListener = setInterval(async () => {
-            try {
-                if (!fs_1.default.existsSync(tmpFolder)) {
-                    return;
-                }
-                const { maxLength } = this.storageSettings.values;
-                const segmentsToKeep = maxLength * 2;
-                const files = fs_1.default.readdirSync(tmpFolder)
-                    .filter(file => {
-                    const fullPath = path_1.default.join(tmpFolder, file);
-                    return fs_1.default.statSync(fullPath).isFile();
-                }).sort((a, b) => {
-                    return fs_1.default.statSync(path_1.default.join(tmpFolder, b)).mtime.getTime() -
-                        fs_1.default.statSync(path_1.default.join(tmpFolder, a)).mtime.getTime();
-                });
-                if (files.length > segmentsToKeep) {
-                    const filesToRemove = files.slice(segmentsToKeep);
-                    filesToRemove.forEach(file => {
-                        const fullPath = path_1.default.join(tmpFolder, file);
-                        try {
-                            fs_1.default.unlinkSync(fullPath);
-                        }
-                        catch (error) {
-                            logger.log(`Error in removing segment: ${file}`);
-                        }
-                    });
-                }
-            }
-            catch (err) {
-                logger.log(`Segment management error: ${err.message}`, 'error');
-            }
-        }, 10000);
     }
     async getVideoclipWebhookUrls(filename) {
         const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: true });
