@@ -97,6 +97,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     scanData: VideoclipFileData[] = [];
     scanFsListener: NodeJS.Timeout;
 
+    processListenersSet = false;
+
     storageSettings = new StorageSettings(this, {
         highQualityVideoclips: {
             title: 'High quality clips',
@@ -178,10 +180,14 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             try {
                 if (!this.killed) {
                     try {
-                        process.on('exit', this.resetListeners);
-                        process.on('SIGINT', this.resetListeners);
-                        process.on('SIGTERM', this.resetListeners);
-                        process.on('uncaughtException', this.resetListeners);
+                        if (!this.processListenersSet) {
+                            process.on('exit', this.resetListeners);
+                            process.on('SIGINT', this.resetListeners);
+                            process.on('SIGTERM', this.resetListeners);
+                            process.on('uncaughtException', this.resetListeners);
+
+                            this.processListenersSet = true;
+                        }
 
                         this.ffmpegPath = await sdk.mediaManager.getFFmpegPath();
                         const processPid = this.storageSettings.values.processPid;
