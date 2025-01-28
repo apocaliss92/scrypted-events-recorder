@@ -27,7 +27,6 @@ const detectionClassIndexReversed = Object.entries(detectionClassIndex)
     .reduce((tot, [detectionClass, index]) => ({ ...tot, [index]: detectionClass }), {});
 
 const defaultClasses = [
-    DetectionClass.Motion,
     DetectionClass.Person,
     DetectionClass.Vehicle,
     DetectionClass.Animal,
