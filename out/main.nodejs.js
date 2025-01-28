@@ -49441,6 +49441,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.recording = false;
         this.classesDetected = [];
         this.scanData = [];
+        this.processListenersSet = false;
         this.storageSettings = new storage_settings_1.StorageSettings(this, {
             highQualityVideoclips: {
                 title: 'High quality clips',
@@ -49502,18 +49503,17 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         setTimeout(async () => {
             try {
                 if (!this.killed) {
-                    try {
+                    if (!this.processListenersSet) {
                         process.on('exit', this.resetListeners);
                         process.on('SIGINT', this.resetListeners);
                         process.on('SIGTERM', this.resetListeners);
                         process.on('uncaughtException', this.resetListeners);
-                        this.ffmpegPath = await sdk_1.default.mediaManager.getFFmpegPath();
-                        const processPid = this.storageSettings.values.processPid;
-                        processPid && process.kill(processPid, 'SIGTERM');
-                        await (0, sleep_1.sleep)(5000);
+                        this.processListenersSet = true;
                     }
-                    catch (e) {
-                        logger.log('Error killing process', e);
+                    this.ffmpegPath = await sdk_1.default.mediaManager.getFFmpegPath();
+                    const processPid = this.storageSettings.values.processPid;
+                    try {
+                        processPid && process.kill(processPid, 'SIGTERM');
                     }
                     finally {
                         this.storageSettings.values.processPid = undefined;
@@ -49681,22 +49681,24 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         return videoclips;
     }
     async getVideoClip(videoId) {
-        const { videoClipPath } = await this.getStorageDirs(videoId);
-        this.console.log('Fetching videoId ', videoId, videoClipPath);
+        const logger = this.getLogger();
+        const { videoClipPath } = this.getStorageDirs(videoId);
+        logger.debug('Fetching videoId ', videoId, videoClipPath);
         const fileURLToPath = url_1.default.pathToFileURL(videoClipPath).toString();
         const videoclipMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
         return videoclipMo;
     }
     async getVideoClipThumbnail(thumbnailId, options) {
+        const logger = this.getLogger();
         const { thumbnailPath } = await this.getStorageDirs(thumbnailId);
-        this.console.log('Fetching thumbnailId ', thumbnailId, thumbnailPath);
+        logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
         const fileURLToPath = url_1.default.pathToFileURL(thumbnailPath).toString();
         const thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
         return thumbnailMo;
     }
     async removeVideoClips(...videoClipIds) {
-        this.console.log('Removing videoclips ', videoClipIds.join(', '));
         const logger = this.getLogger();
+        logger.debug('Removing videoclips ', videoClipIds.join(', '));
         for (const videoClipId of videoClipIds) {
             const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
             await fs_1.default.promises.rm(videoClipPath);
@@ -50130,7 +50132,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             // const [_, __, ___, ____, webhook] = url.pathname.split('/');
             const { deviceId, filename, parameters } = JSON.parse(params);
             const dev = this.currentMixins[deviceId];
-            const devConsole = dev.console;
+            const devConsole = dev.getLogger();
             devConsole.debug(`Request with parameters: ${JSON.stringify({
                 webhook,
                 deviceId,

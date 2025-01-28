@@ -94,7 +94,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
       // const [_, __, ___, ____, webhook] = url.pathname.split('/');
       const { deviceId, filename, parameters } = JSON.parse(params);
       const dev: EventsRecorderMixin = this.currentMixins[deviceId];
-      const devConsole = dev.console;
+      const devConsole = dev.getLogger();
       devConsole.debug(`Request with parameters: ${JSON.stringify({
         webhook,
         deviceId,

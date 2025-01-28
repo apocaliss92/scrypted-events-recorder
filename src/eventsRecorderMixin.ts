@@ -1,4 +1,4 @@
-import sdk, { Camera, EventListenerRegister, MediaObject, ObjectsDetected, ScryptedDevice, ScryptedDeviceBase, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, VideoCamera, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoFrame, VideoFrameGenerator, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { Camera, EventListenerRegister, MediaObject, ObjectsDetected, ScryptedDevice, ScryptedDeviceBase, ScryptedInterface, Setting, Settings, VideoCamera, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import ObjectDetectionPlugin from './main';
@@ -179,22 +179,19 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         setTimeout(async () => {
             try {
                 if (!this.killed) {
+                    if (!this.processListenersSet) {
+                        process.on('exit', this.resetListeners);
+                        process.on('SIGINT', this.resetListeners);
+                        process.on('SIGTERM', this.resetListeners);
+                        process.on('uncaughtException', this.resetListeners);
+
+                        this.processListenersSet = true;
+                    }
+
+                    this.ffmpegPath = await sdk.mediaManager.getFFmpegPath();
+                    const processPid = this.storageSettings.values.processPid;
                     try {
-                        if (!this.processListenersSet) {
-                            process.on('exit', this.resetListeners);
-                            process.on('SIGINT', this.resetListeners);
-                            process.on('SIGTERM', this.resetListeners);
-                            process.on('uncaughtException', this.resetListeners);
-
-                            this.processListenersSet = true;
-                        }
-
-                        this.ffmpegPath = await sdk.mediaManager.getFFmpegPath();
-                        const processPid = this.storageSettings.values.processPid;
                         processPid && process.kill(processPid, 'SIGTERM');
-                        await sleep(5000);
-                    } catch (e) {
-                        logger.log('Error killing process', e);
                     } finally {
                         this.storageSettings.values.processPid = undefined;
                     }
@@ -208,7 +205,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }, 2000);
     }
 
-    private getLogger() {
+    public getLogger() {
         const deviceConsole = this.console;
 
         if (!this.logger) {
@@ -384,8 +381,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async getVideoClip(videoId: string): Promise<MediaObject> {
-        const { videoClipPath } = await this.getStorageDirs(videoId);
-        this.console.log('Fetching videoId ', videoId, videoClipPath);
+        const logger = this.getLogger();
+        const { videoClipPath } = this.getStorageDirs(videoId);
+        logger.debug('Fetching videoId ', videoId, videoClipPath);
         const fileURLToPath = url.pathToFileURL(videoClipPath).toString();
         const videoclipMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
 
@@ -393,8 +391,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async getVideoClipThumbnail(thumbnailId: string, options?: VideoClipThumbnailOptions): Promise<MediaObject> {
+        const logger = this.getLogger();
         const { thumbnailPath } = await this.getStorageDirs(thumbnailId);
-        this.console.log('Fetching thumbnailId ', thumbnailId, thumbnailPath);
+        logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
         const fileURLToPath = url.pathToFileURL(thumbnailPath).toString();
         const thumbnailMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
 
@@ -402,8 +401,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async removeVideoClips(...videoClipIds: string[]): Promise<void> {
-        this.console.log('Removing videoclips ', videoClipIds.join(', '));
         const logger = this.getLogger();
+        logger.debug('Removing videoclips ', videoClipIds.join(', '));
         for (const videoClipId of videoClipIds) {
             const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
             await fs.promises.rm(videoClipPath);
