@@ -49380,52 +49380,8 @@ const child_process_1 = __webpack_require__(/*! child_process */ "child_process"
 const lodash_1 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
 const sleep_1 = __webpack_require__(/*! @scrypted/common/src/sleep */ "../scrypted/common/src/sleep.ts");
+const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const { systemManager } = sdk_1.default;
-const detectionClassIndex = {
-    [detecionClasses_1.DetectionClass.Motion]: 0,
-    [detecionClasses_1.DetectionClass.Person]: 1,
-    [detecionClasses_1.DetectionClass.Vehicle]: 2,
-    [detecionClasses_1.DetectionClass.Animal]: 3,
-    [detecionClasses_1.DetectionClass.Face]: 4,
-    [detecionClasses_1.DetectionClass.Plate]: 5,
-    [detecionClasses_1.DetectionClass.Package]: 6,
-};
-const detectionClassIndexReversed = Object.entries(detectionClassIndex)
-    .reduce((tot, [detectionClass, index]) => ({ ...tot, [index]: detectionClass }), {});
-const defaultClasses = [
-    detecionClasses_1.DetectionClass.Person,
-    detecionClasses_1.DetectionClass.Vehicle,
-    detecionClasses_1.DetectionClass.Animal,
-    detecionClasses_1.DetectionClass.Face,
-    detecionClasses_1.DetectionClass.Plate,
-    detecionClasses_1.DetectionClass.Package,
-];
-const getMainDetectionClass = (detectionClasses) => {
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Face)) {
-        return detecionClasses_1.DetectionClass.Face;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Plate)) {
-        return detecionClasses_1.DetectionClass.Plate;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Package)) {
-        return detecionClasses_1.DetectionClass.Package;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Person)) {
-        return detecionClasses_1.DetectionClass.Person;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Animal)) {
-        return detecionClasses_1.DetectionClass.Animal;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Vehicle)) {
-        return detecionClasses_1.DetectionClass.Vehicle;
-    }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
-        return detecionClasses_1.DetectionClass.Motion;
-    }
-};
-const cleanupMemoryThresholderInGb = 10;
-const clipsToCleanup = 10;
-const videoClipRegex = new RegExp('(.*)_(.*)_(.*).mp4');
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
         super({
@@ -49470,8 +49426,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 title: 'Detection classes',
                 type: 'string',
                 multiple: true,
-                choices: Object.keys(detectionClassIndex),
-                defaultValue: defaultClasses
+                choices: Object.keys(util_1.detectionClassIndex),
+                defaultValue: util_1.defaultClasses
             },
             maxSpaceInGb: {
                 title: 'Dedicated memory in GB',
@@ -49544,9 +49500,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         return this.logger;
     }
-    async resetListeners(props) {
+    async resetListeners(props = {}) {
         const { skipMainLoop, skipDetectionListener } = props;
-        const logger = this.getLogger();
         this.running = false;
         if (!skipMainLoop) {
             this.mainLoopListener && clearInterval(this.mainLoopListener);
@@ -49560,16 +49515,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         this.saveRecordingListener && clearInterval(this.saveRecordingListener);
         this.saveRecordingListener = undefined;
-    }
-    async cleanupTmpFiles() {
-        const { tmpFolder } = this.getStorageDirs();
-        try {
-            await fs_1.default.promises.access(tmpFolder);
-            await fs_1.default.promises.rm(tmpFolder, { recursive: true, force: true });
-        }
-        finally {
-            await fs_1.default.promises.mkdir(tmpFolder, { recursive: true });
-        }
     }
     async init() {
         const logger = this.getLogger();
@@ -49601,7 +49546,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             catch (err) {
                 await fs_1.default.promises.mkdir(videoClipsFolder, { recursive: true });
             }
-            await this.cleanupTmpFiles();
         }
         catch (e) {
             logger.log('Error in init', e);
@@ -49656,7 +49600,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const { detectionClasses, endTime, filename, startTime } = item;
             if (startTime >= options.startTime && startTime <= options.endTime) {
                 const durationInMs = endTime - startTime;
-                const event = getMainDetectionClass(detectionClasses);
+                const event = (0, util_1.getMainDetectionClass)(detectionClasses);
                 const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
                 videoclips.push({
                     id: filename,
@@ -49736,11 +49680,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             occupied: occupiedSpaceInGbNumber,
             total: this.storageSettings.values.maxSpaceInGb
         });
-        if (freeMemory <= cleanupMemoryThresholderInGb) {
+        if (freeMemory <= util_1.cleanupMemoryThresholderInGb) {
             const files = await fs_1.default.promises.readdir(videoClipsFolder);
             const fileDetails = files
                 .map((file) => {
-                const match = file.match(videoClipRegex);
+                const match = file.match(util_1.videoClipRegex);
                 if (match) {
                     const timeStart = match[1];
                     const { videoClipPath } = this.getStorageDirs(file);
@@ -49750,8 +49694,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             })
                 .filter(Boolean);
             fileDetails.sort((a, b) => a.timeStart - b.timeStart);
-            logger.log(`Deleting ${clipsToCleanup} oldest files...`);
-            for (let i = 0; i < clipsToCleanup; i++) {
+            logger.log(`Deleting ${util_1.clipsToCleanup} oldest files...`);
+            for (let i = 0; i < util_1.clipsToCleanup; i++) {
                 const { fullPath, file } = fileDetails[i];
                 await fs_1.default.promises.rm(fullPath);
                 logger.log(`Deleted videoclip: ${file}`);
@@ -49771,10 +49715,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             try {
                 const { videoClipPath, thumbnailPath, filename } = this.getStorageDirs(entry.name);
                 const stats = await fs_1.default.promises.stat(videoClipPath);
-                const [_, startTime, endTime, detectionsHash] = entry.name.match(videoClipRegex);
+                const [_, startTime, endTime, detectionsHash] = entry.name.match(util_1.videoClipRegex);
                 const detectionClasses = [];
                 const detectionFlags = detectionsHash.split('');
-                detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(detectionClassIndexReversed[index]));
+                detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(util_1.detectionClassIndexReversed[index]));
                 filesData.push({
                     detectionClasses,
                     endTime: Number(endTime),
@@ -49802,64 +49746,26 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.killed = true;
         await this.resetListeners({});
     }
-    async triggerMotionRecording() {
-        if (!this.recording) {
-            await this.startNewRecording();
-        }
-        else {
-            const logger = this.getLogger();
-            const { maxLength } = this.storageSettings.values;
-            const currentDuration = Date.now() - this.recordingTimeStart;
-            const shouldExtend = currentDuration <= (this.clipDurationInMs) && currentDuration < (maxLength * 1000);
-            logger.debug(`Log extension check: ${JSON.stringify({
-                shouldExtend,
-                currentDuration,
-                postEventSeconds: this.clipDurationInMs / 1000,
-                maxLength
-            })}`);
-            if (shouldExtend) {
-                await this.extendRecording();
-            }
-        }
-    }
-    getVideoClipName(endTime) {
-        const logger = this.getLogger();
-        const detectionsHashComponents = new Array(10).fill(0);
-        Object.entries(detectionClassIndex).forEach(([detectionClass, index]) => {
-            if (this.classesDetected.includes(detectionClass) || detectionClass === detecionClasses_1.DetectionClass.Motion) {
-                detectionsHashComponents[index] = 1;
-            }
-        });
-        const detectionsHash = detectionsHashComponents.join('');
-        const filename = `${this.recordingTimeStart}_${endTime}_${detectionsHash}`;
-        logger.log(`Filename calculated: ${JSON.stringify({
-            filename,
-            detectionsHashComponents,
-            classesDetected: this.classesDetected,
-            allClasses: Object.entries(detectionClassIndex),
-            detectionsHash
-        })}`);
-        return filename;
-    }
     async saveThumbnail(filename) {
         const logger = this.getLogger();
         return new Promise((resolve) => {
             const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
             const snapshotFfmpeg = (0, child_process_1.spawn)(this.ffmpegPath, [
                 '-ss', (this.prebuffer / (2 * 1000)).toString(),
-                // '-ss', '00:00:05',
                 '-i', `${videoClipPath}`,
                 thumbnailPath
-            ]);
-            snapshotFfmpeg.stdout.on('data', (data) => {
-                logger.debug('Snapshot stdout:', data.toString());
+            ], {
+                stdio: ['pipe', 'pipe', 'pipe'],
+                detached: false
             });
-            snapshotFfmpeg.stderr.on('data', (data) => {
-                logger.debug('Snapshot nstderr:', data.toString());
-            });
-            snapshotFfmpeg.on('close', () => {
-                logger.log(`Snapshot stored ${thumbnailPath}`);
-                resolve();
+            (0, util_1.attachProcessEvents)({
+                processName: 'Thumbnail generator',
+                childProcess: snapshotFfmpeg,
+                logger,
+                onClose: async () => {
+                    logger.log(`Snapshot stored ${thumbnailPath}`);
+                    resolve();
+                }
             });
         });
     }
@@ -49881,38 +49787,42 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             detached: false
         });
         this.storageSettings.values.processPid = this.saveFfmpegProcess.pid;
-        this.saveFfmpegProcess.stdout.on('data', (data) => {
-            logger.debug('Generation stdout:', data.toString());
-        });
-        this.saveFfmpegProcess.stderr.on('data', (data) => {
-            logger.debug('Generatio nstderr:', data.toString());
-        });
-        this.saveFfmpegProcess.on('close', async (code) => {
-            let currentChecks = 0;
-            let found = false;
-            while (currentChecks < 5 && !found) {
-                try {
-                    await fs_1.default.promises.access(tmpVideoClipPath);
-                    found = true;
+        (0, util_1.attachProcessEvents)({
+            processName: 'Videoclip generator',
+            childProcess: this.saveFfmpegProcess,
+            logger,
+            onClose: async () => {
+                let currentChecks = 0;
+                let found = false;
+                while (currentChecks < 5 && !found) {
+                    try {
+                        await fs_1.default.promises.access(tmpVideoClipPath);
+                        found = true;
+                    }
+                    catch {
+                        logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
+                        currentChecks += 1;
+                        await (0, sleep_1.sleep)(1000);
+                    }
                 }
-                catch {
-                    logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
-                    currentChecks += 1;
-                    await (0, sleep_1.sleep)(1000);
-                }
+                const endTime = Date.now();
+                const filename = (0, util_1.getVideoClipName)({
+                    classesDetected: (0, lodash_1.uniq)(this.classesDetected),
+                    endTime,
+                    logger,
+                    startTime: this.recordingTimeStart,
+                });
+                const { videoClipPath } = this.getStorageDirs(filename);
+                await fs_1.default.promises.rename(tmpVideoClipPath, videoClipPath);
+                logger.log(`Videoclip stored ${videoClipPath}`);
+                await this.saveThumbnail(filename);
+                this.recording = false;
+                this.classesDetected = [];
+                this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
+                this.shouldIndexFs = true;
+                this.lastIndexFs = Date.now();
+                this.storageSettings.values.processPid = undefined;
             }
-            const endTime = Date.now();
-            const filename = this.getVideoClipName(endTime);
-            const { videoClipPath } = this.getStorageDirs(filename);
-            await fs_1.default.promises.rename(tmpVideoClipPath, videoClipPath);
-            logger.log(`Videoclip stored ${videoClipPath}`);
-            await this.saveThumbnail(filename);
-            this.recording = false;
-            this.classesDetected = [];
-            this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
-            await this.cleanupTmpFiles();
-            this.shouldIndexFs = true;
-            this.lastIndexFs = Date.now();
         });
     }
     async stopSaveViddeoClip() {
@@ -49921,30 +49831,41 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.saveFfmpegProcess.kill('SIGINT');
     }
     restartTimeout() {
-        const logger = this.getLogger();
         this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
         this.saveRecordingListener = setTimeout(async () => {
             await this.stopSaveViddeoClip();
         }, this.clipDurationInMs);
     }
-    async extendRecording() {
+    async triggerMotionRecording() {
         const logger = this.getLogger();
-        const now = Date.now();
-        if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
-            this.lastExtendLogged = now;
-            logger.log(`Extending recording: ${now}`);
+        if (!this.recording) {
+            this.recordingTimeStart = Date.now();
+            this.recording = true;
+            logger.log(`Starting new recording: ${JSON.stringify({
+                recordingTimeStart: this.recordingTimeStart,
+            })}`);
+            await this.startSaveVideoClip();
             this.restartTimeout();
         }
-    }
-    async startNewRecording() {
-        const logger = this.getLogger();
-        this.recordingTimeStart = Date.now();
-        this.recording = true;
-        logger.log(`Starting new recording: ${JSON.stringify({
-            recordingTimeStart: this.recordingTimeStart,
-        })}`);
-        await this.startSaveVideoClip();
-        this.restartTimeout();
+        else {
+            const { maxLength } = this.storageSettings.values;
+            const currentDuration = Date.now() - this.recordingTimeStart;
+            const shouldExtend = currentDuration <= (this.clipDurationInMs) && currentDuration < (maxLength * 1000);
+            logger.debug(`Log extension check: ${JSON.stringify({
+                shouldExtend,
+                currentDuration,
+                postEventSeconds: this.clipDurationInMs / 1000,
+                maxLength
+            })}`);
+            if (shouldExtend) {
+                const now = Date.now();
+                if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
+                    this.lastExtendLogged = now;
+                    logger.log(`Extending recording: ${now}`);
+                    this.restartTimeout();
+                }
+            }
+        }
     }
     async startListeners() {
         const logger = this.getLogger();
@@ -49952,12 +49873,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const { scoreThreshold, detectionClasses } = this.storageSettings.values;
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
-                const filtered = data.detections.filter(det => {
+                const filtered = this.recording ? data.detections : data.detections.filter(det => {
                     const classname = detecionClasses_1.detectionClassesDefaultMap[det.className];
                     return classname && detectionClasses.includes(classname) && det.score >= scoreThreshold;
                 });
                 if (filtered.length) {
-                    const classes = (0, lodash_1.uniq)(filtered.map(detect => detect.className));
+                    const classes = filtered.map(detect => detect.className);
                     this.classesDetected.push(...classes);
                     this.triggerMotionRecording().catch(logger.log);
                 }
@@ -49984,7 +49905,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             throw new Error('Storage path not defined on the plugin');
         }
         const deviceFolder = path_1.default.join(storagePath, this.cameraDevice.id);
-        const tmpFolder = path_1.default.join(deviceFolder, 'tmp');
         const videoClipsFolder = path_1.default.join(deviceFolder, 'videoclips');
         const thumbnailsFolder = path_1.default.join(deviceFolder, 'thumbnails');
         const filename = videoClipNameSrc?.split('.')?.[0] ?? videoClipNameSrc;
@@ -49993,7 +49913,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const tmpClipFilename = 'tmp_clip.mp4';
         return {
             deviceFolder,
-            tmpFolder,
             videoClipsFolder,
             thumbnailsFolder,
             videoClipPath,
@@ -50270,6 +50189,100 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
 }
 exports.EventsRecorderPlugin = EventsRecorderPlugin;
 exports["default"] = EventsRecorderPlugin;
+
+
+/***/ }),
+
+/***/ "./src/util.ts":
+/*!*********************!*\
+  !*** ./src/util.ts ***!
+  \*********************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getVideoClipName = exports.attachProcessEvents = exports.videoClipRegex = exports.clipsToCleanup = exports.cleanupMemoryThresholderInGb = exports.getMainDetectionClass = exports.defaultClasses = exports.detectionClassIndexReversed = exports.detectionClassIndex = void 0;
+const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
+exports.detectionClassIndex = {
+    [detecionClasses_1.DetectionClass.Motion]: 0,
+    [detecionClasses_1.DetectionClass.Person]: 1,
+    [detecionClasses_1.DetectionClass.Vehicle]: 2,
+    [detecionClasses_1.DetectionClass.Animal]: 3,
+    [detecionClasses_1.DetectionClass.Face]: 4,
+    [detecionClasses_1.DetectionClass.Plate]: 5,
+    [detecionClasses_1.DetectionClass.Package]: 6,
+};
+exports.detectionClassIndexReversed = Object.entries(exports.detectionClassIndex)
+    .reduce((tot, [detectionClass, index]) => ({ ...tot, [index]: detectionClass }), {});
+exports.defaultClasses = [
+    detecionClasses_1.DetectionClass.Person,
+    detecionClasses_1.DetectionClass.Vehicle,
+    detecionClasses_1.DetectionClass.Animal,
+    detecionClasses_1.DetectionClass.Face,
+    detecionClasses_1.DetectionClass.Plate,
+    detecionClasses_1.DetectionClass.Package,
+];
+const getMainDetectionClass = (detectionClasses) => {
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Face)) {
+        return detecionClasses_1.DetectionClass.Face;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Plate)) {
+        return detecionClasses_1.DetectionClass.Plate;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Package)) {
+        return detecionClasses_1.DetectionClass.Package;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Person)) {
+        return detecionClasses_1.DetectionClass.Person;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Animal)) {
+        return detecionClasses_1.DetectionClass.Animal;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Vehicle)) {
+        return detecionClasses_1.DetectionClass.Vehicle;
+    }
+    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
+        return detecionClasses_1.DetectionClass.Motion;
+    }
+};
+exports.getMainDetectionClass = getMainDetectionClass;
+exports.cleanupMemoryThresholderInGb = 10;
+exports.clipsToCleanup = 10;
+exports.videoClipRegex = new RegExp('(.*)_(.*)_(.*).mp4');
+const attachProcessEvents = (props) => {
+    const { processName, childProcess, onClose, logger } = props;
+    childProcess.stdout.on('data', (data) => {
+        logger.debug(`${processName} stdout: ${data.toString()}`);
+    });
+    childProcess.stderr.on('data', (data) => {
+        logger.debug(`${processName} stderr: ${data.toString()}`);
+    });
+    childProcess.on('close', async () => {
+        onClose && (await onClose());
+    });
+};
+exports.attachProcessEvents = attachProcessEvents;
+const getVideoClipName = (props) => {
+    const { startTime, classesDetected, endTime, logger } = props;
+    const detectionsHashComponents = new Array(10).fill(0);
+    Object.entries(exports.detectionClassIndex).forEach(([detectionClass, index]) => {
+        if (classesDetected.includes(detectionClass) || detectionClass === detecionClasses_1.DetectionClass.Motion) {
+            detectionsHashComponents[index] = 1;
+        }
+    });
+    const detectionsHash = detectionsHashComponents.join('');
+    const filename = `${startTime}_${endTime}_${detectionsHash}`;
+    logger.log(`Filename calculated: ${JSON.stringify({
+        filename,
+        detectionsHashComponents,
+        classesDetected,
+        allClasses: Object.entries(exports.detectionClassIndex),
+        detectionsHash
+    })}`);
+    return filename;
+};
+exports.getVideoClipName = getVideoClipName;
 
 
 /***/ }),
