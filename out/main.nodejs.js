@@ -49792,6 +49792,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             childProcess: this.saveFfmpegProcess,
             logger,
             onClose: async () => {
+                this.recording = false;
+                const endTime = Date.now();
                 let currentChecks = 0;
                 let found = false;
                 while (currentChecks < 5 && !found) {
@@ -49805,7 +49807,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                         await (0, sleep_1.sleep)(1000);
                     }
                 }
-                const endTime = Date.now();
                 const filename = (0, util_1.getVideoClipName)({
                     classesDetected: (0, lodash_1.uniq)(this.classesDetected),
                     endTime,
@@ -49816,7 +49817,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 await fs_1.default.promises.rename(tmpVideoClipPath, videoClipPath);
                 logger.log(`Videoclip stored ${videoClipPath}`);
                 await this.saveThumbnail(filename);
-                this.recording = false;
                 this.classesDetected = [];
                 this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
                 this.shouldIndexFs = true;
@@ -49849,13 +49849,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         else {
             const { maxLength } = this.storageSettings.values;
-            const currentDuration = Date.now() - this.recordingTimeStart;
-            const shouldExtend = currentDuration <= (this.clipDurationInMs) && currentDuration < (maxLength * 1000);
+            const currentDuration = (Date.now() - this.recordingTimeStart) / 1000;
+            const clipDuration = this.clipDurationInMs / 1000;
+            const shouldExtend = currentDuration < (maxLength - clipDuration);
             logger.debug(`Log extension check: ${JSON.stringify({
                 shouldExtend,
                 currentDuration,
-                postEventSeconds: this.clipDurationInMs / 1000,
-                maxLength
+                maxLength,
+                clipDuration
             })}`);
             if (shouldExtend) {
                 const now = Date.now();
