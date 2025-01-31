@@ -74,13 +74,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         maxSpaceInGb: {
             title: 'Dedicated memory in GB',
             type: 'number',
-            defaultValue: 250,
-            onPut: async () => this.storageSettings.settings.occupiedSpaceInGb.range = [0, this.storageSettings.values.maxSpaceInGb]
+            defaultValue: 20,
         },
         occupiedSpaceInGb: {
             title: 'Memory occupancy in GB',
             type: 'number',
-            range: [0, 250],
+            range: [0, 20],
             readonly: true,
             placeholder: 'GB'
         },
@@ -392,14 +391,16 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
-        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
+        const { maxSpaceInGb } = this.storageSettings.values;
+        const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
+        this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb]
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
 
         this.plugin.setMixinOccupancy(this.id, {
             free: freeMemory,
             occupied: occupiedSpaceInGbNumber,
-            total: this.storageSettings.values.maxSpaceInGb
+            total: maxSpaceInGb
         });
 
         if (freeMemory <= cleanupMemoryThresholderInGb) {

@@ -18,6 +18,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     ...getBaseSettings({
       onPluginSwitch: (_, enabled) => this.startStop(enabled),
       hideHa: true,
+      hideMqtt: true,
     }),
     storagePath: {
       title: 'Storage path',
