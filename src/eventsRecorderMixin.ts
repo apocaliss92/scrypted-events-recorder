@@ -1,4 +1,4 @@
-import sdk, { EventListenerRegister, MediaObject, ObjectsDetected, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, VideoRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, EventRecorder } from '@scrypted/sdk';
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import ObjectDetectionPlugin from './main';
@@ -13,6 +13,7 @@ import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defa
 
 const { systemManager } = sdk;
 
+// export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, VideoRecorder, EventRecorder {
 export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips {
     cameraDevice: DeviceType;
     killed: boolean;
@@ -68,7 +69,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             type: 'string',
             multiple: true,
             choices: Object.keys(detectionClassIndex),
-            defaultValue: defaultClasses
+            defaultValue: defaultClasses,
         },
         maxSpaceInGb: {
             title: 'Dedicated memory in GB',
@@ -144,6 +145,33 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             }
         }, 2000);
     }
+
+    // getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordedEvents', JSON.stringify({ options }));
+    //     throw new Error('Method not implemented.');
+    // }
+
+    // getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStream', JSON.stringify({ options, recordingStream }));
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamCurrentTime(recordingStream: MediaObject): Promise<number> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamCurrentTime', JSON.stringify({ recordingStream }));
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamOptions(): Promise<ResponseMediaStreamOptions[]> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamOptions');
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamThumbnail(time: number, options?: RecordingStreamThumbnailOptions): Promise<MediaObject> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamThumbnail', JSON.stringify({ options }));
+    //     throw new Error('Method not implemented.');
+    // }
 
     public getLogger() {
         const deviceConsole = this.console;
@@ -593,17 +621,22 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         try {
             const { scoreThreshold, detectionClasses } = this.storageSettings.values;
+
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
-                const filtered = this.recording ? data.detections : data.detections.filter(det => {
+                const filtered = data.detections.filter(det => {
                     const classname = detectionClassesDefaultMap[det.className];
 
                     return classname && detectionClasses.includes(classname) && det.score >= scoreThreshold;
                 });
+                const hasRelevantDetections = filtered.length;
 
-                if (filtered.length) {
+                if (hasRelevantDetections) {
                     const classes = filtered.map(detect => detect.className);
                     this.classesDetected.push(...classes);
+                }
+
+                if (hasRelevantDetections || this.recording) {
                     this.triggerMotionRecording().catch(logger.log);
                 }
             });

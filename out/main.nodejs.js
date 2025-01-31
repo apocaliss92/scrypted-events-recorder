@@ -49382,6 +49382,7 @@ const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifi
 const sleep_1 = __webpack_require__(/*! @scrypted/common/src/sleep */ "../scrypted/common/src/sleep.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const { systemManager } = sdk_1.default;
+// export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, VideoRecorder, EventRecorder {
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
         super({
@@ -49427,7 +49428,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 type: 'string',
                 multiple: true,
                 choices: Object.keys(util_1.detectionClassIndex),
-                defaultValue: util_1.defaultClasses
+                defaultValue: util_1.defaultClasses,
             },
             maxSpaceInGb: {
                 title: 'Dedicated memory in GB',
@@ -49483,6 +49484,31 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             }
         }, 2000);
     }
+    // getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordedEvents', JSON.stringify({ options }));
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStream', JSON.stringify({ options, recordingStream }));
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamCurrentTime(recordingStream: MediaObject): Promise<number> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamCurrentTime', JSON.stringify({ recordingStream }));
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamOptions(): Promise<ResponseMediaStreamOptions[]> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamOptions');
+    //     throw new Error('Method not implemented.');
+    // }
+    // getRecordingStreamThumbnail(time: number, options?: RecordingStreamThumbnailOptions): Promise<MediaObject> {
+    //     const logger = this.getLogger();
+    //     logger.log('getRecordingStreamThumbnail', JSON.stringify({ options }));
+    //     throw new Error('Method not implemented.');
+    // }
     getLogger() {
         const deviceConsole = this.console;
         if (!this.logger) {
@@ -49878,6 +49904,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     const classname = detecionClasses_1.detectionClassesDefaultMap[det.className];
                     return classname && detectionClasses.includes(classname) && det.score >= scoreThreshold;
                 });
+                if (data.detections.length) {
+                    this.console.log(JSON.stringify(data.detections));
+                }
                 if (filtered.length) {
                     const classes = filtered.map(detect => detect.className);
                     this.classesDetected.push(...classes);
