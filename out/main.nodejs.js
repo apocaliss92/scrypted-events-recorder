@@ -49433,13 +49433,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             maxSpaceInGb: {
                 title: 'Dedicated memory in GB',
                 type: 'number',
-                defaultValue: 250,
-                onPut: async () => this.storageSettings.settings.occupiedSpaceInGb.range = [0, this.storageSettings.values.maxSpaceInGb]
+                defaultValue: 20,
             },
             occupiedSpaceInGb: {
                 title: 'Memory occupancy in GB',
                 type: 'number',
-                range: [0, 250],
+                range: [0, 20],
                 readonly: true,
                 placeholder: 'GB'
             },
@@ -49698,13 +49697,15 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
-        const freeMemory = this.storageSettings.values.maxSpaceInGb - occupiedSpaceInGbNumber;
+        const { maxSpaceInGb } = this.storageSettings.values;
+        const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
+        this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb];
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
         this.plugin.setMixinOccupancy(this.id, {
             free: freeMemory,
             occupied: occupiedSpaceInGbNumber,
-            total: this.storageSettings.values.maxSpaceInGb
+            total: maxSpaceInGb
         });
         if (freeMemory <= util_1.cleanupMemoryThresholderInGb) {
             const files = await fs_1.default.promises.readdir(videoClipsFolder);
@@ -49900,16 +49901,19 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const { scoreThreshold, detectionClasses } = this.storageSettings.values;
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
-                const filtered = this.recording ? data.detections : data.detections.filter(det => {
+                const filtered = data.detections.filter(det => {
                     const classname = detecionClasses_1.detectionClassesDefaultMap[det.className];
                     return classname && detectionClasses.includes(classname) && det.score >= scoreThreshold;
                 });
-                if (data.detections.length) {
-                    this.console.log(JSON.stringify(data.detections));
-                }
-                if (filtered.length) {
+                const hasRelevantDetections = filtered.length;
+                if (hasRelevantDetections) {
                     const classes = filtered.map(detect => detect.className);
                     this.classesDetected.push(...classes);
+                }
+                const now = Date.now();
+                if ((hasRelevantDetections || this.recording) &&
+                    (!this.lastMotionTrigger || (now - this.lastMotionTrigger) > 1 * 1000)) {
+                    this.lastMotionTrigger = now;
                     this.triggerMotionRecording().catch(logger.log);
                 }
             });
@@ -50019,6 +50023,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             ...(0, basePlugin_1.getBaseSettings)({
                 onPluginSwitch: (_, enabled) => this.startStop(enabled),
                 hideHa: true,
+                hideMqtt: true,
             }),
             storagePath: {
                 title: 'Storage path',

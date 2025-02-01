@@ -29,6 +29,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     lastIndexFs: number;
     prebuffer: number;
     clipDurationInMs: number;
+    lastMotionTrigger: number;
 
     recording = false;
     saveRecordingListener: NodeJS.Timeout;
@@ -637,7 +638,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     this.classesDetected.push(...classes);
                 }
 
-                if (hasRelevantDetections || this.recording) {
+                const now = Date.now();
+                if (
+                    (hasRelevantDetections || this.recording) &&
+                    (!this.lastMotionTrigger || (now - this.lastMotionTrigger) > 1 * 1000)
+                ) {
+                    this.lastMotionTrigger = now;
                     this.triggerMotionRecording().catch(logger.log);
                 }
             });
