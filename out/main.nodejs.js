@@ -49546,7 +49546,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const { highQualityVideoclips, postEventSeconds } = this.storageSettings.values;
         const destination = highQualityVideoclips ? 'local-recorder' : 'remote-recorder';
         const streamConfigs = await this.cameraDevice.getVideoStreamOptions();
-        const streamConfig = streamConfigs.find(config => config.destinations.includes(destination));
+        let streamConfig = streamConfigs.find(config => config.destinations?.includes(destination));
+        // if (!streamConfig) {
+        //     const streamSettings = createStreamSettings(this);
+        //     const buildStream = highQualityVideoclips ? streamSettings.getRecordingStream(streamConfigs) :
+        //         streamSettings.getRemoteRecordingStream(streamConfigs);
+        //     const withAuth = await this.cameraDevice.getVideoStream(buildStream.stream);
+        //     this.console.log(buildStream, withAuth);
+        // }
         const streamName = streamConfig?.name;
         this.prebuffer = (streamConfig.prebuffer ?? 10000) / 2;
         this.clipDurationInMs = this.prebuffer + (postEventSeconds * 1000);
@@ -49821,6 +49828,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             onClose: async () => {
                 this.recording = false;
                 const endTime = Date.now();
+                this.lastClipRecordedTime = endTime;
                 let currentChecks = 0;
                 let found = false;
                 while (currentChecks < 5 && !found) {
@@ -49865,8 +49873,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async triggerMotionRecording() {
         const logger = this.getLogger();
+        const now = Date.now();
+        if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < 10 * 1000) {
+            return;
+        }
+        this.lastClipRecordedTime = undefined;
         if (!this.recording) {
-            this.recordingTimeStart = Date.now();
+            this.recordingTimeStart = now;
             this.recording = true;
             logger.log(`Starting new recording: ${JSON.stringify({
                 recordingTimeStart: this.recordingTimeStart,
@@ -49876,7 +49889,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         else {
             const { maxLength } = this.storageSettings.values;
-            const currentDuration = (Date.now() - this.recordingTimeStart) / 1000;
+            const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
             const shouldExtend = currentDuration < (maxLength - clipDuration);
             logger.debug(`Log extension check: ${JSON.stringify({
@@ -49886,7 +49899,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 clipDuration
             })}`);
             if (shouldExtend) {
-                const now = Date.now();
                 if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
                     this.lastExtendLogged = now;
                     logger.log(`Extending recording: ${now}`);
