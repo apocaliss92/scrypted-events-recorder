@@ -1,4 +1,4 @@
-import sdk, { EventListenerRegister, VideoRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, EventRecorder } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState, EventRecorder } from '@scrypted/sdk';
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import ObjectDetectionPlugin from './main';
@@ -6,16 +6,15 @@ import path from 'path';
 import fs from 'fs';
 import url from 'url';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { uniq } from 'lodash';
+import { sortBy, uniq } from 'lodash';
 import { DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
 import { sleep } from '@scrypted/common/src/sleep';
 import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
-// import { createStreamSettings } from '../../scrypted/plugins/prebuffer-mixin/src/stream-settings';
+import { classnamePrio } from '../../scrypted-advanced-notifier/src/detecionClasses';
 
 const { systemManager } = sdk;
 
-// export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, VideoRecorder, EventRecorder {
-export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips {
+export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, EventRecorder {
     cameraDevice: DeviceType;
     killed: boolean;
     rtspUrl: string;
@@ -39,6 +38,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     classesDetected: string[] = [];
 
     scanData: VideoclipFileData[] = [];
+    recordedEvents: RecordedEvent[] = [];
     scanFsListener: NodeJS.Timeout;
 
     processListenersSet = false;
@@ -152,32 +152,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }, 2000);
     }
 
-    // getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordedEvents', JSON.stringify({ options }));
-    //     throw new Error('Method not implemented.');
-    // }
-
-    // getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStream', JSON.stringify({ options, recordingStream }));
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamCurrentTime(recordingStream: MediaObject): Promise<number> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamCurrentTime', JSON.stringify({ recordingStream }));
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamOptions(): Promise<ResponseMediaStreamOptions[]> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamOptions');
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamThumbnail(time: number, options?: RecordingStreamThumbnailOptions): Promise<MediaObject> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamThumbnail', JSON.stringify({ options }));
-    //     throw new Error('Method not implemented.');
-    // }
+    async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
+        return this.recordedEvents.filter(item =>
+            item.details.eventTime > options.startTime &&
+            item.details.eventTime < options.endTime
+        ).slice(0, options.count);
+    }
 
     public getLogger() {
         const deviceConsole = this.console;
@@ -230,14 +210,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
         const streamConfigs = await this.cameraDevice.getVideoStreamOptions();
         let streamConfig = streamConfigs.find(config => config.destinations?.includes(destination));
-
-        // if (!streamConfig) {
-        //     const streamSettings = createStreamSettings(this);
-        //     const buildStream = highQualityVideoclips ? streamSettings.getRecordingStream(streamConfigs) :
-        //         streamSettings.getRemoteRecordingStream(streamConfigs);
-        //     const withAuth = await this.cameraDevice.getVideoStream(buildStream.stream);
-        //     this.console.log(buildStream, withAuth);
-        // }
 
         const streamName = streamConfig?.name;
         this.prebuffer = (streamConfig.prebuffer ?? 10000) / 2;
@@ -453,6 +425,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         const { videoClipsFolder } = this.getStorageDirs();
         const filesData: VideoclipFileData[] = [];
+        const recordedEvents: RecordedEvent[] = [];
 
         const entries = (await fs.promises.readdir(videoClipsFolder, { withFileTypes: true })) || [];
         const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4')) || [];
@@ -467,22 +440,38 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 const detectionClasses: DetectionClass[] = [];
                 const detectionFlags = detectionsHash.split('');
                 detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(detectionClassIndexReversed[index]));
+                const sortedClassnames = sortBy(detectionClasses,
+                    (classname) => classnamePrio[classname] ?? 100,
+                );
+                const startTimeNumber = Number(startTime);
+                const endTimeNumber = Number(endTime);
 
                 filesData.push({
                     detectionClasses,
-                    endTime: Number(endTime),
-                    startTime: Number(startTime),
+                    endTime: endTimeNumber,
+                    startTime: startTimeNumber,
                     size: stats.size,
                     filename,
                     thumbnailPath,
                     videoClipPath
                 });
+                recordedEvents.push({
+                    data: {},
+                    details: {
+                        eventId: filename,
+                        eventTime: startTimeNumber,
+                        eventInterface: sortedClassnames[0],
+                        mixinId: this.id,
+                    }
+                })
             } catch (e) {
                 logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`);
             }
         }
 
         this.scanData = filesData;
+        this.recordedEvents = recordedEvents;
+        this.console.log(recordedEvents);
     }
 
     async getMixinSettings(): Promise<Setting[]> {

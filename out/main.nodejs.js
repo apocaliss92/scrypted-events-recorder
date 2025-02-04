@@ -48518,7 +48518,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parentDetectionClassMap = exports.detectionClassesDefaultMap = exports.isLabelDetection = exports.isPackageClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.DetectionClass = void 0;
+exports.parentDetectionClassMap = exports.detectionClassesDefaultMap = exports.isLabelDetection = exports.isPackageClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.classnamePrio = exports.DetectionClass = void 0;
 var DetectionClass;
 (function (DetectionClass) {
     DetectionClass["Motion"] = "motion";
@@ -48531,6 +48531,15 @@ var DetectionClass;
     DetectionClass["DoorSensor"] = "sensor_open";
     DetectionClass["DoorLock"] = "lock_open";
 })(DetectionClass || (exports.DetectionClass = DetectionClass = {}));
+exports.classnamePrio = {
+    [DetectionClass.Face]: 1,
+    [DetectionClass.Plate]: 1,
+    [DetectionClass.Person]: 2,
+    [DetectionClass.Vehicle]: 3,
+    [DetectionClass.Animal]: 4,
+    [DetectionClass.Package]: 5,
+    [DetectionClass.Motion]: 6,
+};
 exports.defaultDetectionClasses = Object.values(DetectionClass);
 exports.animalClasses = [
     // General
@@ -49381,8 +49390,8 @@ const lodash_1 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash
 const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
 const sleep_1 = __webpack_require__(/*! @scrypted/common/src/sleep */ "../scrypted/common/src/sleep.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
+const detecionClasses_2 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
 const { systemManager } = sdk_1.default;
-// export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, VideoRecorder, EventRecorder {
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
         super({
@@ -49398,6 +49407,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.recording = false;
         this.classesDetected = [];
         this.scanData = [];
+        this.recordedEvents = [];
         this.processListenersSet = false;
         this.storageSettings = new storage_settings_1.StorageSettings(this, {
             highQualityVideoclips: {
@@ -49411,7 +49421,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 title: 'Post event seconds',
                 description: 'Seconds to keep after an event occurs.',
                 type: 'number',
-                defaultValue: 15,
+                defaultValue: 20,
             },
             maxLength: {
                 title: 'Max length in seconds',
@@ -49453,6 +49463,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 hide: true,
             },
         });
+        if (this.mixinDeviceInterfaces.includes(sdk_1.ScryptedInterface.Battery)) {
+            this.storageSettings.settings.maxLength.defaultValue = 30;
+            this.storageSettings.settings.postEventSeconds.defaultValue = 10;
+        }
         this.plugin.currentMixins[this.id] = this;
         const logger = this.getLogger();
         this.cameraDevice = systemManager.getDeviceById(this.id);
@@ -49483,31 +49497,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             }
         }, 2000);
     }
-    // getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordedEvents', JSON.stringify({ options }));
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStream', JSON.stringify({ options, recordingStream }));
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamCurrentTime(recordingStream: MediaObject): Promise<number> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamCurrentTime', JSON.stringify({ recordingStream }));
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamOptions(): Promise<ResponseMediaStreamOptions[]> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamOptions');
-    //     throw new Error('Method not implemented.');
-    // }
-    // getRecordingStreamThumbnail(time: number, options?: RecordingStreamThumbnailOptions): Promise<MediaObject> {
-    //     const logger = this.getLogger();
-    //     logger.log('getRecordingStreamThumbnail', JSON.stringify({ options }));
-    //     throw new Error('Method not implemented.');
-    // }
+    async getRecordedEvents(options) {
+        return this.recordedEvents.filter(item => item.details.eventTime > options.startTime &&
+            item.details.eventTime < options.endTime).slice(0, options.count);
+    }
     getLogger() {
         const deviceConsole = this.console;
         if (!this.logger) {
@@ -49547,13 +49540,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const destination = highQualityVideoclips ? 'local-recorder' : 'remote-recorder';
         const streamConfigs = await this.cameraDevice.getVideoStreamOptions();
         let streamConfig = streamConfigs.find(config => config.destinations?.includes(destination));
-        // if (!streamConfig) {
-        //     const streamSettings = createStreamSettings(this);
-        //     const buildStream = highQualityVideoclips ? streamSettings.getRecordingStream(streamConfigs) :
-        //         streamSettings.getRemoteRecordingStream(streamConfigs);
-        //     const withAuth = await this.cameraDevice.getVideoStream(buildStream.stream);
-        //     this.console.log(buildStream, withAuth);
-        // }
         const streamName = streamConfig?.name;
         this.prebuffer = (streamConfig.prebuffer ?? 10000) / 2;
         this.clipDurationInMs = this.prebuffer + (postEventSeconds * 1000);
@@ -49743,6 +49729,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const { videoClipsFolder } = this.getStorageDirs();
         const filesData = [];
+        const recordedEvents = [];
         const entries = (await fs_1.default.promises.readdir(videoClipsFolder, { withFileTypes: true })) || [];
         const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4')) || [];
         for (const entry of filteredEntries) {
@@ -49753,14 +49740,26 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 const detectionClasses = [];
                 const detectionFlags = detectionsHash.split('');
                 detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(util_1.detectionClassIndexReversed[index]));
+                const sortedClassnames = (0, lodash_1.sortBy)(detectionClasses, (classname) => detecionClasses_2.classnamePrio[classname] ?? 100);
+                const startTimeNumber = Number(startTime);
+                const endTimeNumber = Number(endTime);
                 filesData.push({
                     detectionClasses,
-                    endTime: Number(endTime),
-                    startTime: Number(startTime),
+                    endTime: endTimeNumber,
+                    startTime: startTimeNumber,
                     size: stats.size,
                     filename,
                     thumbnailPath,
                     videoClipPath
+                });
+                recordedEvents.push({
+                    data: {},
+                    details: {
+                        eventId: filename,
+                        eventTime: startTimeNumber,
+                        eventInterface: sortedClassnames[0],
+                        mixinId: this.id,
+                    }
                 });
             }
             catch (e) {
@@ -49768,6 +49767,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             }
         }
         this.scanData = filesData;
+        this.recordedEvents = recordedEvents;
+        this.console.log(recordedEvents);
     }
     async getMixinSettings() {
         const settings = await this.storageSettings.getSettings();
@@ -50215,6 +50216,9 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             const ret = [
                 sdk_1.ScryptedInterface.VideoClips,
                 sdk_1.ScryptedInterface.Settings,
+                sdk_1.ScryptedInterface.EventRecorder,
+                // ScryptedInterface.VideoRecorder,
+                // ScryptedInterface.VideoRecorderManagement,
             ];
             return ret;
         }
@@ -50720,7 +50724,7 @@ module.exports = webpackEmptyContext;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.98";
+exports.TYPES_VERSION = "0.3.102";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -50746,6 +50750,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
     ScryptedInterfaceProperty["rgb"] = "rgb";
     ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
     ScryptedInterfaceProperty["running"] = "running";
     ScryptedInterfaceProperty["paused"] = "paused";
     ScryptedInterfaceProperty["docked"] = "docked";
@@ -50754,6 +50759,9 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
     ScryptedInterfaceProperty["humidity"] = "humidity";
     ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
+    ScryptedInterfaceProperty["fontSize"] = "fontSize";
+    ScryptedInterfaceProperty["origin"] = "origin";
+    ScryptedInterfaceProperty["text"] = "text";
     ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
     ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
     ScryptedInterfaceProperty["lockState"] = "lockState";
@@ -50766,6 +50774,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["converters"] = "converters";
     ScryptedInterfaceProperty["binaryState"] = "binaryState";
     ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
     ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
     ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
     ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
@@ -50807,6 +50816,7 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
     ScryptedInterfaceMethod["setRgb"] = "setRgb";
     ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
     ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
     ScryptedInterfaceMethod["start"] = "start";
     ScryptedInterfaceMethod["stop"] = "stop";
@@ -50990,6 +51000,20 @@ exports.ScryptedInterfaceDescriptors = {
             "hsv"
         ]
     },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
     "Notifier": {
         "name": "Notifier",
         "methods": [
@@ -51099,6 +51123,15 @@ exports.ScryptedInterfaceDescriptors = {
             "setPrivacyMasks"
         ],
         "properties": []
+    },
+    "VideoTextOverlay": {
+        "name": "VideoTextOverlay",
+        "methods": [],
+        "properties": [
+            "fontSize",
+            "origin",
+            "text"
+        ]
     },
     "VideoRecorder": {
         "name": "VideoRecorder",
@@ -51314,6 +51347,13 @@ exports.ScryptedInterfaceDescriptors = {
         "methods": [],
         "properties": [
             "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
         ]
     },
     "PowerSensor": {
@@ -51791,6 +51831,8 @@ var ScryptedInterface;
     ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
     ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
     ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
     ScryptedInterface["Notifier"] = "Notifier";
     ScryptedInterface["StartStop"] = "StartStop";
     ScryptedInterface["Pause"] = "Pause";
@@ -51804,6 +51846,7 @@ var ScryptedInterface;
     ScryptedInterface["Display"] = "Display";
     ScryptedInterface["VideoCamera"] = "VideoCamera";
     ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlay"] = "VideoTextOverlay";
     ScryptedInterface["VideoRecorder"] = "VideoRecorder";
     ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
     ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
@@ -51830,6 +51873,7 @@ var ScryptedInterface;
     ScryptedInterface["Settings"] = "Settings";
     ScryptedInterface["BinarySensor"] = "BinarySensor";
     ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
     ScryptedInterface["PowerSensor"] = "PowerSensor";
     ScryptedInterface["AudioSensor"] = "AudioSensor";
     ScryptedInterface["MotionSensor"] = "MotionSensor";
