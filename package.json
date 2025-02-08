@@ -1,11 +1,11 @@
 {
   "name": "@apocaliss92/scrypted-events-recorder",
-  "description": "Basic object detector plugin",
+  "description": "Record events on detections or motion on a mounted volume",
   "repository": {
     "type": "git",
     "url": "https://github.com/apocaliss92/scrypted-events-recorder"
   },
-  "version": "0.0.10",
+  "version": "0.0.11",
   "scripts": {
     "scrypted-setup-project": "scrypted-setup-project",
     "prescrypted-setup-project": "scrypted-package-json",

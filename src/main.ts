@@ -174,6 +174,12 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
               deviceId,
             })}`);
             const thumbnailMo = await dev.getVideoClipThumbnail(filename);
+            if (!thumbnailMo) {
+              response.send('Generating', {
+                code: 400
+              });
+              return;
+            }
             const jpeg = await sdk.mediaManager.convertMediaObjectToBuffer(thumbnailMo, 'image/jpeg');
             response.send(jpeg, {
               headers: {
@@ -231,8 +237,6 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
         ScryptedInterface.VideoClips,
         ScryptedInterface.Settings,
         ScryptedInterface.EventRecorder,
-        // ScryptedInterface.VideoRecorder,
-        // ScryptedInterface.VideoRecorderManagement,
       ];
 
       return ret;

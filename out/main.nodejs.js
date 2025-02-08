@@ -49006,6 +49006,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
     constructor(nativeId, opts) {
         super(nativeId);
         this.opts = opts;
+        this.initializingMqtt = false;
         this.getHaApiUrl = async () => {
             const { haAccessToken, haAddress, haProtocol, useHaPluginCredentials } = this.storageSettings.values;
             let accessToken = haAccessToken;
@@ -49030,33 +49031,36 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             };
         };
     }
-    async getSettings() {
-        const { mqttEnabled, useMqttPluginCredentials, haEnabled, useHaPluginCredentials } = this.storageSettings.values;
-        const { haEnabled: haEnabledSetting, mqttEnabled: mqttEnabledSetting } = this.storageSettings.settings;
+    async applySettingsShow(storageSettings) {
+        const { mqttEnabled, useMqttPluginCredentials, haEnabled, useHaPluginCredentials } = storageSettings.values;
+        const { haEnabled: haEnabledSetting, mqttEnabled: mqttEnabledSetting } = storageSettings.settings;
         if (mqttEnabledSetting.hide || !mqttEnabled) {
-            this.storageSettings.settings.mqttHost.hide = true;
-            this.storageSettings.settings.mqttPassword.hide = true;
-            this.storageSettings.settings.mqttUsename.hide = true;
-            this.storageSettings.settings.useMqttPluginCredentials.hide = true;
+            storageSettings.settings.mqttHost.hide = true;
+            storageSettings.settings.mqttPassword.hide = true;
+            storageSettings.settings.mqttUsename.hide = true;
+            storageSettings.settings.useMqttPluginCredentials.hide = true;
         }
         else {
-            this.storageSettings.settings.mqttHost.hide = useMqttPluginCredentials;
-            this.storageSettings.settings.mqttPassword.hide = useMqttPluginCredentials;
-            this.storageSettings.settings.mqttUsename.hide = useMqttPluginCredentials;
-            this.storageSettings.settings.useMqttPluginCredentials.hide = false;
+            storageSettings.settings.mqttHost.hide = useMqttPluginCredentials;
+            storageSettings.settings.mqttPassword.hide = useMqttPluginCredentials;
+            storageSettings.settings.mqttUsename.hide = useMqttPluginCredentials;
+            storageSettings.settings.useMqttPluginCredentials.hide = false;
         }
         if (haEnabledSetting.hide || !haEnabled) {
-            this.storageSettings.settings.haAccessToken.hide = true;
-            this.storageSettings.settings.haProtocol.hide = true;
-            this.storageSettings.settings.haAddress.hide = true;
-            this.storageSettings.settings.useHaPluginCredentials.hide = true;
+            storageSettings.settings.haAccessToken.hide = true;
+            storageSettings.settings.haProtocol.hide = true;
+            storageSettings.settings.haAddress.hide = true;
+            storageSettings.settings.useHaPluginCredentials.hide = true;
         }
         else {
-            this.storageSettings.settings.haAccessToken.hide = useHaPluginCredentials;
-            this.storageSettings.settings.haProtocol.hide = useHaPluginCredentials;
-            this.storageSettings.settings.haAddress.hide = useHaPluginCredentials;
-            this.storageSettings.settings.useHaPluginCredentials.hide = false;
+            storageSettings.settings.haAccessToken.hide = useHaPluginCredentials;
+            storageSettings.settings.haProtocol.hide = useHaPluginCredentials;
+            storageSettings.settings.haAddress.hide = useHaPluginCredentials;
+            storageSettings.settings.useHaPluginCredentials.hide = false;
         }
+    }
+    async getSettings() {
+        this.applySettingsShow(this.storageSettings);
         const settings = await this.storageSettings.getSettings();
         return settings;
     }
@@ -49098,6 +49102,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
     async setupMqttClient() {
         const { mqttEnabled, useMqttPluginCredentials, pluginEnabled } = this.storageSettings.values;
         if (mqttEnabled && pluginEnabled) {
+            this.initializingMqtt = true;
             const logger = this.getLogger();
             if (this.mqttClient) {
                 this.mqttClient.disconnect();
@@ -49115,10 +49120,13 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             catch (e) {
                 logger.log('Error setting up MQTT client', e);
             }
+            finally {
+                this.initializingMqtt = false;
+            }
         }
     }
     async getMqttClient() {
-        if (!this.mqttClient) {
+        if (!this.mqttClient && !this.initializingMqtt) {
             await this.setupMqttClient();
         }
         return this.mqttClient;
@@ -49652,10 +49660,20 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async getVideoClipThumbnail(thumbnailId, options) {
         const logger = this.getLogger();
-        const { thumbnailPath } = await this.getStorageDirs(thumbnailId);
+        const { thumbnailPath } = this.getStorageDirs(thumbnailId);
         logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
         const fileURLToPath = url_1.default.pathToFileURL(thumbnailPath).toString();
-        const thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+        let thumbnailMo;
+        try {
+            await fs_1.default.promises.access(thumbnailPath);
+            thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+        }
+        catch (e) {
+            if (e.toString().includes('ENOENT')) {
+                await this.saveThumbnail(thumbnailId);
+                thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+            }
+        }
         return thumbnailMo;
     }
     async removeVideoClips(...videoClipIds) {
@@ -49734,8 +49752,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4')) || [];
         for (const entry of filteredEntries) {
             try {
-                const { videoClipPath, thumbnailPath, filename } = this.getStorageDirs(entry.name);
+                const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs(entry.name);
                 const stats = await fs_1.default.promises.stat(videoClipPath);
+                if (entry.name === tmpClipFilename) {
+                    continue;
+                }
                 const [_, startTime, endTime, detectionsHash] = entry.name.match(util_1.videoClipRegex);
                 const detectionClasses = [];
                 const detectionFlags = detectionsHash.split('');
@@ -49763,12 +49784,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 });
             }
             catch (e) {
-                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`);
+                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`, e);
             }
         }
         this.scanData = filesData;
         this.recordedEvents = recordedEvents;
-        this.console.log(recordedEvents);
     }
     async getMixinSettings() {
         const settings = await this.storageSettings.getSettings();
@@ -49783,6 +49803,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async saveThumbnail(filename) {
         const logger = this.getLogger();
+        logger.log(`Generating thumbnail for ${filename}`);
         return new Promise((resolve) => {
             const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
             const snapshotFfmpeg = (0, child_process_1.spawn)(this.ffmpegPath, [
@@ -49808,15 +49829,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const now = Date.now();
-        const tmpFilename = 'tmp_clip.mp4';
-        const { videoClipPath: tmpVideoClipPath } = this.getStorageDirs(tmpFilename);
+        const { tmpClipPath } = this.getStorageDirs();
         logger.log(`Start saving videoclip: ${now}`);
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
             '-c:v', 'copy',
             '-f', 'mp4',
-            tmpVideoClipPath,
+            tmpClipPath,
         ], {
             stdio: ['pipe', 'pipe', 'pipe'],
             detached: false
@@ -49834,7 +49854,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 let found = false;
                 while (currentChecks < 5 && !found) {
                     try {
-                        await fs_1.default.promises.access(tmpVideoClipPath);
+                        await fs_1.default.promises.access(tmpClipPath);
                         found = true;
                     }
                     catch {
@@ -49850,7 +49870,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     startTime: this.recordingTimeStart,
                 });
                 const { videoClipPath } = this.getStorageDirs(filename);
-                await fs_1.default.promises.rename(tmpVideoClipPath, videoClipPath);
+                await fs_1.default.promises.rename(tmpClipPath, videoClipPath);
                 logger.log(`Videoclip stored ${videoClipPath}`);
                 await this.saveThumbnail(filename);
                 this.classesDetected = [];
@@ -49958,6 +49978,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const videoClipPath = filename ? path_1.default.join(videoClipsFolder, `${filename}.mp4`) : undefined;
         const thumbnailPath = filename ? path_1.default.join(thumbnailsFolder, `${filename}.jpg`) : undefined;
         const tmpClipFilename = 'tmp_clip.mp4';
+        const tmpClipPath = path_1.default.join(videoClipsFolder, tmpClipFilename);
         return {
             deviceFolder,
             videoClipsFolder,
@@ -49965,7 +49986,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             videoClipPath,
             thumbnailPath,
             tmpClipFilename,
-            filename
+            filename,
+            tmpClipPath
         };
     }
 }
@@ -50171,6 +50193,12 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                         deviceId,
                     })}`);
                     const thumbnailMo = await dev.getVideoClipThumbnail(filename);
+                    if (!thumbnailMo) {
+                        response.send('Generating', {
+                            code: 400
+                        });
+                        return;
+                    }
                     const jpeg = await sdk_1.default.mediaManager.convertMediaObjectToBuffer(thumbnailMo, 'image/jpeg');
                     response.send(jpeg, {
                         headers: {
@@ -50217,8 +50245,6 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                 sdk_1.ScryptedInterface.VideoClips,
                 sdk_1.ScryptedInterface.Settings,
                 sdk_1.ScryptedInterface.EventRecorder,
-                // ScryptedInterface.VideoRecorder,
-                // ScryptedInterface.VideoRecorderManagement,
             ];
             return ret;
         }
@@ -50724,7 +50750,7 @@ module.exports = webpackEmptyContext;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.102";
+exports.TYPES_VERSION = "0.3.108";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -50759,9 +50785,6 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
     ScryptedInterfaceProperty["humidity"] = "humidity";
     ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
-    ScryptedInterfaceProperty["fontSize"] = "fontSize";
-    ScryptedInterfaceProperty["origin"] = "origin";
-    ScryptedInterfaceProperty["text"] = "text";
     ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
     ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
     ScryptedInterfaceProperty["lockState"] = "lockState";
@@ -50835,6 +50858,8 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
     ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
     ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
     ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
     ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
     ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
@@ -51124,14 +51149,13 @@ exports.ScryptedInterfaceDescriptors = {
         ],
         "properties": []
     },
-    "VideoTextOverlay": {
-        "name": "VideoTextOverlay",
-        "methods": [],
-        "properties": [
-            "fontSize",
-            "origin",
-            "text"
-        ]
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
+        ],
+        "properties": []
     },
     "VideoRecorder": {
         "name": "VideoRecorder",
@@ -51846,7 +51870,7 @@ var ScryptedInterface;
     ScryptedInterface["Display"] = "Display";
     ScryptedInterface["VideoCamera"] = "VideoCamera";
     ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
-    ScryptedInterface["VideoTextOverlay"] = "VideoTextOverlay";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
     ScryptedInterface["VideoRecorder"] = "VideoRecorder";
     ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
     ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";

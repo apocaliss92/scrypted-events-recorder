@@ -248,6 +248,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const funct = async () => {
             try {
                 this.running = true;
+                await this.resetListeners({ skipMainLoop: true });
                 await this.startListeners();
             } catch (e) {
                 logger.log('Error in startCheckInterval funct', e);
@@ -334,10 +335,20 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async getVideoClipThumbnail(thumbnailId: string, options?: VideoClipThumbnailOptions): Promise<MediaObject> {
         const logger = this.getLogger();
-        const { thumbnailPath } = await this.getStorageDirs(thumbnailId);
+        const { thumbnailPath } = this.getStorageDirs(thumbnailId);
         logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
         const fileURLToPath = url.pathToFileURL(thumbnailPath).toString();
-        const thumbnailMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+        let thumbnailMo: MediaObject;
+
+        try {
+            await fs.promises.access(thumbnailPath);
+            thumbnailMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+        } catch (e) {
+            if (e.toString().includes('ENOENT')) {
+                await this.saveThumbnail(thumbnailId);
+                thumbnailMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+            }
+        }
 
         return thumbnailMo;
     }
@@ -432,8 +443,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
         for (const entry of filteredEntries) {
             try {
-                const { videoClipPath, thumbnailPath, filename } = this.getStorageDirs(entry.name);
+                const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs(entry.name);
                 const stats = await fs.promises.stat(videoClipPath);
+
+                if (entry.name === tmpClipFilename) {
+                    continue;
+                }
 
                 const [_, startTime, endTime, detectionsHash] = entry.name.match(videoClipRegex);
 
@@ -465,13 +480,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     }
                 })
             } catch (e) {
-                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`);
+                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`, e);
             }
         }
 
         this.scanData = filesData;
         this.recordedEvents = recordedEvents;
-        this.console.log(recordedEvents);
     }
 
     async getMixinSettings(): Promise<Setting[]> {
@@ -491,6 +505,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async saveThumbnail(filename: string) {
         const logger = this.getLogger();
+        logger.log(`Generating thumbnail for ${filename}`);
         return new Promise<void>((resolve) => {
             const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
 
@@ -519,8 +534,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const now = Date.now();
-        const tmpFilename = 'tmp_clip.mp4';
-        const { videoClipPath: tmpVideoClipPath } = this.getStorageDirs(tmpFilename);
+        const { tmpClipPath } = this.getStorageDirs();
 
         logger.log(`Start saving videoclip: ${now}`);
         this.saveFfmpegProcess = spawn(this.ffmpegPath, [
@@ -528,7 +542,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             '-i', this.rtspUrl,
             '-c:v', 'copy',
             '-f', 'mp4',
-            tmpVideoClipPath,
+            tmpClipPath,
         ], {
             stdio: ['pipe', 'pipe', 'pipe'],
             detached: false
@@ -549,7 +563,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 let found = false;
                 while (currentChecks < 5 && !found) {
                     try {
-                        await fs.promises.access(tmpVideoClipPath);
+                        await fs.promises.access(tmpClipPath);
                         found = true;
                     } catch {
                         logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
@@ -565,7 +579,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     startTime: this.recordingTimeStart,
                 });
                 const { videoClipPath } = this.getStorageDirs(filename);
-                await fs.promises.rename(tmpVideoClipPath, videoClipPath);
+                await fs.promises.rename(tmpClipPath, videoClipPath);
                 logger.log(`Videoclip stored ${videoClipPath}`);
                 await this.saveThumbnail(filename);
                 this.classesDetected = [];
@@ -691,6 +705,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const thumbnailPath = filename ? path.join(thumbnailsFolder, `${filename}.jpg`) : undefined;
 
         const tmpClipFilename = 'tmp_clip.mp4';
+        const tmpClipPath = path.join(videoClipsFolder, tmpClipFilename);
 
         return {
             deviceFolder,
@@ -699,7 +714,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             videoClipPath,
             thumbnailPath,
             tmpClipFilename,
-            filename
+            filename,
+            tmpClipPath
         }
     }
 }
