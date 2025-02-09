@@ -247,7 +247,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
         const funct = async () => {
             try {
-                this.running = true;
                 await this.startListeners();
             } catch (e) {
                 logger.log('Error in startCheckInterval funct', e);
@@ -646,6 +645,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         try {
             await this.resetListeners({ skipMainLoop: true });
+            this.running = true;
             const { scoreThreshold, detectionClasses } = this.storageSettings.values;
 
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
