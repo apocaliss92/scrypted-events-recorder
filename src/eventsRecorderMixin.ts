@@ -48,6 +48,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             description: 'Will use the local remote stream.',
             type: 'boolean',
             defaultValue: true,
+            immediate: true,
             onPut: async () => await this.init()
         },
         postEventSeconds: {
@@ -639,7 +640,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             if (shouldExtend) {
                 if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
                     this.lastExtendLogged = now;
-                    logger.log(`Extending recording: ${now}`);
+                    logger.debug(`Extending recording: ${now}`);
                     this.restartTimeout();
                 }
             }
@@ -670,18 +671,16 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
                 });
-                const hasRelevantDetections = filtered.length;
-
-                this.classesDetected.push(...classes);
 
                 const now = Date.now();
-                if (
-                    (hasRelevantDetections || this.recording) &&
-                    (!this.lastMotionTrigger || (now - this.lastMotionTrigger) > 1 * 1000)
-                ) {
-                    this.lastMotionTrigger = now;
-                    this.triggerMotionRecording().catch(logger.log);
+
+                if (!filtered.length || ((this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000))) {
+                    return;
                 }
+
+                this.classesDetected.push(...classes);
+                this.lastMotionTrigger = now;
+                this.triggerMotionRecording().catch(logger.log);
             });
         } catch (e) {
             logger.log('Error in startListeners', e);
