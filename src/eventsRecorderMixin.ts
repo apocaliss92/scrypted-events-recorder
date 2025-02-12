@@ -1,20 +1,19 @@
-import sdk, { EventListenerRegister, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState, EventRecorder } from '@scrypted/sdk';
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
-import { StorageSettings } from "@scrypted/sdk/storage-settings";
-import ObjectDetectionPlugin from './main';
-import path from 'path';
-import fs from 'fs';
-import url from 'url';
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
-import { sortBy, uniq } from 'lodash';
-import { DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
 import { sleep } from '@scrypted/common/src/sleep';
+import sdk, { EventListenerRegister, MediaObject, ObjectsDetected, RecordedEvent, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
+import { StorageSettings } from "@scrypted/sdk/storage-settings";
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import fs from 'fs';
+import { sortBy, uniq } from 'lodash';
+import path from 'path';
+import url from 'url';
+import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
+import ObjectDetectionPlugin from './main';
 import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
-import { classnamePrio } from '../../scrypted-advanced-notifier/src/detecionClasses';
 
 const { systemManager } = sdk;
 
-export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, EventRecorder {
+export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips {
     cameraDevice: DeviceType;
     killed: boolean;
     rtspUrl: string;
@@ -86,6 +85,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             readonly: true,
             placeholder: 'GB'
         },
+        ignoreCameraDetections: {
+            title: 'Ingnore camera detections',
+            type: 'boolean',
+            defaultValue: true,
+            immediate: true,
+        },
         debug: {
             title: 'Log debug messages',
             type: 'boolean',
@@ -152,12 +157,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }, 2000);
     }
 
-    async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
-        return this.recordedEvents.filter(item =>
-            item.details.eventTime > options.startTime &&
-            item.details.eventTime < options.endTime
-        ).slice(0, options.count);
-    }
+    // async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
+    //     return this.recordedEvents.filter(item =>
+    //         item.details.eventTime > options.startTime &&
+    //         item.details.eventTime < options.endTime
+    //     ).slice(0, options.count);
+    // }
 
     public getLogger() {
         const deviceConsole = this.console;
@@ -566,7 +571,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     } catch {
                         logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
                         currentChecks += 1;
-                        await sleep(1000);
+                        await sleep(2000);
                     }
                 }
 
@@ -646,21 +651,28 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         try {
             await this.resetListeners({ skipMainLoop: true });
             this.running = true;
-            const { scoreThreshold, detectionClasses } = this.storageSettings.values;
+            const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
 
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
+            const classes: string[] = [];
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
                 const filtered = data.detections.filter(det => {
                     const classname = detectionClassesDefaultMap[det.className];
 
-                    return classname && detectionClasses.includes(classname) && det.score >= scoreThreshold;
+                    if (ignoreCameraDetections && !det.boundingBox) {
+                        return false;
+                    }
+
+                    if (classname && detectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                        classes.push(det.className);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 });
                 const hasRelevantDetections = filtered.length;
 
-                if (hasRelevantDetections) {
-                    const classes = filtered.map(detect => detect.className);
-                    this.classesDetected.push(...classes);
-                }
+                this.classesDetected.push(...classes);
 
                 const now = Date.now();
                 if (

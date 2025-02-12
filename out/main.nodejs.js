@@ -48680,7 +48680,9 @@ exports.licensePlateClasses = [
 ];
 exports.motionClasses = [
     DetectionClass.Motion,
-    'movement'
+    'movement',
+    // Reolink battery cams
+    'other',
 ];
 exports.packageClasses = [
     DetectionClass.Package,
@@ -49581,7 +49583,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const funct = async () => {
             try {
-                this.running = true;
                 await this.startListeners();
             }
             catch (e) {
@@ -49931,6 +49932,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async startListeners() {
         const logger = this.getLogger();
         try {
+            await this.resetListeners({ skipMainLoop: true });
+            this.running = true;
             const { scoreThreshold, detectionClasses } = this.storageSettings.values;
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
@@ -50244,7 +50247,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             const ret = [
                 sdk_1.ScryptedInterface.VideoClips,
                 sdk_1.ScryptedInterface.Settings,
-                sdk_1.ScryptedInterface.EventRecorder,
+                // ScryptedInterface.EventRecorder,
             ];
             return ret;
         }
