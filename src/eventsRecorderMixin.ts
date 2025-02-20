@@ -10,6 +10,7 @@ import url from 'url';
 import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
 import ObjectDetectionPlugin from './main';
 import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
+import moment from "moment";
 
 const { systemManager } = sdk;
 
@@ -55,7 +56,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             title: 'Post event seconds',
             description: 'Seconds to keep after an event occurs.',
             type: 'number',
-            defaultValue: 20,
+            defaultValue: 10,
         },
         maxLength: {
             title: 'Max length in seconds',
@@ -123,7 +124,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
         if (this.mixinDeviceInterfaces.includes(ScryptedInterface.Battery)) {
             this.storageSettings.settings.maxLength.defaultValue = 30;
-            this.storageSettings.settings.postEventSeconds.defaultValue = 10;
+            this.storageSettings.settings.postEventSeconds.defaultValue = 5;
         }
 
         this.plugin.currentMixins[this.id] = this;
@@ -294,34 +295,52 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async getVideoClips(options?: VideoClipOptions): Promise<VideoClip[]> {
-        const videoclips: VideoClip[] = [];
+        const getClips = async (startTimeInner: number, endTimeInner: number) => {
+            const videoclips: VideoClip[] = [];
 
-        for (const item of this.scanData) {
-            const { detectionClasses, endTime, filename, startTime } = item;
-            if (startTime >= options.startTime && startTime <= options.endTime) {
-                const durationInMs = endTime - startTime;
-                const event = getMainDetectionClass(detectionClasses);
+            for (const item of this.scanData) {
+                const { detectionClasses, endTime, filename, startTime } = item;
 
-                const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
-                videoclips.push({
-                    id: filename,
-                    startTime,
-                    duration: Math.round(durationInMs),
-                    videoId: filename,
-                    thumbnailId: filename,
-                    detectionClasses,
-                    event,
-                    description: event,
-                    resources: {
-                        thumbnail: {
-                            href: thumbnailUrl
-                        },
-                        video: {
-                            href: videoclipUrl
+                if (startTime >= startTimeInner && startTime <= endTimeInner) {
+                    const durationInMs = endTime - startTime;
+                    const event = getMainDetectionClass(detectionClasses);
+
+                    const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
+                    videoclips.push({
+                        id: filename,
+                        startTime,
+                        duration: Math.round(durationInMs),
+                        videoId: filename,
+                        thumbnailId: filename,
+                        detectionClasses,
+                        event,
+                        description: event,
+                        resources: {
+                            thumbnail: {
+                                href: thumbnailUrl
+                            },
+                            video: {
+                                href: videoclipUrl
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
+
+            return videoclips;
+        }
+
+        let videoclips: VideoClip[] = [];
+        let currentTry = 0;
+        const maxTries = 1;
+
+        while (!videoclips.length && currentTry < maxTries) {
+            currentTry++
+            const additionalDays = currentTry - 1;
+            const startTry = moment(options.startTime).subtract(additionalDays, 'days');
+            const endTry = moment(options.endTime).add(additionalDays, 'days');
+
+            videoclips = await getClips(startTry.toDate().getTime(), endTry.toDate().getTime());
         }
 
         return videoclips;
