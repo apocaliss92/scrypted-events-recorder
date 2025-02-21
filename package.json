@@ -5,7 +5,7 @@
     "type": "git",
     "url": "https://github.com/apocaliss92/scrypted-events-recorder"
   },
-  "version": "0.0.16",
+  "version": "0.0.17",
   "scripts": {
     "scrypted-setup-project": "scrypted-setup-project",
     "prescrypted-setup-project": "scrypted-package-json",
@@ -22,12 +22,13 @@
   "keywords": [
     "scrypted",
     "plugin",
-    "object",
     "detect",
-    "detection",
-    "recognition",
-    "people",
-    "person"
+    "events",
+    "recorder",
+    "motion",
+    "storage",
+    "clips",
+    "videoclips"
   ],
   "scrypted": {
     "name": "Events recorder",
