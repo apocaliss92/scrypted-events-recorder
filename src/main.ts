@@ -59,8 +59,10 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     const { storagePath } = this.storageSettings.values;
 
     if (storagePath) {
-      if (!fs.existsSync(storagePath)) {
-        fs.mkdirSync(storagePath, { recursive: true });
+      try {
+        await fs.promises.access(storagePath);
+      } catch {
+        await fs.promises.mkdir(storagePath, { recursive: true });
       }
     } else {
       this.getLogger().error('Storage path not defined');
@@ -105,9 +107,8 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
 
       try {
         if (webhook === 'videoclip') {
-
           const { videoClipPath } = dev.getStorageDirs(filename);
-          const stat = fs.statSync(videoClipPath);
+          const stat = await fs.promises.stat(videoClipPath);
           const fileSize = stat.size;
           const range = request.headers.range;
 
