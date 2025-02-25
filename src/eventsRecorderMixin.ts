@@ -20,6 +20,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     rtspUrl: string;
     mainLoopListener: NodeJS.Timeout;
     detectionListener: EventListenerRegister;
+    motionListener: EventListenerRegister;
     logger: Console;
     saveFfmpegProcess: ChildProcessWithoutNullStreams;
     running = false;
@@ -204,6 +205,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         if (!skipDetectionListener) {
             this.detectionListener?.removeListener && this.detectionListener.removeListener();
             this.detectionListener = undefined;
+            this.motionListener?.removeListener && this.motionListener.removeListener();
+            this.motionListener = undefined;
         }
 
         this.saveRecordingListener && clearInterval(this.saveRecordingListener);
@@ -673,6 +676,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             this.running = true;
             const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
 
+            const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
+
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             const classes: string[] = [];
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
@@ -683,7 +688,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
 
-                    if (classname && detectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
                         classes.push(det.className);
                         return true;
                     } else {
@@ -693,7 +698,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const now = Date.now();
 
-                if (!filtered.length || ((this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000))) {
+                if (!filtered.length) {
                     return;
                 }
 
@@ -701,6 +706,20 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording().catch(logger.log);
             });
+
+            if (defaultClasses.includes(DetectionClass.Motion)) {
+                this.motionListener = systemManager.listenDevice(this.id, ScryptedInterface.MotionSensor, async (_, __, data: boolean) => {
+                    const now = Date.now();
+
+                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                        return;
+                    }
+
+                    this.classesDetected.push(DetectionClass.Motion);
+                    this.lastMotionTrigger = now;
+                    this.triggerMotionRecording().catch(logger.log);
+                });
+            }
         } catch (e) {
             logger.log('Error in startListeners', e);
         }
