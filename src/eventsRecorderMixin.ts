@@ -634,12 +634,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         const now = Date.now();
 
-        if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < 10 * 1000) {
-            return;
-        }
-        this.lastClipRecordedTime = undefined;
-
         if (!this.recording) {
+            if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < 10 * 1000) {
+                return;
+            }
+
+            this.lastClipRecordedTime = undefined;
             this.recordingTimeStart = now;
             this.recording = true;
             logger.log(`Starting new recording: ${JSON.stringify({
