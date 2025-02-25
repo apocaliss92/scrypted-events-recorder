@@ -47,7 +47,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     storageSettings = new StorageSettings(this, {
         highQualityVideoclips: {
             title: 'High quality clips',
-            description: 'Will use the local remote stream.',
+            description: 'Will use the local record stream. If the camera has only one stream it will not have any effect',
             type: 'boolean',
             defaultValue: true,
             immediate: true,
