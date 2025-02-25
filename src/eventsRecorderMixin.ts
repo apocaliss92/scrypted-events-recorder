@@ -64,6 +64,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             type: 'number',
             defaultValue: 60,
         },
+        minDelayBetweenClips: {
+            title: 'Minimum delay between clips',
+            description: 'Define how many seconds to wait, as minumum, between two clips',
+            type: 'number',
+            defaultValue: 10,
+        },
         scoreThreshold: {
             title: 'Score threshold',
             type: 'number',
@@ -633,9 +639,10 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     async triggerMotionRecording() {
         const logger = this.getLogger();
         const now = Date.now();
+        const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
 
         if (!this.recording) {
-            if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < 10 * 1000) {
+            if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000) {
                 return;
             }
 
@@ -648,7 +655,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             await this.startSaveVideoClip();
             this.restartTimeout();
         } else {
-            const { maxLength } = this.storageSettings.values;
             const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
             const shouldExtend = currentDuration < (maxLength - clipDuration);
