@@ -242,198 +242,6 @@ exports["default"] = exports.sdk;
 
 /***/ }),
 
-/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/storage-settings.js":
-/*!******************************************************************************************!*\
-  !*** ../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/storage-settings.js ***!
-  \******************************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StorageSettings = void 0;
-const _1 = __importStar(__webpack_require__(/*! . */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"));
-const { systemManager } = _1.default;
-function parseValue(value, setting, readDefaultValue, rawDevice) {
-    if (value === null || value === undefined) {
-        return readDefaultValue();
-    }
-    const type = setting.multiple ? 'array' : setting.type;
-    if (type === 'boolean') {
-        if (value === 'true')
-            return true;
-        if (value === 'false')
-            return false;
-        return readDefaultValue() || false;
-    }
-    if (type === 'number') {
-        const n = parseFloat(value);
-        if (!isNaN(n))
-            return n;
-        return readDefaultValue() || 0;
-    }
-    if (type === 'integer') {
-        const n = parseInt(value);
-        if (!isNaN(n))
-            return n;
-        return readDefaultValue() || 0;
-    }
-    if (type === 'array') {
-        if (!value)
-            return readDefaultValue() || [];
-        try {
-            return JSON.parse(value);
-        }
-        catch (e) {
-            return readDefaultValue() || [];
-        }
-    }
-    if (type === 'device') {
-        if (rawDevice)
-            return value;
-        return systemManager.getDeviceById(value) || systemManager.getDeviceById(readDefaultValue());
-    }
-    // string type, so check if it is json.
-    if (value && setting.json) {
-        try {
-            return JSON.parse(value);
-        }
-        catch (e) {
-            return readDefaultValue();
-        }
-    }
-    return value || readDefaultValue();
-}
-class StorageSettings {
-    constructor(device, settings) {
-        this.device = device;
-        this.settings = settings;
-        this.values = {};
-        this.hasValue = {};
-        for (const key of Object.keys(settings)) {
-            const setting = settings[key];
-            const rawGet = () => this.getItem(key);
-            let get;
-            if (setting.type !== 'clippath') {
-                get = rawGet;
-            }
-            else {
-                // maybe need a mapPut. clippath is the only complex type at the moment.
-                get = () => {
-                    try {
-                        return JSON.parse(rawGet());
-                    }
-                    catch (e) {
-                    }
-                };
-            }
-            Object.defineProperty(this.values, key, {
-                get,
-                set: value => this.putSetting(key, value),
-                enumerable: true,
-            });
-            Object.defineProperty(this.hasValue, key, {
-                get: () => this.device.storage.getItem(key) != null,
-                enumerable: true,
-            });
-        }
-    }
-    get keys() {
-        const ret = {};
-        for (const key of Object.keys(this.settings)) {
-            ret[key] = key;
-        }
-        return ret;
-    }
-    async getSettings() {
-        const onGet = await this.options?.onGet?.();
-        const ret = [];
-        for (const [key, setting] of Object.entries(this.settings)) {
-            let s = Object.assign({}, setting);
-            if (onGet?.[key])
-                s = Object.assign(s, onGet[key]);
-            if (s.onGet)
-                s = Object.assign(s, await s.onGet());
-            if (s.hide || await this.options?.hide?.[key]?.())
-                continue;
-            s.key = key;
-            s.value = this.getItemInternal(key, s, true);
-            ret.push(s);
-            delete s.onPut;
-            delete s.onGet;
-            delete s.mapPut;
-            delete s.mapGet;
-        }
-        return ret;
-    }
-    async putSetting(key, value) {
-        const setting = this.settings[key];
-        let oldValue;
-        if (setting)
-            oldValue = this.getItemInternal(key, setting);
-        return this.putSettingInternal(setting, oldValue, key, value);
-    }
-    putSettingInternal(setting, oldValue, key, value) {
-        if (!setting?.noStore) {
-            if (setting?.mapPut)
-                value = setting.mapPut(oldValue, value);
-            // nullish values should be removed, since Storage can't persist them correctly.
-            if (value == null)
-                this.device.storage.removeItem(key);
-            else if (typeof value === 'object')
-                this.device.storage.setItem(key, JSON.stringify(value));
-            else
-                this.device.storage.setItem(key, value?.toString());
-        }
-        setting?.onPut?.(oldValue, value);
-        if (!setting?.hide)
-            this.device.onDeviceEvent(_1.ScryptedInterface.Settings, undefined);
-    }
-    getItemInternal(key, setting, rawDevice) {
-        if (!setting)
-            return this.device.storage.getItem(key);
-        const readDefaultValue = () => {
-            if (setting.persistedDefaultValue != null) {
-                this.putSettingInternal(setting, undefined, key, setting.persistedDefaultValue);
-                return setting.persistedDefaultValue;
-            }
-            return setting.defaultValue;
-        };
-        const ret = parseValue(this.device.storage.getItem(key), setting, readDefaultValue, rawDevice);
-        return setting.mapGet ? setting.mapGet(ret) : ret;
-    }
-    getItem(key) {
-        return this.getItemInternal(key, this.settings[key]);
-    }
-}
-exports.StorageSettings = StorageSettings;
-//# sourceMappingURL=storage-settings.js.map
-
-/***/ }),
-
 /***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src sync recursive":
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/ sync ***!
@@ -462,7 +270,7 @@ module.exports = webpackEmptyContext;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.97";
+exports.TYPES_VERSION = "0.3.113";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -488,6 +296,8 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
     ScryptedInterfaceProperty["rgb"] = "rgb";
     ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
     ScryptedInterfaceProperty["running"] = "running";
     ScryptedInterfaceProperty["paused"] = "paused";
     ScryptedInterfaceProperty["docked"] = "docked";
@@ -508,6 +318,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["converters"] = "converters";
     ScryptedInterfaceProperty["binaryState"] = "binaryState";
     ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
     ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
     ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
     ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
@@ -549,6 +360,7 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
     ScryptedInterfaceMethod["setRgb"] = "setRgb";
     ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
     ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
     ScryptedInterfaceMethod["start"] = "start";
     ScryptedInterfaceMethod["stop"] = "stop";
@@ -567,6 +379,8 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
     ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
     ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
     ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
     ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
     ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
@@ -732,6 +546,27 @@ exports.ScryptedInterfaceDescriptors = {
             "hsv"
         ]
     },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
+    },
     "Notifier": {
         "name": "Notifier",
         "methods": [
@@ -839,6 +674,14 @@ exports.ScryptedInterfaceDescriptors = {
         "methods": [
             "getPrivacyMasks",
             "setPrivacyMasks"
+        ],
+        "properties": []
+    },
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
         ],
         "properties": []
     },
@@ -1056,6 +899,13 @@ exports.ScryptedInterfaceDescriptors = {
         "methods": [],
         "properties": [
             "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
         ]
     },
     "PowerSensor": {
@@ -1387,7 +1237,14 @@ exports.ScryptedInterfaceDescriptors = {
  */
 var ScryptedDeviceType;
 (function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
     ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
     ScryptedDeviceType["Camera"] = "Camera";
     ScryptedDeviceType["Fan"] = "Fan";
     ScryptedDeviceType["Light"] = "Light";
@@ -1533,6 +1390,9 @@ var ScryptedInterface;
     ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
     ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
     ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
     ScryptedInterface["Notifier"] = "Notifier";
     ScryptedInterface["StartStop"] = "StartStop";
     ScryptedInterface["Pause"] = "Pause";
@@ -1546,6 +1406,7 @@ var ScryptedInterface;
     ScryptedInterface["Display"] = "Display";
     ScryptedInterface["VideoCamera"] = "VideoCamera";
     ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
     ScryptedInterface["VideoRecorder"] = "VideoRecorder";
     ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
     ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
@@ -1572,6 +1433,7 @@ var ScryptedInterface;
     ScryptedInterface["Settings"] = "Settings";
     ScryptedInterface["BinarySensor"] = "BinarySensor";
     ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
     ScryptedInterface["PowerSensor"] = "PowerSensor";
     ScryptedInterface["AudioSensor"] = "AudioSensor";
     ScryptedInterface["MotionSensor"] = "MotionSensor";
@@ -30036,6 +29898,8 @@ class StorageSettings {
                 continue;
             s.key = key;
             s.value = this.getItemInternal(key, s, true);
+            if (typeof s.deviceFilter === 'function')
+                s.deviceFilter = s.deviceFilter.toString();
             ret.push(s);
             delete s.onPut;
             delete s.onGet;
@@ -30117,7 +29981,7 @@ module.exports = webpackEmptyContext;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.97";
+exports.TYPES_VERSION = "0.3.113";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -30143,6 +30007,8 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
     ScryptedInterfaceProperty["rgb"] = "rgb";
     ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
     ScryptedInterfaceProperty["running"] = "running";
     ScryptedInterfaceProperty["paused"] = "paused";
     ScryptedInterfaceProperty["docked"] = "docked";
@@ -30163,6 +30029,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["converters"] = "converters";
     ScryptedInterfaceProperty["binaryState"] = "binaryState";
     ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
     ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
     ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
     ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
@@ -30204,6 +30071,7 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
     ScryptedInterfaceMethod["setRgb"] = "setRgb";
     ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
     ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
     ScryptedInterfaceMethod["start"] = "start";
     ScryptedInterfaceMethod["stop"] = "stop";
@@ -30222,6 +30090,8 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
     ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
     ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
     ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
     ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
     ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
@@ -30387,6 +30257,27 @@ exports.ScryptedInterfaceDescriptors = {
             "hsv"
         ]
     },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
+    },
     "Notifier": {
         "name": "Notifier",
         "methods": [
@@ -30494,6 +30385,14 @@ exports.ScryptedInterfaceDescriptors = {
         "methods": [
             "getPrivacyMasks",
             "setPrivacyMasks"
+        ],
+        "properties": []
+    },
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
         ],
         "properties": []
     },
@@ -30711,6 +30610,13 @@ exports.ScryptedInterfaceDescriptors = {
         "methods": [],
         "properties": [
             "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
         ]
     },
     "PowerSensor": {
@@ -31042,7 +30948,14 @@ exports.ScryptedInterfaceDescriptors = {
  */
 var ScryptedDeviceType;
 (function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
     ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
     ScryptedDeviceType["Camera"] = "Camera";
     ScryptedDeviceType["Fan"] = "Fan";
     ScryptedDeviceType["Light"] = "Light";
@@ -31188,6 +31101,9 @@ var ScryptedInterface;
     ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
     ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
     ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
     ScryptedInterface["Notifier"] = "Notifier";
     ScryptedInterface["StartStop"] = "StartStop";
     ScryptedInterface["Pause"] = "Pause";
@@ -31201,6 +31117,7 @@ var ScryptedInterface;
     ScryptedInterface["Display"] = "Display";
     ScryptedInterface["VideoCamera"] = "VideoCamera";
     ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
     ScryptedInterface["VideoRecorder"] = "VideoRecorder";
     ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
     ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
@@ -31227,6 +31144,7 @@ var ScryptedInterface;
     ScryptedInterface["Settings"] = "Settings";
     ScryptedInterface["BinarySensor"] = "BinarySensor";
     ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
     ScryptedInterface["PowerSensor"] = "PowerSensor";
     ScryptedInterface["AudioSensor"] = "AudioSensor";
     ScryptedInterface["MotionSensor"] = "MotionSensor";
@@ -70593,90 +70511,6 @@ exports.parentDetectionClassMap = {
 
 /***/ }),
 
-/***/ "../scrypted-apocaliss-base/src/baseMixin.ts":
-/*!***************************************************!*\
-  !*** ../scrypted-apocaliss-base/src/baseMixin.ts ***!
-  \***************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BaseMixin = void 0;
-const sdk_1 = __importStar(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"));
-const storage_settings_1 = __webpack_require__(/*! @scrypted/sdk/storage-settings */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/storage-settings.js");
-class BaseMixin extends sdk_1.MixinDeviceBase {
-    constructor(options, plugin) {
-        super(options);
-        this.plugin = plugin;
-        this.baseStorageSettings = new storage_settings_1.StorageSettings(this, {
-            debug: {
-                title: 'Log debug messages',
-                type: 'boolean',
-                defaultValue: false,
-                immediate: true,
-            },
-        });
-        // this.plugin.currentMixinsMap[this.name] = this;
-    }
-    async release() {
-        this.killed = true;
-    }
-    getLogger() {
-        const deviceConsole = sdk_1.default.deviceManager.getMixinConsole(this.id, this.nativeId);
-        if (!this.logger) {
-            const log = (debug, message, ...optionalParams) => {
-                const now = new Date().toLocaleString();
-                if (!debug || this.baseStorageSettings.getItem('debug')) {
-                    deviceConsole.log(` ${now} - `, message, ...optionalParams);
-                }
-            };
-            this.logger = {
-                log: (message, ...optionalParams) => log(false, message, ...optionalParams),
-                debug: (message, ...optionalParams) => log(true, message, ...optionalParams),
-            };
-        }
-        return this.logger;
-    }
-}
-exports.BaseMixin = BaseMixin;
-
-
-/***/ }),
-
 /***/ "../scrypted-apocaliss-base/src/basePlugin.ts":
 /*!****************************************************!*\
   !*** ../scrypted-apocaliss-base/src/basePlugin.ts ***!
@@ -70725,7 +70559,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BasePlugin = exports.getMqttBasicClient = exports.getBaseSettings = exports.applySettingsShow = void 0;
 const sdk_1 = __importStar(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"));
 const mqtt_client_1 = __importDefault(__webpack_require__(/*! ./mqtt-client */ "../scrypted-apocaliss-base/src/mqtt-client.ts"));
-const baseMixin_1 = __webpack_require__(/*! ./baseMixin */ "../scrypted-apocaliss-base/src/baseMixin.ts");
 const axios_1 = __importDefault(__webpack_require__(/*! axios */ "../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs"));
 const https_1 = __importDefault(__webpack_require__(/*! https */ "https"));
 const { systemManager } = sdk_1.default;
@@ -71006,28 +70839,39 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
         }
         return this.mqttClient;
     }
-    async getMixin(mixinDevice, mixinDeviceInterfaces, mixinDeviceState) {
-        const props = {
-            mixinDevice,
-            mixinDeviceInterfaces,
-            mixinDeviceState,
-            mixinProviderNativeId: this.nativeId,
-            group: this.opts.mixinGroup,
-            groupKey: this.opts.mixinKey,
-        };
-        if ([sdk_1.ScryptedInterface.Camera, sdk_1.ScryptedInterface.VideoCamera,].some(int => mixinDeviceInterfaces.includes(int))) {
-            return new baseMixin_1.BaseMixin(props, this);
-        }
-        else if ([sdk_1.ScryptedInterface.BinarySensor, sdk_1.ScryptedInterface.Lock].some(int => mixinDeviceInterfaces.includes(int))) {
-            return new baseMixin_1.BaseMixin(props, this);
-        }
-        else if (mixinDeviceInterfaces.includes(sdk_1.ScryptedInterface.Notifier)) {
-            return new baseMixin_1.BaseMixin(props, this);
-        }
-    }
-    async releaseMixin(id, mixinDevice) {
-        await mixinDevice.release();
-    }
+    // async getMixin(mixinDevice: any, mixinDeviceInterfaces: ScryptedInterface[], mixinDeviceState: WritableDeviceState): Promise<any> {
+    //     const props = {
+    //         mixinDevice,
+    //         mixinDeviceInterfaces,
+    //         mixinDeviceState,
+    //         mixinProviderNativeId: this.nativeId,
+    //         group: this.opts.mixinGroup,
+    //         groupKey: this.opts.mixinKey,
+    //     };
+    //     if (
+    //         [ScryptedInterface.Camera, ScryptedInterface.VideoCamera,].some(int => mixinDeviceInterfaces.includes(int))
+    //     ) {
+    //         return new BaseMixin(
+    //             props,
+    //             this
+    //         );
+    //     } else if (
+    //         [ScryptedInterface.BinarySensor, ScryptedInterface.Lock].some(int => mixinDeviceInterfaces.includes(int))
+    //     ) {
+    //         return new BaseMixin(
+    //             props,
+    //             this
+    //         );
+    //     } else if (mixinDeviceInterfaces.includes(ScryptedInterface.Notifier)) {
+    //         return new BaseMixin(
+    //             props,
+    //             this
+    //         );
+    //     }
+    // }
+    // async releaseMixin(id: string, mixinDevice: any): Promise<void> {
+    //     await mixinDevice.release();
+    // }
     getLogger() {
         if (!this.mainLogger) {
             const prefix = `[${this.opts.pluginFriendlyName}]`;
@@ -71295,7 +71139,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.storageSettings = new storage_settings_1.StorageSettings(this, {
             highQualityVideoclips: {
                 title: 'High quality clips',
-                description: 'Will use the local remote stream.',
+                description: 'Will use the local record stream. If the camera has only one stream it will not have any effect',
                 type: 'boolean',
                 defaultValue: true,
                 immediate: true,
@@ -71311,6 +71155,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 title: 'Max length in seconds',
                 type: 'number',
                 defaultValue: 60,
+            },
+            minDelayBetweenClips: {
+                title: 'Minimum delay between clips',
+                description: 'Define how many seconds to wait, as minumum, between two clips',
+                type: 'number',
+                defaultValue: 10,
             },
             scoreThreshold: {
                 title: 'Score threshold',
@@ -71422,6 +71272,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         if (!skipDetectionListener) {
             this.detectionListener?.removeListener && this.detectionListener.removeListener();
             this.detectionListener = undefined;
+            this.motionListener?.removeListener && this.motionListener.removeListener();
+            this.motionListener = undefined;
         }
         this.saveRecordingListener && clearInterval(this.saveRecordingListener);
         this.saveRecordingListener = undefined;
@@ -71791,11 +71643,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async triggerMotionRecording() {
         const logger = this.getLogger();
         const now = Date.now();
-        if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < 10 * 1000) {
-            return;
-        }
-        this.lastClipRecordedTime = undefined;
+        const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
         if (!this.recording) {
+            if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000) {
+                return;
+            }
+            this.lastClipRecordedTime = undefined;
             this.recordingTimeStart = now;
             this.recording = true;
             logger.log(`Starting new recording: ${JSON.stringify({
@@ -71805,7 +71658,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.restartTimeout();
         }
         else {
-            const { maxLength } = this.storageSettings.values;
             const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
             const shouldExtend = currentDuration < (maxLength - clipDuration);
@@ -71830,6 +71682,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             await this.resetListeners({ skipMainLoop: true });
             this.running = true;
             const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
+            const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             const classes = [];
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
@@ -71838,7 +71691,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
-                    if (classname && detectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
                         classes.push(det.className);
                         return true;
                     }
@@ -71847,13 +71700,24 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     }
                 });
                 const now = Date.now();
-                if (!filtered.length || ((this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000))) {
+                if (!filtered.length) {
                     return;
                 }
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording().catch(logger.log);
             });
+            if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
+                this.motionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.MotionSensor, async (_, __, data) => {
+                    const now = Date.now();
+                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                        return;
+                    }
+                    this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
+                    this.lastMotionTrigger = now;
+                    this.triggerMotionRecording().catch(logger.log);
+                });
+            }
         }
         catch (e) {
             logger.log('Error in startListeners', e);
@@ -71994,8 +71858,11 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
     async start() {
         const { storagePath } = this.storageSettings.values;
         if (storagePath) {
-            if (!fs_1.default.existsSync(storagePath)) {
-                fs_1.default.mkdirSync(storagePath, { recursive: true });
+            try {
+                await fs_1.default.promises.access(storagePath);
+            }
+            catch {
+                await fs_1.default.promises.mkdir(storagePath, { recursive: true });
             }
         }
         else {
@@ -72035,7 +71902,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             try {
                 if (webhook === 'videoclip') {
                     const { videoClipPath } = dev.getStorageDirs(filename);
-                    const stat = fs_1.default.statSync(videoClipPath);
+                    const stat = await fs_1.default.promises.stat(videoClipPath);
                     const fileSize = stat.size;
                     const range = request.headers.range;
                     devConsole.debug(`Videoclip requested: ${JSON.stringify({
@@ -72653,7 +72520,7 @@ module.exports = webpackEmptyContext;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.108";
+exports.TYPES_VERSION = "0.3.114";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -72680,6 +72547,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["rgb"] = "rgb";
     ScryptedInterfaceProperty["hsv"] = "hsv";
     ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
     ScryptedInterfaceProperty["running"] = "running";
     ScryptedInterfaceProperty["paused"] = "paused";
     ScryptedInterfaceProperty["docked"] = "docked";
@@ -72941,6 +72809,13 @@ exports.ScryptedInterfaceDescriptors = {
             "pressButton"
         ],
         "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
     },
     "Notifier": {
         "name": "Notifier",
@@ -73612,7 +73487,14 @@ exports.ScryptedInterfaceDescriptors = {
  */
 var ScryptedDeviceType;
 (function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
     ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
     ScryptedDeviceType["Camera"] = "Camera";
     ScryptedDeviceType["Fan"] = "Fan";
     ScryptedDeviceType["Light"] = "Light";
@@ -73760,6 +73642,7 @@ var ScryptedInterface;
     ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
     ScryptedInterface["Buttons"] = "Buttons";
     ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
     ScryptedInterface["Notifier"] = "Notifier";
     ScryptedInterface["StartStop"] = "StartStop";
     ScryptedInterface["Pause"] = "Pause";

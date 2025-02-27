@@ -562,13 +562,13 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         });
     }
 
-    async startSaveVideoClip() {
+    async startVideoclipRecording() {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const now = Date.now();
         const { tmpClipPath } = this.getStorageDirs();
 
-        logger.log(`Start saving videoclip: ${now}`);
+        logger.log(`Start videoclip recording: ${now}`);
         this.saveFfmpegProcess = spawn(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
@@ -636,7 +636,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }, this.clipDurationInMs);
     }
 
-    async triggerMotionRecording() {
+    async triggerMotionRecording(triggers: string[]) {
         const logger = this.getLogger();
         const now = Date.now();
         const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
@@ -651,8 +651,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             this.recording = true;
             logger.log(`Starting new recording: ${JSON.stringify({
                 recordingTimeStart: this.recordingTimeStart,
+                classTriggers: triggers
             })}`);
-            await this.startSaveVideoClip();
+            await this.startVideoclipRecording();
             this.restartTimeout();
         } else {
             const currentDuration = (now - this.recordingTimeStart) / 1000;
@@ -664,7 +665,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 currentDuration,
                 maxLength,
                 clipDuration
-            })}`)
+            })}`);
             if (shouldExtend) {
                 if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
                     this.lastExtendLogged = now;
@@ -684,8 +685,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
 
-            logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             const classes: string[] = [];
+            logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
                 const filtered = data.detections.filter(det => {
                     const classname = detectionClassesDefaultMap[det.className];
@@ -702,28 +703,40 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     }
                 });
 
-                const now = Date.now();
+                logger.debug(`Object detections received: ${JSON.stringify({
+                    filtered,
+                    classes,
+                })}`);
 
                 if (!filtered.length) {
                     return;
                 }
 
+                const now = Date.now();
+
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
-                this.triggerMotionRecording().catch(logger.log);
+                this.triggerMotionRecording(classes).catch(logger.log);
             });
 
-            if (defaultClasses.includes(DetectionClass.Motion)) {
+            if (detectionClasses.includes(DetectionClass.Motion)) {
+                logger.log(`Starting listener of ${ScryptedInterface.MotionSensor}`);
                 this.motionListener = systemManager.listenDevice(this.id, ScryptedInterface.MotionSensor, async (_, __, data: boolean) => {
                     const now = Date.now();
 
-                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
-                        return;
-                    }
+                    if (data) {
+                        logger.debug(`Motion received: ${JSON.stringify({
+                            lastMotion: this.lastMotionTrigger,
+                        })}`);
 
-                    this.classesDetected.push(DetectionClass.Motion);
-                    this.lastMotionTrigger = now;
-                    this.triggerMotionRecording().catch(logger.log);
+                        if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                            return;
+                        }
+
+                        this.classesDetected.push(DetectionClass.Motion);
+                        this.lastMotionTrigger = now;
+                        this.triggerMotionRecording([DetectionClass.Motion]).catch(logger.log);
+                    }
                 });
             }
         } catch (e) {
