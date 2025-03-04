@@ -71130,7 +71130,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         });
         this.plugin = plugin;
         this.running = false;
-        this.shouldIndexFs = false;
         this.recording = false;
         this.classesDetected = [];
         this.scanData = [];
@@ -71266,8 +71265,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         if (!skipMainLoop) {
             this.mainLoopListener && clearInterval(this.mainLoopListener);
             this.mainLoopListener = undefined;
-            this.scanFsListener && clearInterval(this.scanFsListener);
-            this.scanFsListener = undefined;
         }
         if (!skipDetectionListener) {
             this.detectionListener?.removeListener && this.detectionListener.removeListener();
@@ -71337,14 +71334,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                         await funct();
                     }
                     const now = Date.now();
-                    if (this.shouldIndexFs || !this.lastIndexFs || (now - this.lastIndexFs) > (1000 * 60 * 5)) {
-                        logger.debug(`Indexing FS: ${JSON.stringify({
-                            shouldIndexFs: this.shouldIndexFs,
-                            lastIndexFs: this.lastIndexFs,
-                        })}`);
+                    // Every 3 hours force a re-indexing of the videoclips
+                    if (!this.lastIndexFs || (now - this.lastIndexFs) > (1000 * 60 * 60 * 3)) {
                         await this.indexFs();
-                        this.lastIndexFs = now;
-                        logger.debug(`${this.scanData.length} videoclips found`);
+                    }
+                    // Every 1 hour
+                    if (!this.lastScanFs || (now - this.lastScanFs) > (1000 * 60 * 60)) {
+                        await this.scanFs();
                     }
                 }
             }
@@ -71352,8 +71348,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 logger.log('Error in startCheckInterval', e);
             }
         }, 10000);
-        this.scanFsListener = setInterval(async () => await this.scanFs(), 1000 * 60 * 5);
         await this.scanFs();
+        await this.indexFs();
     }
     async getVideoClips(options) {
         const getClips = async (startTimeInner, endTimeInner) => {
@@ -71490,6 +71486,52 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
         }
+        this.lastScanFs = Date.now();
+        logger.log(`FS scan executed: ${JSON.stringify({
+            freeMemory,
+            occupiedSpaceInGbNumber,
+            maxSpaceInGb,
+            cleanupMemoryThresholderInGb: util_1.cleanupMemoryThresholderInGb
+        })}`);
+    }
+    async parseVideoClipFile(videoClipName) {
+        const logger = this.getLogger();
+        try {
+            const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs(videoClipName);
+            const stats = await fs_1.default.promises.stat(videoClipPath);
+            if (videoClipName === tmpClipFilename) {
+                return;
+            }
+            const [_, startTime, endTime, detectionsHash] = videoClipName.match(util_1.videoClipRegex);
+            const detectionClasses = [];
+            const detectionFlags = detectionsHash.split('');
+            detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(util_1.detectionClassIndexReversed[index]));
+            const sortedClassnames = (0, lodash_1.sortBy)(detectionClasses, (classname) => detecionClasses_1.classnamePrio[classname] ?? 100);
+            const startTimeNumber = Number(startTime);
+            const endTimeNumber = Number(endTime);
+            const fildeData = {
+                detectionClasses,
+                endTime: endTimeNumber,
+                startTime: startTimeNumber,
+                size: stats.size,
+                filename,
+                thumbnailPath,
+                videoClipPath
+            };
+            const recordedEvent = {
+                data: {},
+                details: {
+                    eventId: filename,
+                    eventTime: startTimeNumber,
+                    eventInterface: sortedClassnames[0],
+                    mixinId: this.id,
+                }
+            };
+            return { fildeData, recordedEvent };
+        }
+        catch (e) {
+            logger.log(`Error parsing file entry: ${JSON.stringify({ videoClipName })}`, e);
+        }
     }
     async indexFs() {
         const logger = this.getLogger();
@@ -71499,44 +71541,20 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const entries = (await fs_1.default.promises.readdir(videoClipsFolder, { withFileTypes: true })) || [];
         const filteredEntries = entries.filter(entry => entry.name.endsWith('.mp4')) || [];
         for (const entry of filteredEntries) {
-            try {
-                const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs(entry.name);
-                const stats = await fs_1.default.promises.stat(videoClipPath);
-                if (entry.name === tmpClipFilename) {
-                    continue;
-                }
-                const [_, startTime, endTime, detectionsHash] = entry.name.match(util_1.videoClipRegex);
-                const detectionClasses = [];
-                const detectionFlags = detectionsHash.split('');
-                detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(util_1.detectionClassIndexReversed[index]));
-                const sortedClassnames = (0, lodash_1.sortBy)(detectionClasses, (classname) => detecionClasses_1.classnamePrio[classname] ?? 100);
-                const startTimeNumber = Number(startTime);
-                const endTimeNumber = Number(endTime);
-                filesData.push({
-                    detectionClasses,
-                    endTime: endTimeNumber,
-                    startTime: startTimeNumber,
-                    size: stats.size,
-                    filename,
-                    thumbnailPath,
-                    videoClipPath
-                });
-                recordedEvents.push({
-                    data: {},
-                    details: {
-                        eventId: filename,
-                        eventTime: startTimeNumber,
-                        eventInterface: sortedClassnames[0],
-                        mixinId: this.id,
-                    }
-                });
-            }
-            catch (e) {
-                logger.log(`Error parsing file entry: ${JSON.stringify({ entry })}`, e);
+            const parsedEntry = await this.parseVideoClipFile(entry.name);
+            if (parsedEntry) {
+                const { fildeData, recordedEvent } = parsedEntry;
+                filesData.push(fildeData);
+                recordedEvents.push(recordedEvent);
             }
         }
         this.scanData = filesData;
         this.recordedEvents = recordedEvents;
+        this.lastIndexFs = Date.now();
+        logger.log(`FS indexed: ${JSON.stringify({
+            videoclipsFound: filesData.length,
+            recordedEventsFound: recordedEvents.length,
+        })}`);
     }
     async getMixinSettings() {
         const settings = await this.storageSettings.getSettings();
@@ -71573,12 +71591,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             });
         });
     }
-    async startSaveVideoClip() {
+    async startVideoclipRecording() {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const now = Date.now();
         const { tmpClipPath } = this.getStorageDirs();
-        logger.log(`Start saving videoclip: ${now}`);
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
@@ -71617,15 +71634,19 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     logger,
                     startTime: this.recordingTimeStart,
                 });
-                const { videoClipPath } = this.getStorageDirs(filename);
+                const { videoClipPath, filenameWithVideoExtension } = this.getStorageDirs(filename);
                 await fs_1.default.promises.rename(tmpClipPath, videoClipPath);
                 logger.log(`Videoclip stored ${videoClipPath}`);
                 await this.saveThumbnail(filename);
                 this.classesDetected = [];
                 this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
-                this.shouldIndexFs = true;
-                this.lastIndexFs = Date.now();
                 this.storageSettings.values.processPid = undefined;
+                const parsedEntry = await this.parseVideoClipFile(filenameWithVideoExtension);
+                if (parsedEntry) {
+                    const { fildeData, recordedEvent } = parsedEntry;
+                    this.scanData.push(fildeData);
+                    this.recordedEvents.push(recordedEvent);
+                }
             }
         });
     }
@@ -71640,7 +71661,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             await this.stopSaveViddeoClip();
         }, this.clipDurationInMs);
     }
-    async triggerMotionRecording() {
+    async triggerMotionRecording(triggers) {
         const logger = this.getLogger();
         const now = Date.now();
         const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
@@ -71653,8 +71674,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.recording = true;
             logger.log(`Starting new recording: ${JSON.stringify({
                 recordingTimeStart: this.recordingTimeStart,
+                classTriggers: triggers
             })}`);
-            await this.startSaveVideoClip();
+            await this.startVideoclipRecording();
             this.restartTimeout();
         }
         else {
@@ -71683,8 +71705,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.running = true;
             const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
-            logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             const classes = [];
+            logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
                 const filtered = data.detections.filter(det => {
                     const classname = detecionClasses_1.detectionClassesDefaultMap[det.className];
@@ -71699,23 +71721,33 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                         return false;
                     }
                 });
-                const now = Date.now();
+                logger.debug(`Object detections received: ${JSON.stringify({
+                    filtered,
+                    classes,
+                })}`);
                 if (!filtered.length) {
                     return;
                 }
+                const now = Date.now();
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
-                this.triggerMotionRecording().catch(logger.log);
+                this.triggerMotionRecording(classes).catch(logger.log);
             });
             if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
+                logger.log(`Starting listener of ${sdk_1.ScryptedInterface.MotionSensor}`);
                 this.motionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.MotionSensor, async (_, __, data) => {
                     const now = Date.now();
-                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
-                        return;
+                    if (data) {
+                        logger.debug(`Motion received: ${JSON.stringify({
+                            lastMotion: this.lastMotionTrigger,
+                        })}`);
+                        if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                            return;
+                        }
+                        this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
+                        this.lastMotionTrigger = now;
+                        this.triggerMotionRecording([detecionClasses_1.DetectionClass.Motion]).catch(logger.log);
                     }
-                    this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
-                    this.lastMotionTrigger = now;
-                    this.triggerMotionRecording().catch(logger.log);
                 });
             }
         }
@@ -71743,8 +71775,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const videoClipsFolder = path_1.default.join(deviceFolder, 'videoclips');
         const thumbnailsFolder = path_1.default.join(deviceFolder, 'thumbnails');
         const filename = videoClipNameSrc?.split('.')?.[0] ?? videoClipNameSrc;
-        const videoClipPath = filename ? path_1.default.join(videoClipsFolder, `${filename}.mp4`) : undefined;
-        const thumbnailPath = filename ? path_1.default.join(thumbnailsFolder, `${filename}.jpg`) : undefined;
+        const filenameWithVideoExtension = `${filename}.mp4`;
+        const filenameWithImageExtension = `${filename}.jpg`;
+        const videoClipPath = filename ? path_1.default.join(videoClipsFolder, `${filenameWithVideoExtension}`) : undefined;
+        const thumbnailPath = filename ? path_1.default.join(thumbnailsFolder, `${filenameWithImageExtension}`) : undefined;
         const tmpClipFilename = 'tmp_clip.mp4';
         const tmpClipPath = path_1.default.join(videoClipsFolder, tmpClipFilename);
         return {
@@ -71755,7 +71789,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             thumbnailPath,
             tmpClipFilename,
             filename,
-            tmpClipPath
+            tmpClipPath,
+            filenameWithVideoExtension,
         };
     }
 }
