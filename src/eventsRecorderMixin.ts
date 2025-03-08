@@ -1,6 +1,6 @@
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { sleep } from '@scrypted/common/src/sleep';
-import sdk, { EventListenerRegister, MediaObject, ObjectsDetected, RecordedEvent, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, EventRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
@@ -14,7 +14,7 @@ import moment from "moment";
 
 const { systemManager } = sdk;
 
-export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips {
+export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, EventRecorder {
     cameraDevice: DeviceType;
     killed: boolean;
     rtspUrl: string;
@@ -165,12 +165,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         }, 2000);
     }
 
-    // async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
-    //     return this.recordedEvents.filter(item =>
-    //         item.details.eventTime > options.startTime &&
-    //         item.details.eventTime < options.endTime
-    //     ).slice(0, options.count);
-    // }
+    async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
+        return this.recordedEvents.filter(item =>
+            item.details.eventTime > options.startTime &&
+            item.details.eventTime < options.endTime
+        ).slice(0, options.count);
+    }
 
     public getLogger() {
         const deviceConsole = this.console;
@@ -618,15 +618,20 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 let currentChecks = 0;
                 let found = false;
-                while (currentChecks < 5 && !found) {
+                while (currentChecks < 10 && !found) {
                     try {
                         await fs.promises.access(tmpClipPath);
                         found = true;
                     } catch {
                         logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
                         currentChecks += 1;
-                        await sleep(2000);
+                        await sleep(5000);
                     }
+                }
+
+                if (!found) {
+                    logger.log(`File ${tmpClipPath} not found, probably lost somewhere`);
+                    return;
                 }
 
                 const filename = getVideoClipName({
@@ -650,7 +655,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     this.scanData.push(fildeData);
                     this.recordedEvents.push(recordedEvent);
                 }
-
             }
         });
     }
@@ -727,7 +731,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
 
-                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    if (classname && !classes.includes(classname) && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
                         classes.push(det.className);
                         return true;
                     } else {

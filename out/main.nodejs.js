@@ -71236,12 +71236,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             }
         }, 2000);
     }
-    // async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
-    //     return this.recordedEvents.filter(item =>
-    //         item.details.eventTime > options.startTime &&
-    //         item.details.eventTime < options.endTime
-    //     ).slice(0, options.count);
-    // }
+    async getRecordedEvents(options) {
+        return this.recordedEvents.filter(item => item.details.eventTime > options.startTime &&
+            item.details.eventTime < options.endTime).slice(0, options.count);
+    }
     getLogger() {
         const deviceConsole = this.console;
         if (!this.logger) {
@@ -71617,7 +71615,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 this.lastClipRecordedTime = endTime;
                 let currentChecks = 0;
                 let found = false;
-                while (currentChecks < 5 && !found) {
+                while (currentChecks < 10 && !found) {
                     try {
                         await fs_1.default.promises.access(tmpClipPath);
                         found = true;
@@ -71625,8 +71623,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     catch {
                         logger.log(`Waiting for the file to be available. Current check ${currentChecks + 1}`);
                         currentChecks += 1;
-                        await (0, sleep_1.sleep)(2000);
+                        await (0, sleep_1.sleep)(5000);
                     }
+                }
+                if (!found) {
+                    logger.log(`File ${tmpClipPath} not found, probably lost somewhere`);
+                    return;
                 }
                 const filename = (0, util_1.getVideoClipName)({
                     classesDetected: (0, lodash_1.uniq)(this.classesDetected),
@@ -72049,6 +72051,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             (interfaces.includes(sdk_1.ScryptedInterface.ObjectDetector))) {
             const ret = [
                 sdk_1.ScryptedInterface.VideoClips,
+                sdk_1.ScryptedInterface.EventRecorder,
                 sdk_1.ScryptedInterface.Settings,
             ];
             return ret;
@@ -72141,7 +72144,7 @@ const attachProcessEvents = (props) => {
         logger.debug(`${processName} stderr: ${data.toString()}`);
     });
     childProcess.on('close', async () => {
-        onClose && (await onClose());
+        onClose && (onClose().catch(logger.log));
     });
 };
 exports.attachProcessEvents = attachProcessEvents;

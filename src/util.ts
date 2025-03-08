@@ -80,7 +80,7 @@ export const attachProcessEvents = (props: {
     });
 
     childProcess.on('close', async () => {
-        onClose && (await onClose());
+        onClose && (onClose().catch(logger.log));
     });
 }
 
