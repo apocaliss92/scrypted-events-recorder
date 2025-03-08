@@ -386,10 +386,10 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         logger.debug('Removing videoclips ', videoClipIds.join(', '));
         for (const videoClipId of videoClipIds) {
             const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
-            await fs.promises.rm(videoClipPath);
+            await fs.promises.rm(videoClipPath, { force: true, recursive: true, maxRetries: 10 });
             logger.log(`Videoclip ${videoClipId} removed`);
 
-            await fs.promises.rm(thumbnailPath);
+            await fs.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
             logger.log(`Thumbnail ${thumbnailPath} removed`);
         }
 
@@ -451,10 +451,10 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
             for (let i = 0; i < clipsToCleanup; i++) {
                 const { fullPath, file } = fileDetails[i];
-                await fs.promises.rm(fullPath);
+                await fs.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted videoclip: ${file}`);
                 const { thumbnailPath } = this.getStorageDirs(file);
-                await fs.promises.rm(thumbnailPath);
+                await fs.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
         }
