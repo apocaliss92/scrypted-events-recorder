@@ -1,6 +1,6 @@
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { sleep } from '@scrypted/common/src/sleep';
-import sdk, { EventListenerRegister, EventRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, ScryptedInterface, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, EventRecorder, FFmpegInput, MediaObject, MediaStreamUrl, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
@@ -11,10 +11,12 @@ import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../..
 import ObjectDetectionPlugin from './main';
 import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
 import moment from "moment";
+import { listenZeroSingleClient } from '@scrypted/common/src/listen-cluster';
+import { Deferred } from '@scrypted/common/src/deferred';
 
 const { systemManager } = sdk;
 
-export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, EventRecorder {
+export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> implements Settings, VideoClips, EventRecorder, VideoRecorder {
     cameraDevice: DeviceType;
     killed: boolean;
     rtspUrl: string;
@@ -42,6 +44,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     recordedEvents: RecordedEvent[] = [];
 
     processListenersSet = false;
+    currentTime: number;
 
     storageSettings = new StorageSettings(this, {
         highQualityVideoclips: {
@@ -163,6 +166,128 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 logger.log(`Error on init flow`, e);
             }
         }, 2000);
+    }
+
+    async getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
+        const logger = this.getLogger();
+        const foundClip = this.scanData.reduce((closest, obj) =>
+            Math.abs(obj.startTime - options.startTime) < Math.abs(closest.startTime - options.startTime) ? obj : closest
+        );
+        logger.log(`STREAM: ${JSON.stringify({ options, foundClip, recordingStream, startTime: new Date(options.startTime).toISOString() })}`);
+
+        if (foundClip) {
+            this.currentTime = foundClip.startTime;
+
+            const kill = new Deferred<void>();
+
+            const rtspServer = await listenZeroSingleClient('127.0.0.1');
+            // rtspServer.clientPromise.then(async rtsp => {
+            //     kill.promise.finally(() => rtsp.destroy());
+            //     rtsp.on('close', () => kill.resolve());
+            //     try {
+            //         // const process = spawn(this.ffmpegPath, [
+            //         //     '-re', '-i', foundClip.videoClipPath,
+            //         //     '-c:v', 'copy',
+            //         //     '-an',
+            //         //     '-f', 'rtsp',
+            //         //     `${playbackUrl}`
+            //         // ], {
+            //         //     stdio: ['pipe', 'pipe', 'pipe'],
+            //         //     detached: false
+            //         // });
+            //         const process = await startRtpForwarderProcess(this.console, {
+            //             inputArguments: [
+            //                 '-f', 'h264', '-i', 'pipe:4',
+            //                 '-f', 'aac', '-i', 'pipe:5',
+            //             ]
+            //         }, {
+            //             video: {
+            //                 onRtp: rtp => {
+            //                     if (videoTrack)
+            //                         rtsp.sendTrack(videoTrack.control, rtp, false);
+            //                 },
+            //                 encoderArguments: [
+            //                     '-vcodec', 'copy',
+            //                 ]
+            //             },
+            //             audio: {
+            //                 onRtp: rtp => {
+            //                     if (audioTrack)
+            //                         rtsp.sendTrack(audioTrack.control, rtp, false);
+            //                 },
+            //                 encoderArguments: [
+            //                     '-acodec', 'copy',
+            //                     '-rtpflags', 'latm',
+            //                 ]
+            //             }
+            //         });
+
+            //         process.killPromise.finally(() => kill.resolve());
+            //         kill.promise.finally(() => process.kill());
+
+            //         let parsedSdp: ReturnType<typeof parseSdp>;
+            //         let videoTrack: typeof parsedSdp.msections[0]
+            //         let audioTrack: typeof parsedSdp.msections[0]
+            //         process.sdpContents.then(async sdp => {
+            //             sdp = addTrackControls(sdp);
+            //             rtsp.sdp = sdp;
+            //             parsedSdp = parseSdp(sdp);
+            //             videoTrack = parsedSdp.msections.find(msection => msection.type === 'video');
+            //             audioTrack = parsedSdp.msections.find(msection => msection.type === 'audio');
+            //             await rtsp.handlePlayback();
+            //         });
+
+            //         const proxyStream = await livestreamManager.getLocalLivestream();
+            //         proxyStream.videostream.pipe(process.cp.stdio[4] as Writable);
+            //         proxyStream.audiostream.pipe((process.cp.stdio as any)[5] as Writable);
+            //     }
+            //     catch (e) {
+            //         rtsp.client.destroy();
+            //     }
+            // });
+
+            // return sdk.mediaManager.createMediaObject(ret, ScryptedMimeTypes.MediaStreamUrl);
+            // const videoclipFfmpeg = spawn(this.ffmpegPath, [
+            //     '-re', '-i', foundClip.videoClipPath,
+            //     '-c:v', 'copy',
+            //     '-an',
+            //     '-f', 'rtsp',
+            //     `${playbackUrl}`
+            // ], {
+            //     stdio: ['pipe', 'pipe', 'pipe'],
+            //     detached: false
+            // });
+
+            // attachProcessEvents({
+            //     processName: 'Videoclip serving',
+            //     childProcess: videoclipFfmpeg,
+            //     logger,
+            //     onClose: async () => {
+            //         // logger.log(`Snapshot stored ${thumbnailPath}`);
+            //         // resolve();
+            //     }
+            // });
+
+            return this.createMediaObject(rtspServer, ScryptedMimeTypes.MediaStreamUrl);
+        }
+    }
+
+    async getRecordingStreamCurrentTime(recordingStream: MediaObject): Promise<number> {
+        const logger = this.getLogger();
+        logger.log(`CURRENT TIME: ${JSON.stringify({ recordingStream })}`);
+        this.currentTime += 1000;
+        return this.currentTime;
+    }
+
+    getRecordingStreamOptions(): Promise<ResponseMediaStreamOptions[]> {
+        const logger = this.getLogger();
+        logger.log(`OPTIONS`);
+        throw new Error("Method not implemented.");
+    }
+    getRecordingStreamThumbnail(time: number, options?: RecordingStreamThumbnailOptions): Promise<MediaObject> {
+        const logger = this.getLogger();
+        logger.log(`THUMBNAIL: ${JSON.stringify({ options, time })}`);
+        throw new Error("Method not implemented.");
     }
 
     async getRecordedEvents(options: RecordedEventOptions): Promise<RecordedEvent[]> {
@@ -694,20 +819,23 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         } else {
             const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
-            const shouldExtend = currentDuration < (maxLength - clipDuration);
+            // const shouldExtend = currentDuration < (maxLength - clipDuration);
+            const shouldExtend = currentDuration < maxLength;
 
             logger.debug(`Log extension check: ${JSON.stringify({
                 shouldExtend,
                 currentDuration,
                 maxLength,
-                clipDuration
+                // clipDuration
             })}`);
+
             if (shouldExtend) {
-                if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
+                if (!this.lastExtendLogged || ((now - this.lastExtendLogged) > 1000)) {
                     this.lastExtendLogged = now;
                     logger.debug(`Extending recording: ${now}`);
-                    this.restartTimeout();
                 }
+
+                this.restartTimeout();
             }
         }
     }

@@ -71118,6 +71118,7 @@ const url_1 = __importDefault(__webpack_require__(/*! url */ "url"));
 const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
+const listen_cluster_1 = __webpack_require__(/*! @scrypted/common/src/listen-cluster */ "../scrypted/common/src/listen-cluster.ts");
 const { systemManager } = sdk_1.default;
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
@@ -71235,6 +71236,53 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 logger.log(`Error on init flow`, e);
             }
         }, 2000);
+    }
+    async getRecordingStream(options, recordingStream) {
+        const logger = this.getLogger();
+        const foundClip = this.scanData.reduce((closest, obj) => Math.abs(obj.startTime - options.startTime) < Math.abs(closest.startTime - options.startTime) ? obj : closest);
+        logger.log(`STREAM: ${JSON.stringify({ options, foundClip, recordingStream, startTime: new Date(options.startTime).toISOString() })}`);
+        if (foundClip) {
+            this.currentTime = foundClip.startTime;
+            const { clientPromise: playbackPromise, port: playbackPort } = await (0, listen_cluster_1.listenZeroSingleClient)('127.0.0.1');
+            const playbackUrl = `rtsp://127.0.0.1:${playbackPort}`;
+            // return sdk.mediaManager.createMediaObject(ret, ScryptedMimeTypes.MediaStreamUrl);
+            // const videoclipFfmpeg = spawn(this.ffmpegPath, [
+            //     '-re', '-i', foundClip.videoClipPath,
+            //     '-c:v', 'copy',
+            //     '-an',
+            //     '-f', 'rtsp',
+            //     `${playbackUrl}`
+            // ], {
+            //     stdio: ['pipe', 'pipe', 'pipe'],
+            //     detached: false
+            // });
+            // attachProcessEvents({
+            //     processName: 'Videoclip serving',
+            //     childProcess: videoclipFfmpeg,
+            //     logger,
+            //     onClose: async () => {
+            //         // logger.log(`Snapshot stored ${thumbnailPath}`);
+            //         // resolve();
+            //     }
+            // });
+            return this.createMediaObject(playbackUrl, sdk_1.ScryptedMimeTypes.MediaStreamUrl);
+        }
+    }
+    async getRecordingStreamCurrentTime(recordingStream) {
+        const logger = this.getLogger();
+        logger.log(`CURRENT TIME: ${JSON.stringify({ recordingStream })}`);
+        this.currentTime += 1000;
+        return this.currentTime;
+    }
+    getRecordingStreamOptions() {
+        const logger = this.getLogger();
+        logger.log(`OPTIONS`);
+        throw new Error("Method not implemented.");
+    }
+    getRecordingStreamThumbnail(time, options) {
+        const logger = this.getLogger();
+        logger.log(`THUMBNAIL: ${JSON.stringify({ options, time })}`);
+        throw new Error("Method not implemented.");
     }
     async getRecordedEvents(options) {
         return this.recordedEvents.filter(item => item.details.eventTime > options.startTime &&
@@ -71423,9 +71471,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         logger.debug('Removing videoclips ', videoClipIds.join(', '));
         for (const videoClipId of videoClipIds) {
             const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
-            await fs_1.default.promises.rm(videoClipPath);
+            await fs_1.default.promises.rm(videoClipPath, { force: true, recursive: true, maxRetries: 10 });
             logger.log(`Videoclip ${videoClipId} removed`);
-            await fs_1.default.promises.rm(thumbnailPath);
+            await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
             logger.log(`Thumbnail ${thumbnailPath} removed`);
         }
         return;
@@ -71477,10 +71525,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             logger.log(`Deleting ${util_1.clipsToCleanup} oldest files...`);
             for (let i = 0; i < util_1.clipsToCleanup; i++) {
                 const { fullPath, file } = fileDetails[i];
-                await fs_1.default.promises.rm(fullPath);
+                await fs_1.default.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted videoclip: ${file}`);
                 const { thumbnailPath } = this.getStorageDirs(file);
-                await fs_1.default.promises.rm(thumbnailPath);
+                await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
         }
@@ -71715,7 +71763,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
-                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    if (classname && !classes.includes(classname) && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
                         classes.push(det.className);
                         return true;
                     }
@@ -72052,6 +72100,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             const ret = [
                 sdk_1.ScryptedInterface.VideoClips,
                 sdk_1.ScryptedInterface.EventRecorder,
+                sdk_1.ScryptedInterface.VideoRecorder,
                 sdk_1.ScryptedInterface.Settings,
             ];
             return ret;
@@ -72172,6 +72221,106 @@ exports.getVideoClipName = getVideoClipName;
 
 /***/ }),
 
+/***/ "../scrypted/common/src/listen-cluster.ts":
+/*!************************************************!*\
+  !*** ../scrypted/common/src/listen-cluster.ts ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.listenZeroSingleClient = exports.listenZero = exports.ListenZeroSingleClientTimeoutError = void 0;
+exports.closeQuiet = closeQuiet;
+exports.bindUdp = bindUdp;
+exports.bindZero = bindZero;
+exports.createBindZero = createBindZero;
+exports.createSquentialBindZero = createSquentialBindZero;
+exports.reserveUdpPort = reserveUdpPort;
+exports.createBindUdp = createBindUdp;
+exports.bind = bind;
+const dgram_1 = __importDefault(__webpack_require__(/*! dgram */ "dgram"));
+const events_1 = __webpack_require__(/*! events */ "events");
+async function closeQuiet(socket) {
+    if (!socket)
+        return;
+    try {
+        await new Promise((r, f) => {
+            try {
+                socket.close(r);
+            }
+            catch (e) {
+                f(e);
+            }
+        });
+    }
+    catch (e) {
+    }
+}
+async function bindUdp(server, usePort, address) {
+    server.bind(usePort, address);
+    await (0, events_1.once)(server, 'listening');
+    const port = server.address().port;
+    return {
+        port,
+        url: `udp://127.0.0.1:${port}`,
+    };
+}
+async function bindZero(server) {
+    return bindUdp(server, 0);
+}
+async function createBindZero(socketType) {
+    return createBindUdp(0, socketType);
+}
+async function createSquentialBindZero(socketType) {
+    let attempts = 0;
+    while (true) {
+        const rtpServer = await createBindZero(socketType);
+        try {
+            const rtcpServer = await createBindUdp(rtpServer.port + 1, socketType);
+            return [rtpServer, rtcpServer];
+        }
+        catch (e) {
+            attempts++;
+            closeQuiet(rtpServer.server);
+        }
+        if (attempts === 10)
+            throw new Error('unable to reserve sequential udp ports');
+    }
+}
+async function reserveUdpPort() {
+    const udp = await createBindZero();
+    await new Promise(resolve => udp.server.close(() => resolve(undefined)));
+    return udp.port;
+}
+async function createBindUdp(usePort, socketType) {
+    const server = dgram_1.default.createSocket(socketType || 'udp4');
+    const { port, url } = await bindUdp(server, usePort);
+    return {
+        server,
+        port,
+        url,
+    };
+}
+async function bind(server, port) {
+    server.bind(port);
+    await (0, events_1.once)(server, 'listening');
+    return {
+        port,
+        url: `udp://127.0.0.1:${port}`,
+    };
+}
+var listen_zero_1 = __webpack_require__(/*! ../../server/src/listen-zero */ "../scrypted/server/src/listen-zero.ts");
+Object.defineProperty(exports, "ListenZeroSingleClientTimeoutError", ({ enumerable: true, get: function () { return listen_zero_1.ListenZeroSingleClientTimeoutError; } }));
+Object.defineProperty(exports, "listenZero", ({ enumerable: true, get: function () { return listen_zero_1.listenZero; } }));
+Object.defineProperty(exports, "listenZeroSingleClient", ({ enumerable: true, get: function () { return listen_zero_1.listenZeroSingleClient; } }));
+
+
+/***/ }),
+
 /***/ "../scrypted/common/src/settings-mixin.ts":
 /*!************************************************!*\
   !*** ../scrypted/common/src/settings-mixin.ts ***!
@@ -72268,6 +72417,70 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = void 0;
 var sleep_1 = __webpack_require__(/*! ../../server/src/sleep */ "../scrypted/server/src/sleep.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_1.sleep; } }));
+
+
+/***/ }),
+
+/***/ "../scrypted/server/src/listen-zero.ts":
+/*!*********************************************!*\
+  !*** ../scrypted/server/src/listen-zero.ts ***!
+  \*********************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ListenZeroSingleClientTimeoutError = void 0;
+exports.listenZero = listenZero;
+exports.listenZeroSingleClient = listenZeroSingleClient;
+const events_1 = __webpack_require__(/*! events */ "events");
+const net_1 = __importDefault(__webpack_require__(/*! net */ "net"));
+const tls_1 = __importDefault(__webpack_require__(/*! tls */ "tls"));
+class ListenZeroSingleClientTimeoutError extends Error {
+    constructor() {
+        super('timeout waiting for client');
+    }
+}
+exports.ListenZeroSingleClientTimeoutError = ListenZeroSingleClientTimeoutError;
+async function listenZero(server, hostname) {
+    server.listen(0, hostname || '127.0.0.1');
+    await (0, events_1.once)(server, 'listening');
+    return server.address().port;
+}
+async function listenZeroSingleClient(hostname, options, listenTimeout = 30000) {
+    const server = options?.tls ? new tls_1.default.Server(options) : new net_1.default.Server(options);
+    const port = await listenZero(server, hostname);
+    let cancel;
+    const clientPromise = new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            server.close();
+            reject(new ListenZeroSingleClientTimeoutError());
+        }, listenTimeout);
+        cancel = () => {
+            clearTimeout(timeout);
+            server.close();
+        };
+        server.on('connection', client => {
+            cancel();
+            resolve(client);
+        });
+    });
+    clientPromise.catch(() => { });
+    let host = hostname;
+    if (!host || host === '0.0.0.0')
+        host = '127.0.0.1';
+    return {
+        server,
+        cancel,
+        url: `tcp://${host}:${port}`,
+        host,
+        port,
+        clientPromise,
+    };
+}
 
 
 /***/ }),
@@ -73833,6 +74046,17 @@ module.exports = require("child_process");
 
 "use strict";
 module.exports = require("crypto");
+
+/***/ }),
+
+/***/ "dgram":
+/*!************************!*\
+  !*** external "dgram" ***!
+  \************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("dgram");
 
 /***/ }),
 
