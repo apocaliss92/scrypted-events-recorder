@@ -94,7 +94,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             placeholder: 'GB'
         },
         ignoreCameraDetections: {
-            title: 'Ingnore camera detections',
+            title: 'Ignore camera detections',
             type: 'boolean',
             defaultValue: true,
             immediate: true,
