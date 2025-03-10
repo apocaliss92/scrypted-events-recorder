@@ -26,7 +26,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     logger: Console;
     saveFfmpegProcess: ChildProcessWithoutNullStreams;
     running = false;
-    lastExtendLogged: number;
     ffmpegPath: string;
     lastIndexFs: number;
     lastScanFs: number;
@@ -830,10 +829,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             })}`);
 
             if (shouldExtend) {
-                if (!this.lastExtendLogged || ((now - this.lastExtendLogged) > 1000)) {
-                    this.lastExtendLogged = now;
-                    logger.debug(`Extending recording: ${now}`);
-                }
+                logger.debug(`Extending recording: ${now}`);
 
                 this.restartTimeout();
             }
