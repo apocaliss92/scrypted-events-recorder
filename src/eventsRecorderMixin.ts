@@ -818,8 +818,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         } else {
             const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
-            // const shouldExtend = currentDuration < (maxLength - clipDuration);
-            const shouldExtend = currentDuration < maxLength;
+            const shouldExtend = currentDuration + clipDuration < maxLength;
 
             logger.debug(`Log extension check: ${JSON.stringify({
                 shouldExtend,
@@ -844,6 +843,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
 
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
+            const isMotionIncluded = detectionClasses.includes(DetectionClass.Motion);
 
             const classes: string[] = [];
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
@@ -879,26 +879,28 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 this.triggerMotionRecording(classes).catch(logger.log);
             });
 
-            if (detectionClasses.includes(DetectionClass.Motion)) {
-                logger.log(`Starting listener of ${ScryptedInterface.MotionSensor}`);
-                this.motionListener = systemManager.listenDevice(this.id, ScryptedInterface.MotionSensor, async (_, __, data: boolean) => {
-                    const now = Date.now();
+            logger.log(`Starting listener of ${ScryptedInterface.MotionSensor}`);
+            this.motionListener = systemManager.listenDevice(this.id, ScryptedInterface.MotionSensor, async (_, __, data: boolean) => {
+                const now = Date.now();
 
-                    if (data) {
-                        logger.debug(`Motion received: ${JSON.stringify({
-                            lastMotion: this.lastMotionTrigger,
-                        })}`);
+                if (data) {
+                    logger.debug(`Motion received: ${JSON.stringify({
+                        lastMotion: this.lastMotionTrigger,
+                    })}`);
 
-                        if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
-                            return;
-                        }
+                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                        return;
+                    }
 
-                        this.classesDetected.push(DetectionClass.Motion);
-                        this.lastMotionTrigger = now;
+                    this.classesDetected.push(DetectionClass.Motion);
+                    this.lastMotionTrigger = now;
+
+                    // Motion should trigger a recording if included as trigger o if already recording to prolong the clip
+                    if (isMotionIncluded || this.recording) {
                         this.triggerMotionRecording([DetectionClass.Motion]).catch(logger.log);
                     }
-                });
-            }
+                }
+            });
         } catch (e) {
             logger.log('Error in startListeners', e);
         }
