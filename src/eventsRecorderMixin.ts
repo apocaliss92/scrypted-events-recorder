@@ -1,6 +1,6 @@
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { sleep } from '@scrypted/common/src/sleep';
-import sdk, { EventListenerRegister, EventRecorder, FFmpegInput, MediaObject, MediaStreamUrl, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, EventRecorder, FFmpegInput, MediaObject, MediaStreamUrl, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, SettingValue, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
@@ -87,6 +87,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             title: 'Dedicated memory in GB',
             type: 'number',
             defaultValue: 20,
+            onPut: async (_, newValue) => await this.scanFs(newValue)
         },
         occupiedSpaceInGb: {
             title: 'Memory occupancy in GB',
@@ -154,6 +155,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     const processPid = this.storageSettings.values.processPid;
                     try {
                         processPid && process.kill(processPid, 'SIGTERM');
+                    } catch {
                     } finally {
                         this.storageSettings.values.processPid = undefined;
                     }
@@ -520,10 +522,11 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         return;
     }
 
-    async scanFs() {
+    async scanFs(newMaxMemory?: number) {
         const logger = this.getLogger();
         const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
         let occupiedSizeInBytes = 0;
+        logger.log(`Starting FS scan: ${JSON.stringify({ newMaxMemory })}`);
 
         const calculateSize = async (currentPath: string) => {
             const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
@@ -542,7 +545,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
-        const { maxSpaceInGb } = this.storageSettings.values;
+        const { maxSpaceInGb: maxSpaceInGbSrc } = this.storageSettings.values;
+        const maxSpaceInGb = newMaxMemory ?? maxSpaceInGbSrc;
         const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
         this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb]
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
@@ -676,6 +680,15 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         return settings;
     }
 
+    async putSetting(key: string, value: SettingValue): Promise<void> {
+        const [group, ...rest] = key.split(':');
+        if (group === this.settingsGroupKey) {
+            this.storageSettings.putSetting(rest.join(':'), value);
+        } else {
+            super.putSetting(key, value);
+        }
+    }
+
     async putMixinSetting(key: string, value: string | number | boolean | string[] | number[]): Promise<void> {
         this.storage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
     }
@@ -801,6 +814,13 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const now = Date.now();
         const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
 
+        logger.debug(`Recording starting attempt: ${JSON.stringify({
+            recording: this.recording,
+            lastClipRecordedTime: this.lastClipRecordedTime,
+            timePassed: this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000,
+            triggers
+        })}`);
+
         if (!this.recording) {
             if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000) {
                 return;
@@ -824,11 +844,15 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 shouldExtend,
                 currentDuration,
                 maxLength,
-                // clipDuration
+                clipDuration
             })}`);
 
             if (shouldExtend) {
-                logger.debug(`Extending recording: ${now}`);
+                logger.log(`Extending recording: ${JSON.stringify({
+                    currentDuration,
+                    clipDuration,
+                    maxLength
+                })}`);
 
                 this.restartTimeout();
             }
@@ -845,7 +869,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
             const isMotionIncluded = detectionClasses.includes(DetectionClass.Motion);
 
-            const classes: string[] = [];
+            const classesMap = new Map<string, boolean>();
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
                 const filtered = data.detections.filter(det => {
@@ -855,8 +879,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
 
-                    if (classname && !classes.includes(classname) && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
-                        classes.push(det.className);
+                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                        classesMap.set(classname, true);
                         return true;
                     } else {
                         return false;
@@ -865,7 +889,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 logger.debug(`Object detections received: ${JSON.stringify({
                     filtered,
-                    classes,
+                    data,
+                    scoreThreshold
                 })}`);
 
                 if (!filtered.length) {
@@ -874,6 +899,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const now = Date.now();
 
+                const classes = Array.from(classesMap.keys());
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording(classes).catch(logger.log);

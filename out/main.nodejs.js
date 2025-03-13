@@ -71119,6 +71119,7 @@ const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifi
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 const listen_cluster_1 = __webpack_require__(/*! @scrypted/common/src/listen-cluster */ "../scrypted/common/src/listen-cluster.ts");
+const deferred_1 = __webpack_require__(/*! @scrypted/common/src/deferred */ "../scrypted/server/src/deferred.ts");
 const { systemManager } = sdk_1.default;
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
@@ -71178,6 +71179,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 title: 'Dedicated memory in GB',
                 type: 'number',
                 defaultValue: 20,
+                onPut: async (_, newValue) => await this.scanFs(newValue)
             },
             occupiedSpaceInGb: {
                 title: 'Memory occupancy in GB',
@@ -71187,7 +71189,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 placeholder: 'GB'
             },
             ignoreCameraDetections: {
-                title: 'Ingnore camera detections',
+                title: 'Ignore camera detections',
                 type: 'boolean',
                 defaultValue: true,
                 immediate: true,
@@ -71225,6 +71227,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     try {
                         processPid && process.kill(processPid, 'SIGTERM');
                     }
+                    catch {
+                    }
                     finally {
                         this.storageSettings.values.processPid = undefined;
                     }
@@ -71243,8 +71247,69 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         logger.log(`STREAM: ${JSON.stringify({ options, foundClip, recordingStream, startTime: new Date(options.startTime).toISOString() })}`);
         if (foundClip) {
             this.currentTime = foundClip.startTime;
-            const { clientPromise: playbackPromise, port: playbackPort } = await (0, listen_cluster_1.listenZeroSingleClient)('127.0.0.1');
-            const playbackUrl = `rtsp://127.0.0.1:${playbackPort}`;
+            const kill = new deferred_1.Deferred();
+            const rtspServer = await (0, listen_cluster_1.listenZeroSingleClient)('127.0.0.1');
+            // rtspServer.clientPromise.then(async rtsp => {
+            //     kill.promise.finally(() => rtsp.destroy());
+            //     rtsp.on('close', () => kill.resolve());
+            //     try {
+            //         // const process = spawn(this.ffmpegPath, [
+            //         //     '-re', '-i', foundClip.videoClipPath,
+            //         //     '-c:v', 'copy',
+            //         //     '-an',
+            //         //     '-f', 'rtsp',
+            //         //     `${playbackUrl}`
+            //         // ], {
+            //         //     stdio: ['pipe', 'pipe', 'pipe'],
+            //         //     detached: false
+            //         // });
+            //         const process = await startRtpForwarderProcess(this.console, {
+            //             inputArguments: [
+            //                 '-f', 'h264', '-i', 'pipe:4',
+            //                 '-f', 'aac', '-i', 'pipe:5',
+            //             ]
+            //         }, {
+            //             video: {
+            //                 onRtp: rtp => {
+            //                     if (videoTrack)
+            //                         rtsp.sendTrack(videoTrack.control, rtp, false);
+            //                 },
+            //                 encoderArguments: [
+            //                     '-vcodec', 'copy',
+            //                 ]
+            //             },
+            //             audio: {
+            //                 onRtp: rtp => {
+            //                     if (audioTrack)
+            //                         rtsp.sendTrack(audioTrack.control, rtp, false);
+            //                 },
+            //                 encoderArguments: [
+            //                     '-acodec', 'copy',
+            //                     '-rtpflags', 'latm',
+            //                 ]
+            //             }
+            //         });
+            //         process.killPromise.finally(() => kill.resolve());
+            //         kill.promise.finally(() => process.kill());
+            //         let parsedSdp: ReturnType<typeof parseSdp>;
+            //         let videoTrack: typeof parsedSdp.msections[0]
+            //         let audioTrack: typeof parsedSdp.msections[0]
+            //         process.sdpContents.then(async sdp => {
+            //             sdp = addTrackControls(sdp);
+            //             rtsp.sdp = sdp;
+            //             parsedSdp = parseSdp(sdp);
+            //             videoTrack = parsedSdp.msections.find(msection => msection.type === 'video');
+            //             audioTrack = parsedSdp.msections.find(msection => msection.type === 'audio');
+            //             await rtsp.handlePlayback();
+            //         });
+            //         const proxyStream = await livestreamManager.getLocalLivestream();
+            //         proxyStream.videostream.pipe(process.cp.stdio[4] as Writable);
+            //         proxyStream.audiostream.pipe((process.cp.stdio as any)[5] as Writable);
+            //     }
+            //     catch (e) {
+            //         rtsp.client.destroy();
+            //     }
+            // });
             // return sdk.mediaManager.createMediaObject(ret, ScryptedMimeTypes.MediaStreamUrl);
             // const videoclipFfmpeg = spawn(this.ffmpegPath, [
             //     '-re', '-i', foundClip.videoClipPath,
@@ -71265,7 +71330,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             //         // resolve();
             //     }
             // });
-            return this.createMediaObject(playbackUrl, sdk_1.ScryptedMimeTypes.MediaStreamUrl);
+            return this.createMediaObject(rtspServer, sdk_1.ScryptedMimeTypes.MediaStreamUrl);
         }
     }
     async getRecordingStreamCurrentTime(recordingStream) {
@@ -71478,10 +71543,11 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         return;
     }
-    async scanFs() {
+    async scanFs(newMaxMemory) {
         const logger = this.getLogger();
         const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
         let occupiedSizeInBytes = 0;
+        logger.log(`Starting FS scan: ${JSON.stringify({ newMaxMemory })}`);
         const calculateSize = async (currentPath) => {
             const entries = await fs_1.default.promises.readdir(currentPath, { withFileTypes: true });
             for (const entry of entries) {
@@ -71498,7 +71564,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         await calculateSize(deviceFolder);
         const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
         const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
-        const { maxSpaceInGb } = this.storageSettings.values;
+        const { maxSpaceInGb: maxSpaceInGbSrc } = this.storageSettings.values;
+        const maxSpaceInGb = newMaxMemory ?? maxSpaceInGbSrc;
         const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
         this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb];
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
@@ -71605,6 +71672,15 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async getMixinSettings() {
         const settings = await this.storageSettings.getSettings();
         return settings;
+    }
+    async putSetting(key, value) {
+        const [group, ...rest] = key.split(':');
+        if (group === this.settingsGroupKey) {
+            this.storageSettings.putSetting(rest.join(':'), value);
+        }
+        else {
+            super.putSetting(key, value);
+        }
     }
     async putMixinSetting(key, value) {
         this.storage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
@@ -71715,6 +71791,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const now = Date.now();
         const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
+        logger.log(`Recording starting attempt: ${JSON.stringify({
+            recording: this.recording,
+            lastClipRecordedTime: this.lastClipRecordedTime,
+            timePassed: this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000,
+            triggers
+        })}`);
         if (!this.recording) {
             if (this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000) {
                 return;
@@ -71732,7 +71814,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         else {
             const currentDuration = (now - this.recordingTimeStart) / 1000;
             const clipDuration = this.clipDurationInMs / 1000;
-            const shouldExtend = currentDuration < (maxLength - clipDuration);
+            const shouldExtend = currentDuration + clipDuration < maxLength;
             logger.debug(`Log extension check: ${JSON.stringify({
                 shouldExtend,
                 currentDuration,
@@ -71740,11 +71822,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 clipDuration
             })}`);
             if (shouldExtend) {
-                if (!this.lastExtendLogged || (now - this.lastExtendLogged > 1000)) {
-                    this.lastExtendLogged = now;
-                    logger.debug(`Extending recording: ${now}`);
-                    this.restartTimeout();
-                }
+                logger.log(`Extending recording: ${JSON.stringify({
+                    currentDuration,
+                    clipDuration,
+                    maxLength
+                })}`);
+                this.restartTimeout();
             }
         }
     }
@@ -71755,7 +71838,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             this.running = true;
             const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
-            const classes = [];
+            const isMotionIncluded = detectionClasses.includes(detecionClasses_1.DetectionClass.Motion);
+            const classesMap = new Map();
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
                 const filtered = data.detections.filter(det => {
@@ -71763,8 +71847,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
-                    if (classname && !classes.includes(classname) && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
-                        classes.push(det.className);
+                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                        classesMap.set(classname, true);
                         return true;
                     }
                     else {
@@ -71773,33 +71857,36 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 });
                 logger.debug(`Object detections received: ${JSON.stringify({
                     filtered,
-                    classes,
+                    data,
+                    scoreThreshold
                 })}`);
                 if (!filtered.length) {
                     return;
                 }
                 const now = Date.now();
+                const classes = Array.from(classesMap.keys());
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording(classes).catch(logger.log);
             });
-            if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
-                logger.log(`Starting listener of ${sdk_1.ScryptedInterface.MotionSensor}`);
-                this.motionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.MotionSensor, async (_, __, data) => {
-                    const now = Date.now();
-                    if (data) {
-                        logger.debug(`Motion received: ${JSON.stringify({
-                            lastMotion: this.lastMotionTrigger,
-                        })}`);
-                        if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
-                            return;
-                        }
-                        this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
-                        this.lastMotionTrigger = now;
+            logger.log(`Starting listener of ${sdk_1.ScryptedInterface.MotionSensor}`);
+            this.motionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.MotionSensor, async (_, __, data) => {
+                const now = Date.now();
+                if (data) {
+                    logger.debug(`Motion received: ${JSON.stringify({
+                        lastMotion: this.lastMotionTrigger,
+                    })}`);
+                    if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
+                        return;
+                    }
+                    this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
+                    this.lastMotionTrigger = now;
+                    // Motion should trigger a recording if included as trigger o if already recording to prolong the clip
+                    if (isMotionIncluded || this.recording) {
                         this.triggerMotionRecording([detecionClasses_1.DetectionClass.Motion]).catch(logger.log);
                     }
-                });
-            }
+                }
+            });
         }
         catch (e) {
             logger.log('Error in startListeners', e);
@@ -72100,7 +72187,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             const ret = [
                 sdk_1.ScryptedInterface.VideoClips,
                 sdk_1.ScryptedInterface.EventRecorder,
-                sdk_1.ScryptedInterface.VideoRecorder,
+                // ScryptedInterface.VideoRecorder,
                 sdk_1.ScryptedInterface.Settings,
             ];
             return ret;
@@ -72192,7 +72279,8 @@ const attachProcessEvents = (props) => {
     childProcess.stderr.on('data', (data) => {
         logger.debug(`${processName} stderr: ${data.toString()}`);
     });
-    childProcess.on('close', async () => {
+    childProcess.on('close', async (data) => {
+        logger.log(`Process ${processName} closed: ${data}`);
         onClose && (onClose().catch(logger.log));
     });
 };
@@ -72417,6 +72505,46 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = void 0;
 var sleep_1 = __webpack_require__(/*! ../../server/src/sleep */ "../scrypted/server/src/sleep.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_1.sleep; } }));
+
+
+/***/ }),
+
+/***/ "../scrypted/server/src/deferred.ts":
+/*!******************************************!*\
+  !*** ../scrypted/server/src/deferred.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Deferred = void 0;
+class Deferred {
+    constructor() {
+        this.finished = false;
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = v => {
+                this.finished = true;
+                resolve(v);
+                return this;
+            };
+            this.reject = e => {
+                this.finished = true;
+                reject(e);
+                return this;
+            };
+        });
+    }
+    async resolvePromise(p) {
+        try {
+            this.resolve(await p);
+        }
+        catch (e) {
+            this.reject(e);
+        }
+    }
+}
+exports.Deferred = Deferred;
 
 
 /***/ }),

@@ -79,7 +79,8 @@ export const attachProcessEvents = (props: {
         logger.debug(`${processName} stderr: ${data.toString()}`);
     });
 
-    childProcess.on('close', async () => {
+    childProcess.on('close', async (data) => {
+        logger.log(`Process ${processName} closed: ${data}`);
         onClose && (onClose().catch(logger.log));
     });
 }
