@@ -42,7 +42,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     scanData: VideoclipFileData[] = [];
     recordedEvents: RecordedEvent[] = [];
 
-    processListenersSet = false;
     currentTime: number;
 
     storageSettings = new StorageSettings(this, {
@@ -149,15 +148,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         setTimeout(async () => {
             try {
                 if (!this.killed) {
-                    if (!this.processListenersSet) {
-                        process.on('exit', this.resetListeners);
-                        process.on('SIGINT', this.resetListeners);
-                        process.on('SIGTERM', this.resetListeners);
-                        process.on('uncaughtException', this.resetListeners);
-
-                        this.processListenersSet = true;
-                    }
-
                     this.ffmpegPath = await sdk.mediaManager.getFFmpegPath();
                     const processPid = this.storageSettings.values.processPid;
                     try {

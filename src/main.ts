@@ -67,6 +67,15 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     } else {
       this.getLogger().error('Storage path not defined');
     }
+
+    process.on('exit', this.cleanAllListeners);
+    process.on('SIGINT', this.cleanAllListeners);
+    process.on('SIGTERM', this.cleanAllListeners);
+    process.on('uncaughtException', this.cleanAllListeners);
+  }
+
+  cleanAllListeners() {
+    this.currentMixins.forEach(mixin => mixin.resetListeners());
   }
 
   setMixinOccupancy(deviceId: string, data: MixinStorage) {

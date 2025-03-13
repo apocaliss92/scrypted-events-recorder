@@ -71136,7 +71136,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.classesDetected = [];
         this.scanData = [];
         this.recordedEvents = [];
-        this.processListenersSet = false;
         this.storageSettings = new storage_settings_1.StorageSettings(this, {
             highQualityVideoclips: {
                 title: 'High quality clips',
@@ -71194,6 +71193,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 defaultValue: true,
                 immediate: true,
             },
+            prolongClipOnMotion: {
+                title: 'Prolong the clip on motion',
+                description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
+                type: 'boolean',
+                defaultValue: true,
+                immediate: true,
+            },
             debug: {
                 title: 'Log debug messages',
                 type: 'boolean',
@@ -71215,13 +71221,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         setTimeout(async () => {
             try {
                 if (!this.killed) {
-                    if (!this.processListenersSet) {
-                        process.on('exit', this.resetListeners);
-                        process.on('SIGINT', this.resetListeners);
-                        process.on('SIGTERM', this.resetListeners);
-                        process.on('uncaughtException', this.resetListeners);
-                        this.processListenersSet = true;
-                    }
                     this.ffmpegPath = await sdk_1.default.mediaManager.getFFmpegPath();
                     const processPid = this.storageSettings.values.processPid;
                     try {
@@ -71791,7 +71790,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         const now = Date.now();
         const { maxLength, minDelayBetweenClips } = this.storageSettings.values;
-        logger.log(`Recording starting attempt: ${JSON.stringify({
+        logger.debug(`Recording starting attempt: ${JSON.stringify({
             recording: this.recording,
             lastClipRecordedTime: this.lastClipRecordedTime,
             timePassed: this.lastClipRecordedTime && (now - this.lastClipRecordedTime) < minDelayBetweenClips * 1000,
@@ -71825,7 +71824,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 logger.log(`Extending recording: ${JSON.stringify({
                     currentDuration,
                     clipDuration,
-                    maxLength
+                    maxLength,
+                    triggers
                 })}`);
                 this.restartTimeout();
             }
@@ -71836,7 +71836,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         try {
             await this.resetListeners({ skipMainLoop: true });
             this.running = true;
-            const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
+            const { scoreThreshold, detectionClasses, ignoreCameraDetections, prolongClipOnMotion } = this.storageSettings.values;
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
             const isMotionIncluded = detectionClasses.includes(detecionClasses_1.DetectionClass.Motion);
             const classesMap = new Map();
@@ -71881,8 +71881,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     }
                     this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
                     this.lastMotionTrigger = now;
-                    // Motion should trigger a recording if included as trigger o if already recording to prolong the clip
-                    if (isMotionIncluded || this.recording) {
+                    if (isMotionIncluded || (prolongClipOnMotion && this.recording)) {
                         this.triggerMotionRecording([detecionClasses_1.DetectionClass.Motion]).catch(logger.log);
                     }
                 }
@@ -72040,6 +72039,13 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
         else {
             this.getLogger().error('Storage path not defined');
         }
+        process.on('exit', this.cleanAllListeners);
+        process.on('SIGINT', this.cleanAllListeners);
+        process.on('SIGTERM', this.cleanAllListeners);
+        process.on('uncaughtException', this.cleanAllListeners);
+    }
+    cleanAllListeners() {
+        this.currentMixins.forEach(mixin => mixin.resetListeners());
     }
     setMixinOccupancy(deviceId, data) {
         this.mixinStorage[deviceId] = data;
