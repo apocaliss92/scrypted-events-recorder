@@ -105,7 +105,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             title: 'Prolong the clip on motion',
             description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
             type: 'boolean',
-            defaultValue: true,
             immediate: true,
         },
         debug: {
