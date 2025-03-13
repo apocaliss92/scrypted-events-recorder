@@ -102,6 +102,13 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             defaultValue: true,
             immediate: true,
         },
+        prolongClipOnMotion: {
+            title: 'Prolong the clip on motion',
+            description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
+            type: 'boolean',
+            defaultValue: true,
+            immediate: true,
+        },
         debug: {
             title: 'Log debug messages',
             type: 'boolean',
@@ -851,7 +858,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 logger.log(`Extending recording: ${JSON.stringify({
                     currentDuration,
                     clipDuration,
-                    maxLength
+                    maxLength,
+                    triggers
                 })}`);
 
                 this.restartTimeout();
@@ -864,7 +872,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         try {
             await this.resetListeners({ skipMainLoop: true });
             this.running = true;
-            const { scoreThreshold, detectionClasses, ignoreCameraDetections } = this.storageSettings.values;
+            const { scoreThreshold, detectionClasses, ignoreCameraDetections, prolongClipOnMotion } = this.storageSettings.values;
 
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
             const isMotionIncluded = detectionClasses.includes(DetectionClass.Motion);
@@ -921,8 +929,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     this.classesDetected.push(DetectionClass.Motion);
                     this.lastMotionTrigger = now;
 
-                    // Motion should trigger a recording if included as trigger o if already recording to prolong the clip
-                    if (isMotionIncluded || this.recording) {
+                    if (isMotionIncluded || (prolongClipOnMotion && this.recording)) {
                         this.triggerMotionRecording([DetectionClass.Motion]).catch(logger.log);
                     }
                 }
