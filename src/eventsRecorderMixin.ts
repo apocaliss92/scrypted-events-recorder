@@ -58,7 +58,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             description: 'Seconds to keep after an event occurs.',
             type: 'number',
             defaultValue: 10,
-            group: 'Advanced'
         },
         maxLength: {
             title: 'Max length in seconds',
@@ -70,7 +69,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             description: 'Define how many seconds to wait, as minumum, between two clips',
             type: 'number',
             defaultValue: 10,
-            group: 'Advanced'
         },
         scoreThreshold: {
             title: 'Score threshold',
@@ -102,28 +100,24 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             type: 'boolean',
             defaultValue: true,
             immediate: true,
-            group: 'Advanced'
         },
         transcodeToH264: {
             title: 'Transcode to h264',
             type: 'boolean',
             defaultValue: true,
             immediate: true,
-            group: 'Advanced'
         },
         prolongClipOnMotion: {
             title: 'Prolong the clip on motion',
             description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
             type: 'boolean',
             immediate: true,
-            group: 'Advanced'
         },
         debug: {
             title: 'Log debug messages',
             type: 'boolean',
             defaultValue: false,
             immediate: true,
-            group: 'Advanced'
         },
         processPid: {
             type: 'string',
