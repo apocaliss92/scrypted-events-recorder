@@ -577,9 +577,11 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
             fileDetails.sort((a, b) => a.timeStart - b.timeStart);
 
-            logger.log(`Deleting ${clipsToCleanup} oldest files...`);
+            const filesToDelete = Math.min(fileDetails.length, clipsToCleanup);
 
-            for (let i = 0; i < clipsToCleanup; i++) {
+            logger.log(`Deleting ${filesToDelete} oldest files... ${JSON.stringify({ freeMemory, cleanupMemoryThresholderInGb })}`);
+
+            for (let i = 0; i < filesToDelete; i++) {
                 const { fullPath, file } = fileDetails[i];
                 await fs.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted videoclip: ${file}`);

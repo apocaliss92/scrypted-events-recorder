@@ -71193,6 +71193,12 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 defaultValue: true,
                 immediate: true,
             },
+            transcodeToH264: {
+                title: 'Transcode to h264',
+                type: 'boolean',
+                defaultValue: true,
+                immediate: true,
+            },
             prolongClipOnMotion: {
                 title: 'Prolong the clip on motion',
                 description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
@@ -71573,30 +71579,31 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             occupied: occupiedSpaceInGbNumber,
             total: maxSpaceInGb
         });
-        if (freeMemory <= util_1.cleanupMemoryThresholderInGb) {
-            const files = await fs_1.default.promises.readdir(videoClipsFolder);
-            const fileDetails = files
-                .map((file) => {
-                const match = file.match(util_1.videoClipRegex);
-                if (match) {
-                    const timeStart = match[1];
-                    const { videoClipPath } = this.getStorageDirs(file);
-                    return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
-                }
-                return null;
-            })
-                .filter(Boolean);
-            fileDetails.sort((a, b) => a.timeStart - b.timeStart);
-            logger.log(`Deleting ${util_1.clipsToCleanup} oldest files...`);
-            for (let i = 0; i < util_1.clipsToCleanup; i++) {
-                const { fullPath, file } = fileDetails[i];
-                await fs_1.default.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
-                logger.log(`Deleted videoclip: ${file}`);
-                const { thumbnailPath } = this.getStorageDirs(file);
-                await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
-                logger.log(`Deleted thumbnail: ${thumbnailPath}`);
+        // if (freeMemory <= cleanupMemoryThresholderInGb) {
+        const files = await fs_1.default.promises.readdir(videoClipsFolder);
+        const fileDetails = files
+            .map((file) => {
+            const match = file.match(util_1.videoClipRegex);
+            if (match) {
+                const timeStart = match[1];
+                const { videoClipPath } = this.getStorageDirs(file);
+                return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
             }
+            return null;
+        })
+            .filter(Boolean);
+        fileDetails.sort((a, b) => a.timeStart - b.timeStart);
+        const filesToDelete = Math.min(fileDetails.length, util_1.clipsToCleanup);
+        logger.log(`Deleting ${filesToDelete} oldest files... ${JSON.stringify({ freeMemory, cleanupMemoryThresholderInGb: util_1.cleanupMemoryThresholderInGb })}`);
+        for (let i = 0; i < filesToDelete; i++) {
+            const { fullPath, file } = fileDetails[i];
+            // await fs.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
+            logger.log(`Deleted videoclip: ${file}`);
+            const { thumbnailPath } = this.getStorageDirs(file);
+            // await fs.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
+            logger.log(`Deleted thumbnail: ${thumbnailPath}`);
         }
+        // }
         this.lastScanFs = Date.now();
         logger.log(`FS scan executed: ${JSON.stringify({
             freeMemory,
@@ -71714,12 +71721,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async startVideoclipRecording() {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
-        const now = Date.now();
         const { tmpClipPath } = this.getStorageDirs();
+        const { transcodeToH264 } = this.storageSettings.values;
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
-            '-c:v', 'copy',
+            '-c:v', transcodeToH264 ? 'libx264' : 'copy',
+            // '-c:a', 'aac',
             '-f', 'mp4',
             tmpClipPath,
         ], {
