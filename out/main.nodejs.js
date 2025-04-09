@@ -70595,14 +70595,15 @@ const applySettingsShow = (storageSettings) => {
 };
 exports.applySettingsShow = applySettingsShow;
 const getBaseSettings = (props) => {
-    const { onPluginSwitch, hideMqtt, hideHa = true } = props;
+    const { onPluginSwitch, hideMqtt, hideHa = true, baseGroupName = 'Base' } = props;
+    const group = baseGroupName === '' ? undefined : baseGroupName;
     const settings = {
         pluginEnabled: {
             title: 'Plugin enabled',
             type: 'boolean',
             defaultValue: true,
             immediate: true,
-            group: 'Base',
+            group,
             onPut: onPluginSwitch
         },
         mqttEnabled: {
@@ -70610,7 +70611,7 @@ const getBaseSettings = (props) => {
             type: 'boolean',
             defaultValue: true,
             immediate: true,
-            group: 'Base',
+            group,
             hide: hideMqtt
         },
         debug: {
@@ -70618,20 +70619,27 @@ const getBaseSettings = (props) => {
             type: 'boolean',
             defaultValue: false,
             immediate: true,
-            group: 'Base',
+            group,
+        },
+        info: {
+            title: 'Log info messages',
+            type: 'boolean',
+            defaultValue: false,
+            immediate: true,
+            group,
         },
         devNotifier: {
             title: 'DEV notifier',
             type: 'device',
             deviceFilter: `(type === '${sdk_1.ScryptedDeviceType.Notifier}')`,
-            group: 'Base',
+            group,
         },
         useMqttPluginCredentials: {
             title: 'Use MQTT plugin credentials',
             subgroup: 'MQTT',
             type: 'boolean',
             immediate: true,
-            group: 'Base',
+            group,
             hide: hideMqtt
         },
         mqttHost: {
@@ -70639,14 +70647,14 @@ const getBaseSettings = (props) => {
             subgroup: 'MQTT',
             description: 'Specify the mqtt address.',
             placeholder: 'mqtt://192.168.1.100',
-            group: 'Base',
+            group,
             hide: hideMqtt
         },
         mqttUsename: {
             title: 'Username',
             subgroup: 'MQTT',
             description: 'Specify the mqtt username.',
-            group: 'Base',
+            group,
             hide: hideMqtt
         },
         mqttPassword: {
@@ -70654,7 +70662,7 @@ const getBaseSettings = (props) => {
             subgroup: 'MQTT',
             description: 'Specify the mqtt password.',
             type: 'password',
-            group: 'Base',
+            group,
             hide: hideMqtt
         },
         haEnabled: {
@@ -70662,10 +70670,11 @@ const getBaseSettings = (props) => {
             type: 'boolean',
             defaultValue: false,
             immediate: true,
-            hide: hideHa
+            hide: hideHa,
+            group,
         },
         useHaPluginCredentials: {
-            group: 'Base',
+            group,
             subgroup: 'Homeassistant',
             title: 'Use HA plugin credentials',
             type: 'boolean',
@@ -70673,14 +70682,14 @@ const getBaseSettings = (props) => {
             hide: hideHa
         },
         haAccessToken: {
-            group: 'Base',
+            group,
             subgroup: 'Homeassistant',
             title: 'HAPersonal access token',
             type: 'string',
             hide: hideHa
         },
         haProtocol: {
-            group: 'Base',
+            group,
             subgroup: 'Homeassistant',
             title: 'Protocol',
             type: 'string',
@@ -70689,7 +70698,7 @@ const getBaseSettings = (props) => {
             hide: hideHa
         },
         haAddress: {
-            group: 'Base',
+            group,
             subgroup: 'Homeassistant',
             title: 'Address',
             placeholder: 'https://192.168.1.1',
@@ -70701,18 +70710,18 @@ const getBaseSettings = (props) => {
 };
 exports.getBaseSettings = getBaseSettings;
 const getMqttBasicClient = async (props) => {
-    const { useMqttPluginCredentials, logger } = props;
+    const { useMqttPluginCredentials, logger, clientId, messageCb } = props;
     let mqttHost;
     let mqttUsename;
     let mqttPassword;
     let client;
     if (useMqttPluginCredentials) {
-        logger.log(`Using MQTT plugin credentials.`);
+        logger.debug(`Using MQTT plugin credentials.`);
         const mqttDevice = systemManager.getDeviceByName('MQTT');
         const mqttSettings = await mqttDevice.getSettings();
         const isInternalBroker = (JSON.parse(mqttSettings.find(setting => setting.key === 'enableBroker')?.value || 'false'));
         if (isInternalBroker) {
-            logger.log(`Internal MQTT broker not supported yet. Please disable useMqttPluginCredentials.`);
+            logger.debug(`Internal MQTT broker not supported yet. Please disable useMqttPluginCredentials.`);
         }
         else {
             mqttHost = mqttSettings.find(setting => setting.key === 'externalBroker')?.value;
@@ -70721,16 +70730,16 @@ const getMqttBasicClient = async (props) => {
         }
     }
     else {
-        logger.log(`Using provided credentials.`);
+        logger.debug(`Using provided credentials.`);
         mqttHost = props.mqttHost;
         mqttUsename = props.mqttUsename;
         mqttPassword = props.mqttPassword;
     }
     if (!mqttHost || !mqttUsename || !mqttPassword) {
-        logger.log('MQTT params not provided');
+        logger.debug('MQTT params not provided');
     }
     try {
-        client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger);
+        client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger, clientId, messageCb);
     }
     catch (e) {
         logger.log('Error setting up MQTT client', e);
@@ -70807,7 +70816,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
     putSetting(key, value) {
         return this.storageSettings.putSetting(key, value);
     }
-    async setupMqttClient() {
+    async setupMqttClient(clientId) {
         const { mqttEnabled, useMqttPluginCredentials, pluginEnabled } = this.storageSettings.values;
         if (mqttEnabled && pluginEnabled) {
             this.initializingMqtt = true;
@@ -70823,6 +70832,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
                     mqttHost: this.storageSettings.getItem('mqttHost'),
                     mqttUsename: this.storageSettings.getItem('mqttUsename'),
                     mqttPassword: this.storageSettings.getItem('mqttPassword'),
+                    clientId,
                 });
             }
             catch (e) {
@@ -70833,9 +70843,9 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             }
         }
     }
-    async getMqttClient() {
+    async getMqttClient(clientId) {
         if (!this.mqttClient && !this.initializingMqtt) {
-            await this.setupMqttClient();
+            await this.setupMqttClient(clientId);
         }
         return this.mqttClient;
     }
@@ -70877,8 +70887,18 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             const prefix = `[${this.opts.pluginFriendlyName}]`;
             const log = (type, message, ...optionalParams) => {
                 const now = new Date().toLocaleString();
-                if (type !== 'debug' || this.storageSettings.getItem('debug')) {
-                    this.console.log(`${prefix} ${now} - `, message, ...optionalParams);
+                let canLog = false;
+                if (type === 'debug') {
+                    canLog = this.storageSettings.getItem('debug');
+                }
+                else if (type === 'info') {
+                    canLog = this.storageSettings.getItem('info');
+                }
+                else {
+                    canLog = true;
+                }
+                if (canLog) {
+                    this.console.log(` ${now} - `, message, ...optionalParams);
                 }
                 if (type === 'error' && this.storageSettings.values.devNotifier) {
                     this.storageSettings.values.devNotifier.sendNotification(this.opts.pluginFriendlyName, {
@@ -70893,6 +70913,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             };
             this.mainLogger = {
                 log: (message, ...optionalParams) => log('log', message, ...optionalParams),
+                info: (message, ...optionalParams) => log('info', message, ...optionalParams),
                 debug: (message, ...optionalParams) => log('debug', message, ...optionalParams),
                 error: (message, ...optionalParams) => log('error', message, ...optionalParams),
             };
@@ -70916,12 +70937,15 @@ exports.BasePlugin = BasePlugin;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const mqtt_1 = __webpack_require__(/*! mqtt */ "../scrypted-apocaliss-base/node_modules/mqtt/build/index.js");
 class MqttClient {
-    constructor(host, username, password, logger) {
+    constructor(host, username, password, logger, clientId, messageCb) {
         this.topicLastValue = {};
+        this.topicCbMap = {};
         this.host = host;
         this.username = username;
         this.password = password;
         this.logger = logger;
+        this.clientId = clientId;
+        this.messageCb = messageCb;
     }
     async disconnect() {
         if (this.mqttClient) {
@@ -70939,17 +70963,25 @@ class MqttClient {
                 rejectUnauthorized: false,
                 username: this.username,
                 password: this.password,
-                reschedulePings: true
+                clientId: this.clientId,
+                reschedulePings: true,
             });
-            client.on('connect', data => {
-                this.mqttClient = client;
+            client.on('message', async (messageTopic, message) => {
+                const cbs = this.topicCbMap[messageTopic];
+                const messageString = message.toString();
+                if (cbs) {
+                    for (const cb of cbs) {
+                        await cb(messageTopic, messageString);
+                    }
+                }
+                this.messageCb && this.messageCb(messageTopic, messageString);
             });
             client.on('error', data => {
                 this.logger.log('Error connecting to mqtt', data);
                 this.mqttClient = undefined;
             });
             client.setMaxListeners(Infinity);
-            this.logger.log('Connected to mqtt');
+            this.logger.log(`Connected to mqtt ${this.host}:${this.username}`);
             this.mqttClient = client;
         };
         if (!this.mqttClient || forceReconnect) {
@@ -71028,28 +71060,22 @@ class MqttClient {
             getInfoTopic,
         };
     }
-    async subscribeToTopic(topic, cb) {
-        const client = await this.getMqttClient();
-        await client.unsubscribeAsync([topic]);
-        await client.subscribeAsync([topic]);
-        client.on('message', (messageTopic, message) => {
-            const messageString = message.toString();
-            if (messageTopic === topic) {
-                cb(messageString);
-            }
-        });
-    }
     async subscribe(topics, cb) {
         await this.unsubscribe(topics);
         await this.mqttClient.subscribeAsync(topics);
-        this.mqttClient.on('message', async (topic, message) => {
-            const messageString = message.toString();
-            await cb(topic, messageString);
-        });
+        for (const topic of topics) {
+            if (!this.topicCbMap[topic]) {
+                this.topicCbMap[topic] = [];
+            }
+            this.topicCbMap[topic].push(cb);
+        }
     }
     async unsubscribe(topics) {
         const client = await this.getMqttClient();
         await client.unsubscribeAsync(topics);
+        for (const topic of topics) {
+            delete this.topicCbMap[topic];
+        }
     }
     removeAllListeners() {
         this.mqttClient.removeAllListeners();
@@ -71164,8 +71190,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             },
             scoreThreshold: {
                 title: 'Score threshold',
+                description: 'Leave blank to use object detection thresholds',
                 type: 'number',
-                defaultValue: 0.7,
             },
             detectionClasses: {
                 title: 'Detection classes',
@@ -71549,28 +71575,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async scanFs(newMaxMemory) {
         const logger = this.getLogger();
-        const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
-        let occupiedSizeInBytes = 0;
         logger.log(`Starting FS scan: ${JSON.stringify({ newMaxMemory })}`);
-        const calculateSize = async (currentPath) => {
-            const entries = await fs_1.default.promises.readdir(currentPath, { withFileTypes: true });
-            for (const entry of entries) {
-                const fullPath = path_1.default.join(currentPath, entry.name);
-                if (entry.isDirectory()) {
-                    await calculateSize(fullPath);
-                }
-                else if (entry.isFile()) {
-                    const stats = await fs_1.default.promises.stat(fullPath);
-                    occupiedSizeInBytes += stats.size;
-                }
-            }
-        };
-        await calculateSize(deviceFolder);
-        const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
-        const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
+        const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
         const { maxSpaceInGb: maxSpaceInGbSrc } = this.storageSettings.values;
         const maxSpaceInGb = newMaxMemory ?? maxSpaceInGbSrc;
-        const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
+        const { occupiedSpaceInGb, occupiedSpaceInGbNumber, freeMemory } = await (0, util_1.calculateSize)({
+            currentPath: deviceFolder,
+            maxSpaceInGb
+        });
         this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb];
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
@@ -71579,31 +71591,31 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             occupied: occupiedSpaceInGbNumber,
             total: maxSpaceInGb
         });
-        // if (freeMemory <= cleanupMemoryThresholderInGb) {
-        const files = await fs_1.default.promises.readdir(videoClipsFolder);
-        const fileDetails = files
-            .map((file) => {
-            const match = file.match(util_1.videoClipRegex);
-            if (match) {
-                const timeStart = match[1];
-                const { videoClipPath } = this.getStorageDirs(file);
-                return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
+        if (freeMemory <= util_1.cleanupMemoryThresholderInGb) {
+            const files = await fs_1.default.promises.readdir(videoClipsFolder);
+            const fileDetails = files
+                .map((file) => {
+                const match = file.match(util_1.videoClipRegex);
+                if (match) {
+                    const timeStart = match[1];
+                    const { videoClipPath } = this.getStorageDirs(file);
+                    return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
+                }
+                return null;
+            })
+                .filter(Boolean);
+            fileDetails.sort((a, b) => a.timeStart - b.timeStart);
+            const filesToDelete = Math.min(fileDetails.length, util_1.clipsToCleanup);
+            logger.log(`Deleting ${filesToDelete} oldest files... ${JSON.stringify({ freeMemory, cleanupMemoryThresholderInGb: util_1.cleanupMemoryThresholderInGb })}`);
+            for (let i = 0; i < filesToDelete; i++) {
+                const { fullPath, file } = fileDetails[i];
+                await fs_1.default.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
+                logger.log(`Deleted videoclip: ${file}`);
+                const { thumbnailPath } = this.getStorageDirs(file);
+                await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
+                logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
-            return null;
-        })
-            .filter(Boolean);
-        fileDetails.sort((a, b) => a.timeStart - b.timeStart);
-        const filesToDelete = Math.min(fileDetails.length, util_1.clipsToCleanup);
-        logger.log(`Deleting ${filesToDelete} oldest files... ${JSON.stringify({ freeMemory, cleanupMemoryThresholderInGb: util_1.cleanupMemoryThresholderInGb })}`);
-        for (let i = 0; i < filesToDelete; i++) {
-            const { fullPath, file } = fileDetails[i];
-            // await fs.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
-            logger.log(`Deleted videoclip: ${file}`);
-            const { thumbnailPath } = this.getStorageDirs(file);
-            // await fs.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
-            logger.log(`Deleted thumbnail: ${thumbnailPath}`);
         }
-        // }
         this.lastScanFs = Date.now();
         logger.log(`FS scan executed: ${JSON.stringify({
             freeMemory,
@@ -71854,7 +71866,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
-                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    const thresholdValid = scoreThreshold ? det.score >= scoreThreshold : true;
+                    const classnameValid = classname && objectDetectionClasses.includes(classname);
+                    if (classnameValid && thresholdValid) {
                         classesMap.set(classname, true);
                         return true;
                     }
@@ -72155,6 +72169,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                         });
                         return;
                     }
+                    // devConsole.log(thumbnailMo);
                     const jpeg = await sdk_1.default.mediaManager.convertMediaObjectToBuffer(thumbnailMo, 'image/jpeg');
                     response.send(jpeg, {
                         headers: {
@@ -72231,13 +72246,18 @@ exports["default"] = EventsRecorderPlugin;
 /*!*********************!*\
   !*** ./src/util.ts ***!
   \*********************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVideoClipName = exports.attachProcessEvents = exports.videoClipRegex = exports.clipsToCleanup = exports.cleanupMemoryThresholderInGb = exports.getMainDetectionClass = exports.defaultClasses = exports.detectionClassIndexReversed = exports.detectionClassIndex = void 0;
+exports.calculateSize = exports.getVideoClipName = exports.attachProcessEvents = exports.videoClipRegex = exports.clipsToCleanup = exports.cleanupMemoryThresholderInGb = exports.getMainDetectionClass = exports.defaultClasses = exports.detectionClassIndexReversed = exports.detectionClassIndex = void 0;
 const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
+const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
+const path_1 = __importDefault(__webpack_require__(/*! path */ "path"));
 exports.detectionClassIndex = {
     [detecionClasses_1.DetectionClass.Motion]: 0,
     [detecionClasses_1.DetectionClass.Person]: 1,
@@ -72318,6 +72338,66 @@ const getVideoClipName = (props) => {
     return filename;
 };
 exports.getVideoClipName = getVideoClipName;
+const calculateSize = async (props) => {
+    const { currentPath, filenamePrefix, maxSpaceInGb } = props;
+    let occupiedSizeInBytes = 0;
+    const calculateSizeInner = async (innerPath) => {
+        const entries = await fs_1.default.promises.readdir(innerPath, { withFileTypes: true });
+        const filteredFiles = filenamePrefix ? entries.filter(entry => entry.name.startsWith(filenamePrefix)) : entries;
+        for (const entry of filteredFiles) {
+            const fullPath = path_1.default.join(innerPath, entry.name);
+            if (entry.isDirectory()) {
+                await calculateSizeInner(fullPath);
+            }
+            else if (entry.isFile()) {
+                const stats = await fs_1.default.promises.stat(fullPath);
+                occupiedSizeInBytes += stats.size;
+            }
+        }
+    };
+    await calculateSizeInner(currentPath);
+    console.log(occupiedSizeInBytes);
+    const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
+    const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
+    const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
+    return {
+        occupiedSizeInBytes,
+        occupiedSpaceInGbNumber,
+        occupiedSpaceInGb,
+        freeMemory,
+    };
+};
+exports.calculateSize = calculateSize;
+// export const freeMemory = async (props: {
+//     logger: Console,
+//     filenamePrefix?: string,
+//     currentPath: string,
+// }) => {
+//     const { logger, filenamePrefix, currentPath } = props;
+//     const files = await fs.promises.readdir(currentPath);
+//     const fileDetails = files
+//         .map((file) => {
+//             const match = file.match(videoClipRegex);
+//             if (match) {
+//                 const timeStart = match[1];
+//                 const { videoClipPath } = this.getStorageDirs(file);
+//                 return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
+//             }
+//             return null;
+//         })
+//         .filter(Boolean);
+//     fileDetails.sort((a, b) => a.timeStart - b.timeStart);
+//     const filesToDelete = Math.min(fileDetails.length, clipsToCleanup);
+//     logger.log(`Deleting ${filesToDelete} oldest files... ${JSON.stringify({ freeMemory, cleanupMemoryThresholderInGb })}`);
+//     for (let i = 0; i < filesToDelete; i++) {
+//         const { fullPath, file } = fileDetails[i];
+//         await fs.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
+//         logger.log(`Deleted videoclip: ${file}`);
+//         const { thumbnailPath } = this.getStorageDirs(file);
+//         await fs.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
+//         logger.log(`Deleted thumbnail: ${thumbnailPath}`);
+//     }
+// }
 
 
 /***/ }),
@@ -72547,6 +72627,10 @@ class Deferred {
                 return this;
             };
         });
+    }
+    [Symbol.dispose]() {
+        if (!this.finished)
+            this.reject(new Error('deferred disposed without being resolved'));
     }
     async resolvePromise(p) {
         try {

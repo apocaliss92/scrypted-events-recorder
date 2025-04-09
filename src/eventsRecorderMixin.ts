@@ -9,7 +9,7 @@ import path from 'path';
 import url from 'url';
 import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
 import ObjectDetectionPlugin from './main';
-import { attachProcessEvents, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
+import { attachProcessEvents, calculateSize, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
 import moment from "moment";
 import { listenZeroSingleClient } from '@scrypted/common/src/listen-cluster';
 import { Deferred } from '@scrypted/common/src/deferred';
@@ -72,8 +72,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         },
         scoreThreshold: {
             title: 'Score threshold',
+            description: 'Leave blank to use object detection thresholds',
             type: 'number',
-            defaultValue: 0.7,
         },
         detectionClasses: {
             title: 'Detection classes',
@@ -526,30 +526,16 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async scanFs(newMaxMemory?: number) {
         const logger = this.getLogger();
-        const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
-        let occupiedSizeInBytes = 0;
         logger.log(`Starting FS scan: ${JSON.stringify({ newMaxMemory })}`);
 
-        const calculateSize = async (currentPath: string) => {
-            const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
-
-            for (const entry of entries) {
-                const fullPath = path.join(currentPath, entry.name);
-                if (entry.isDirectory()) {
-                    await calculateSize(fullPath);
-                } else if (entry.isFile()) {
-                    const stats = await fs.promises.stat(fullPath);
-                    occupiedSizeInBytes += stats.size;
-                }
-            }
-        }
-
-        await calculateSize(deviceFolder);
-        const occupiedSpaceInGbNumber = (occupiedSizeInBytes / (1024 * 1024 * 1024));
-        const occupiedSpaceInGb = occupiedSpaceInGbNumber.toFixed(2);
+        const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
         const { maxSpaceInGb: maxSpaceInGbSrc } = this.storageSettings.values;
         const maxSpaceInGb = newMaxMemory ?? maxSpaceInGbSrc;
-        const freeMemory = maxSpaceInGb - occupiedSpaceInGbNumber;
+
+        const { occupiedSpaceInGb, occupiedSpaceInGbNumber, freeMemory } = await calculateSize({
+            currentPath: deviceFolder,
+            maxSpaceInGb
+        });
         this.storageSettings.settings.occupiedSpaceInGb.range = [0, maxSpaceInGb]
         this.putMixinSetting('occupiedSpaceInGb', occupiedSpaceInGb);
         logger.debug(`Occupied space: ${occupiedSpaceInGb} GB`);
@@ -885,7 +871,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
 
-                    if (classname && objectDetectionClasses.includes(classname) && det.score >= scoreThreshold) {
+                    const thresholdValid = scoreThreshold ? det.score >= scoreThreshold : true;
+                    const classnameValid = classname && objectDetectionClasses.includes(classname);
+                    if (classnameValid && thresholdValid) {
                         classesMap.set(classname, true);
                         return true;
                     } else {

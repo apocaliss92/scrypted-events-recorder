@@ -190,6 +190,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
               });
               return;
             }
+            // devConsole.log(thumbnailMo);
             const jpeg = await sdk.mediaManager.convertMediaObjectToBuffer(thumbnailMo, 'image/jpeg');
             response.send(jpeg, {
               headers: {
