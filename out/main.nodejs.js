@@ -71753,8 +71753,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             logger,
             onClose: async () => {
                 this.recording = false;
-                const endTime = Date.now();
-                this.lastClipRecordedTime = endTime;
                 let currentChecks = 0;
                 let found = false;
                 while (currentChecks < 10 && !found) {
@@ -71774,7 +71772,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 }
                 const filename = (0, util_1.getVideoClipName)({
                     classesDetected: (0, lodash_1.uniq)(this.classesDetected),
-                    endTime,
+                    endTime: this.lastClipRecordedTime,
                     logger,
                     startTime: this.recordingTimeStart,
                 });
@@ -71797,6 +71795,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async stopSaveViddeoClip() {
         const logger = this.getLogger();
         logger.log('Stopping videoclip');
+        const endTime = Date.now();
+        this.lastClipRecordedTime = endTime;
         this.saveFfmpegProcess.kill('SIGINT');
     }
     restartTimeout() {
@@ -71858,7 +71858,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const { scoreThreshold, detectionClasses, ignoreCameraDetections, prolongClipOnMotion } = this.storageSettings.values;
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
             const isMotionIncluded = detectionClasses.includes(detecionClasses_1.DetectionClass.Motion);
-            const classesMap = new Map();
+            const classesMap = new Set();
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
                 const filtered = data.detections.filter(det => {
@@ -71866,10 +71866,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
+                    if (det.movement && !det.movement.moving) {
+                        return false;
+                    }
                     const thresholdValid = scoreThreshold ? det.score >= scoreThreshold : true;
                     const classnameValid = classname && objectDetectionClasses.includes(classname);
                     if (classnameValid && thresholdValid) {
-                        classesMap.set(classname, true);
+                        classesMap.add(classname);
                         return true;
                     }
                     else {
@@ -71885,7 +71888,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     return;
                 }
                 const now = Date.now();
-                const classes = Array.from(classesMap.keys());
+                const classes = Array.from(classesMap);
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording(classes).catch(logger.log);

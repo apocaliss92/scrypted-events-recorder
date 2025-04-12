@@ -741,8 +741,6 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             logger,
             onClose: async () => {
                 this.recording = false;
-                const endTime = Date.now();
-                this.lastClipRecordedTime = endTime;
 
                 let currentChecks = 0;
                 let found = false;
@@ -764,7 +762,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const filename = getVideoClipName({
                     classesDetected: uniq(this.classesDetected),
-                    endTime,
+                    endTime: this.lastClipRecordedTime,
                     logger,
                     startTime: this.recordingTimeStart,
                 });
@@ -790,6 +788,10 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     async stopSaveViddeoClip() {
         const logger = this.getLogger();
         logger.log('Stopping videoclip');
+
+        const endTime = Date.now();
+        this.lastClipRecordedTime = endTime;
+
         this.saveFfmpegProcess.kill('SIGINT');
     }
 
@@ -861,7 +863,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== DetectionClass.Motion);
             const isMotionIncluded = detectionClasses.includes(DetectionClass.Motion);
 
-            const classesMap = new Map<string, boolean>();
+            const classesMap = new Set<string>();
             logger.log(`Starting listener of ${ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, ScryptedInterface.ObjectDetector, async (_, __, data: ObjectsDetected) => {
                 const filtered = data.detections.filter(det => {
@@ -871,10 +873,14 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         return false;
                     }
 
+                    if (det.movement && !det.movement.moving) {
+                        return false;
+                    }
+
                     const thresholdValid = scoreThreshold ? det.score >= scoreThreshold : true;
                     const classnameValid = classname && objectDetectionClasses.includes(classname);
                     if (classnameValid && thresholdValid) {
-                        classesMap.set(classname, true);
+                        classesMap.add(classname);
                         return true;
                     } else {
                         return false;
@@ -893,7 +899,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const now = Date.now();
 
-                const classes = Array.from(classesMap.keys());
+                const classes = Array.from(classesMap);
                 this.classesDetected.push(...classes);
                 this.lastMotionTrigger = now;
                 this.triggerMotionRecording(classes).catch(logger.log);
