@@ -70936,6 +70936,7 @@ exports.BasePlugin = BasePlugin;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const mqtt_1 = __webpack_require__(/*! mqtt */ "../scrypted-apocaliss-base/node_modules/mqtt/build/index.js");
+const sleep_1 = __webpack_require__(/*! ../../scrypted/server/src/sleep */ "../scrypted/server/src/sleep.ts");
 class MqttClient {
     constructor(host, username, password, logger, clientId, messageCb) {
         this.topicLastValue = {};
@@ -70948,9 +70949,11 @@ class MqttClient {
         this.messageCb = messageCb;
     }
     async disconnect() {
-        if (this.mqttClient) {
+        const mqttClient = await this.getMqttClient();
+        if (mqttClient) {
             try {
-                await this.mqttClient.endAsync(true);
+                this.logger.log('Disconnecting mqtt client');
+                await mqttClient.endAsync(true);
             }
             catch (e) {
                 this.logger.log('Error closing MQTT connection', e);
@@ -70959,31 +70962,38 @@ class MqttClient {
     }
     async getMqttClient(forceReconnect) {
         const _connect = async () => {
-            const client = await (0, mqtt_1.connectAsync)(this.mqttPathmame, {
-                rejectUnauthorized: false,
-                username: this.username,
-                password: this.password,
-                clientId: this.clientId,
-                reschedulePings: true,
-            });
-            client.on('message', async (messageTopic, message) => {
-                const cbs = this.topicCbMap[messageTopic];
-                const messageString = message.toString();
-                if (cbs) {
-                    for (const cb of cbs) {
-                        await cb(messageTopic, messageString);
+            try {
+                const client = await (0, mqtt_1.connectAsync)(this.mqttPathmame, {
+                    rejectUnauthorized: false,
+                    username: this.username,
+                    password: this.password,
+                    clientId: this.clientId,
+                    reschedulePings: true,
+                }, true);
+                client.on('message', async (messageTopic, message) => {
+                    const cbs = this.topicCbMap[messageTopic];
+                    const messageString = message.toString();
+                    if (cbs) {
+                        for (const cb of cbs) {
+                            await cb(messageTopic, messageString);
+                        }
                     }
-                }
-                this.messageCb && this.messageCb(messageTopic, messageString);
-            });
-            client.on('error', data => {
-                this.logger.log('Error connecting to mqtt', data);
-                this.mqttClient = undefined;
-            });
-            client.setMaxListeners(Infinity);
-            this.logger.log(`Connected to mqtt ${this.host}:${this.username}`);
-            this.mqttClient = client;
+                    this.messageCb && this.messageCb(messageTopic, messageString);
+                });
+                client.setMaxListeners(Infinity);
+                this.logger.log(`Connected to mqtt ${this.host}:${this.username}`);
+                this.mqttClient = client;
+            }
+            catch (e) {
+                this.logger.log('Error connecting to mqtt. Waiting before trying agian', e);
+                // this.mqttClient = undefined;
+                await (0, sleep_1.sleep)(5000);
+            }
         };
+        // client.on('error', data => {
+        //     this.logger.log('Error connecting to mqtt', data);
+        //     this.mqttClient = undefined;
+        // });
         if (!this.mqttClient || forceReconnect) {
             if (forceReconnect && this.mqttClient) {
                 try {
@@ -71035,17 +71045,19 @@ class MqttClient {
         }
         this.logger.debug(`Publishing ${JSON.stringify({ topic, value })}`);
         const client = await this.getMqttClient();
-        try {
-            await client.publishAsync(topic, value, { retain });
-        }
-        catch (e) {
-            this.logger.log(`Error publishing to MQTT. Reconnecting. ${JSON.stringify({ topic, value })}`, e);
-            await this.getMqttClient(true);
-            await client.publishAsync(topic, value, { retain }).catch(e => this.logger.log(`Error publish retry. ${JSON.stringify({ topic, value })}`, e));
-        }
-        finally {
-            if (retain) {
-                this.topicLastValue[topic] = value;
+        if (client) {
+            try {
+                await client.publishAsync(topic, value, { retain });
+            }
+            catch (e) {
+                this.logger.log(`Error publishing to MQTT. Reconnecting. ${JSON.stringify({ topic, value })}`, e);
+                await this.getMqttClient(true);
+                await client.publishAsync(topic, value, { retain }).catch(e => this.logger.log(`Error publish retry. ${JSON.stringify({ topic, value })}`, e));
+            }
+            finally {
+                if (retain) {
+                    this.topicLastValue[topic] = value;
+                }
             }
         }
     }
@@ -71062,23 +71074,31 @@ class MqttClient {
     }
     async subscribe(topics, cb) {
         await this.unsubscribe(topics);
-        await this.mqttClient.subscribeAsync(topics);
-        for (const topic of topics) {
-            if (!this.topicCbMap[topic]) {
-                this.topicCbMap[topic] = [];
+        const client = await this.getMqttClient();
+        if (client) {
+            await client.subscribeAsync(topics);
+            for (const topic of topics) {
+                if (!this.topicCbMap[topic]) {
+                    this.topicCbMap[topic] = [];
+                }
+                this.topicCbMap[topic].push(cb);
             }
-            this.topicCbMap[topic].push(cb);
         }
     }
     async unsubscribe(topics) {
         const client = await this.getMqttClient();
-        await client.unsubscribeAsync(topics);
-        for (const topic of topics) {
-            delete this.topicCbMap[topic];
+        if (client) {
+            await client.unsubscribeAsync(topics);
+            for (const topic of topics) {
+                delete this.topicCbMap[topic];
+            }
         }
     }
-    removeAllListeners() {
-        this.mqttClient.removeAllListeners();
+    async removeAllListeners() {
+        const mqttClient = await this.getMqttClient();
+        if (mqttClient) {
+            mqttClient.removeAllListeners();
+        }
     }
 }
 exports["default"] = MqttClient;
@@ -71144,8 +71164,6 @@ const url_1 = __importDefault(__webpack_require__(/*! url */ "url"));
 const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
-const listen_cluster_1 = __webpack_require__(/*! @scrypted/common/src/listen-cluster */ "../scrypted/common/src/listen-cluster.ts");
-const deferred_1 = __webpack_require__(/*! @scrypted/common/src/deferred */ "../scrypted/server/src/deferred.ts");
 const { systemManager } = sdk_1.default;
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
@@ -71219,12 +71237,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 defaultValue: true,
                 immediate: true,
             },
-            transcodeToH264: {
-                title: 'Transcode to h264',
-                type: 'boolean',
-                defaultValue: true,
-                immediate: true,
-            },
+            // transcodeToH264: {
+            //     title: 'Transcode to h264',
+            //     type: 'boolean',
+            //     defaultValue: true,
+            //     immediate: true,
+            //     hide: true,
+            // },
             prolongClipOnMotion: {
                 title: 'Prolong the clip on motion',
                 description: 'If checked, the clip will be prolonged for any motion received, otherwise will use the detection classes configured.',
@@ -71272,97 +71291,108 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }, 2000);
     }
     async getRecordingStream(options, recordingStream) {
-        const logger = this.getLogger();
-        const foundClip = this.scanData.reduce((closest, obj) => Math.abs(obj.startTime - options.startTime) < Math.abs(closest.startTime - options.startTime) ? obj : closest);
-        logger.log(`STREAM: ${JSON.stringify({ options, foundClip, recordingStream, startTime: new Date(options.startTime).toISOString() })}`);
-        if (foundClip) {
-            this.currentTime = foundClip.startTime;
-            const kill = new deferred_1.Deferred();
-            const rtspServer = await (0, listen_cluster_1.listenZeroSingleClient)('127.0.0.1');
-            // rtspServer.clientPromise.then(async rtsp => {
-            //     kill.promise.finally(() => rtsp.destroy());
-            //     rtsp.on('close', () => kill.resolve());
-            //     try {
-            //         // const process = spawn(this.ffmpegPath, [
-            //         //     '-re', '-i', foundClip.videoClipPath,
-            //         //     '-c:v', 'copy',
-            //         //     '-an',
-            //         //     '-f', 'rtsp',
-            //         //     `${playbackUrl}`
-            //         // ], {
-            //         //     stdio: ['pipe', 'pipe', 'pipe'],
-            //         //     detached: false
-            //         // });
-            //         const process = await startRtpForwarderProcess(this.console, {
-            //             inputArguments: [
-            //                 '-f', 'h264', '-i', 'pipe:4',
-            //                 '-f', 'aac', '-i', 'pipe:5',
-            //             ]
-            //         }, {
-            //             video: {
-            //                 onRtp: rtp => {
-            //                     if (videoTrack)
-            //                         rtsp.sendTrack(videoTrack.control, rtp, false);
-            //                 },
-            //                 encoderArguments: [
-            //                     '-vcodec', 'copy',
-            //                 ]
-            //             },
-            //             audio: {
-            //                 onRtp: rtp => {
-            //                     if (audioTrack)
-            //                         rtsp.sendTrack(audioTrack.control, rtp, false);
-            //                 },
-            //                 encoderArguments: [
-            //                     '-acodec', 'copy',
-            //                     '-rtpflags', 'latm',
-            //                 ]
-            //             }
-            //         });
-            //         process.killPromise.finally(() => kill.resolve());
-            //         kill.promise.finally(() => process.kill());
-            //         let parsedSdp: ReturnType<typeof parseSdp>;
-            //         let videoTrack: typeof parsedSdp.msections[0]
-            //         let audioTrack: typeof parsedSdp.msections[0]
-            //         process.sdpContents.then(async sdp => {
-            //             sdp = addTrackControls(sdp);
-            //             rtsp.sdp = sdp;
-            //             parsedSdp = parseSdp(sdp);
-            //             videoTrack = parsedSdp.msections.find(msection => msection.type === 'video');
-            //             audioTrack = parsedSdp.msections.find(msection => msection.type === 'audio');
-            //             await rtsp.handlePlayback();
-            //         });
-            //         const proxyStream = await livestreamManager.getLocalLivestream();
-            //         proxyStream.videostream.pipe(process.cp.stdio[4] as Writable);
-            //         proxyStream.audiostream.pipe((process.cp.stdio as any)[5] as Writable);
-            //     }
-            //     catch (e) {
-            //         rtsp.client.destroy();
-            //     }
-            // });
-            // return sdk.mediaManager.createMediaObject(ret, ScryptedMimeTypes.MediaStreamUrl);
-            // const videoclipFfmpeg = spawn(this.ffmpegPath, [
-            //     '-re', '-i', foundClip.videoClipPath,
-            //     '-c:v', 'copy',
-            //     '-an',
-            //     '-f', 'rtsp',
-            //     `${playbackUrl}`
-            // ], {
-            //     stdio: ['pipe', 'pipe', 'pipe'],
-            //     detached: false
-            // });
-            // attachProcessEvents({
-            //     processName: 'Videoclip serving',
-            //     childProcess: videoclipFfmpeg,
-            //     logger,
-            //     onClose: async () => {
-            //         // logger.log(`Snapshot stored ${thumbnailPath}`);
-            //         // resolve();
-            //     }
-            // });
-            return this.createMediaObject(rtspServer, sdk_1.ScryptedMimeTypes.MediaStreamUrl);
-        }
+        return;
     }
+    // async getRecordingStream(options: RequestRecordingStreamOptions, recordingStream?: MediaObject): Promise<MediaObject> {
+    //     const logger = this.getLogger();
+    //     const foundClip = this.scanData.reduce((closest, obj) =>
+    //         Math.abs(obj.startTime - options.startTime) < Math.abs(closest.startTime - options.startTime) ? obj : closest
+    //     );
+    //     logger.log(`STREAM: ${JSON.stringify({ options, foundClip, recordingStream, startTime: new Date(options.startTime).toISOString() })}`);
+    //     if (foundClip) {
+    //         this.currentTime = foundClip.startTime;
+    //         const kill = new Deferred<void>();
+    //         const rtspServer = new RtspServer(client, sdp);
+    //         const rtspServer = await listenZeroSingleClient('127.0.0.1');
+    //         rtspServer.clientPromise.then(async rtsp => {
+    //             kill.promise.finally(() => rtsp.destroy());
+    //             rtsp.on('close', () => kill.resolve());
+    //             try {
+    //                 // const process = spawn(this.ffmpegPath, [
+    //                 //     '-re', '-i', foundClip.videoClipPath,
+    //                 //     '-c:v', 'copy',
+    //                 //     '-an',
+    //                 //     '-f', 'rtsp',
+    //                 //     `${playbackUrl}`
+    //                 // ], {
+    //                 //     stdio: ['pipe', 'pipe', 'pipe'],
+    //                 //     detached: false
+    //                 // });
+    //                 const process = await startRtpForwarderProcess(this.console, {
+    //                     inputArguments: [
+    //                         '-f', 'h264', '-i', 'pipe:4',
+    //                         '-f', 'aac', '-i', 'pipe:5',
+    //                     ]
+    //                 }, {
+    //                     video: {
+    //                         onRtp: rtp => {
+    //                             if (videoTrack)
+    //                                 rtsp.sendTrack(videoTrack.control, rtp, false);
+    //                         },
+    //                         encoderArguments: [
+    //                             '-vcodec', 'copy',
+    //                         ]
+    //                     },
+    //                     audio: {
+    //                         onRtp: rtp => {
+    //                             if (audioTrack)
+    //                                 rtsp.sendTrack(audioTrack.control, rtp, false);
+    //                         },
+    //                         encoderArguments: [
+    //                             '-acodec', 'copy',
+    //                             '-rtpflags', 'latm',
+    //                         ]
+    //                     }
+    //                 });
+    //                 process.killPromise.finally(() => kill.resolve());
+    //                 kill.promise.finally(() => process.kill());
+    //                 let parsedSdp: ReturnType<typeof parseSdp>;
+    //                 let videoTrack: typeof parsedSdp.msections[0]
+    //                 let audioTrack: typeof parsedSdp.msections[0]
+    //                 process.sdpContents.then(async sdp => {
+    //                     sdp = addTrackControls(sdp);
+    //                     rtsp.sdp = sdp;
+    //                     parsedSdp = parseSdp(sdp);
+    //                     videoTrack = parsedSdp.msections.find(msection => msection.type === 'video');
+    //                     audioTrack = parsedSdp.msections.find(msection => msection.type === 'audio');
+    //                     await rtsp.handlePlayback();
+    //                 });
+    //                 const proxyStream = await livestreamManager.getLocalLivestream();
+    //                 proxyStream.videostream.pipe(process.cp.stdio[4] as Writable);
+    //                 proxyStream.audiostream.pipe((process.cp.stdio as any)[5] as Writable);
+    //             }
+    //             catch (e) {
+    //                 rtsp.client.destroy();
+    //             }
+    //         });
+    //         return sdk.mediaManager.createMediaObject(ret, ScryptedMimeTypes.MediaStreamUrl);
+    //         // const { server: rtspServer, url, cancel, clientPromise } = await listenZeroSingleClient('127.0.0.1');
+    //         // const ffmpegProcess = spawn('ffmpeg', [
+    //         //     '-re', // Legge il file in tempo reale
+    //         //     '-i', foundClip.videoClipPath, // Percorso del file MP4
+    //         //     '-c:v', 'copy', // Copia il codec video senza ricodifica
+    //         //     '-f', 'rtsp', // Formato di output RTSP
+    //         //     url, // URL del server RTSP
+    //         // ]);
+    //         // ffmpegProcess.stdout.on('data', (data) => {
+    //         //     logger.log(`FFmpeg stdout: ${data}`);
+    //         // });
+    //         // ffmpegProcess.stderr.on('data', (data) => {
+    //         //     logger.error(`FFmpeg stderr: ${data}`);
+    //         // });
+    //         // ffmpegProcess.on('close', (code) => {
+    //         //     logger.log(`FFmpeg process exited with code ${code}`);
+    //         //     cancel(); // Chiude il server quando ffmpeg termina
+    //         // });
+    //         // try {
+    //         //     const client = await clientPromise;
+    //         //     logger.log('Client connected:', client.remoteAddress);
+    //         // } catch (error) {
+    //         //     logger.error('Error waiting for client:', error);
+    //         // }
+    //         return this.createMediaObject(rtspServer, ScryptedMimeTypes.MediaStreamUrl);
+    //     }
+    // }
     async getRecordingStreamCurrentTime(recordingStream) {
         const logger = this.getLogger();
         logger.log(`CURRENT TIME: ${JSON.stringify({ recordingStream })}`);
@@ -71424,6 +71454,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         let streamConfig = streamConfigs.find(config => config.destinations?.includes(destination));
         const streamName = streamConfig?.name;
         this.prebuffer = (streamConfig.prebuffer ?? 10000) / 2;
+        this.codec = streamConfig.video.codec;
         this.clipDurationInMs = this.prebuffer + (postEventSeconds * 1000);
         const deviceSettings = await this.cameraDevice.getSettings();
         const rebroadcastConfig = deviceSettings.find(setting => setting.subgroup === `Stream: ${streamName}` && setting.title === 'RTSP Rebroadcast Url');
@@ -71431,6 +71462,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         logger.log(`Rebroadcast URL found: ${JSON.stringify({
             url: this.rtspUrl,
             streamName,
+            streamConfig
         })}`);
         try {
             const { thumbnailsFolder, videoClipsFolder } = this.getStorageDirs();
@@ -71734,11 +71766,28 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const { tmpClipPath } = this.getStorageDirs();
-        const { transcodeToH264 } = this.storageSettings.values;
+        // const { transcodeToH264 } = this.storageSettings.values;
+        // const ffmpegInput: FFmpegInput = {
+        //     container: 'rtsp',
+        //     url: this.rtspUrl,
+        //     mediaStreamOptions: {
+        //         id: undefined,
+        //         video: null,
+        //     },
+        //     inputArguments: [
+        //         '-analyzeduration', '0',
+        //         '-probesize', '512',
+        //         '-rtsp_transport', 'tcp',
+        //         '-i', this.rtspUrl,
+        //     ],            
+        // };
+        const transcodeToH264 = this.codec !== 'h264';
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
             '-c:v', transcodeToH264 ? 'libx264' : 'copy',
+            ...(transcodeToH264 ? ['-preset', 'veryfast', '-crf', '23'] : []),
+            '-movflags', '+faststart',
             // '-c:a', 'aac',
             '-f', 'mp4',
             tmpClipPath,
@@ -71783,12 +71832,14 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 this.classesDetected = [];
                 this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
                 this.storageSettings.values.processPid = undefined;
-                const parsedEntry = await this.parseVideoClipFile(filenameWithVideoExtension);
-                if (parsedEntry) {
-                    const { fildeData, recordedEvent } = parsedEntry;
-                    this.scanData.push(fildeData);
-                    this.recordedEvents.push(recordedEvent);
-                }
+                await this.indexFs();
+                // const parsedEntry = await this.parseVideoClipFile(filenameWithVideoExtension);
+                // logger.log(`Parsed entry video ${filenameWithVideoExtension}: ${JSON.stringify(parsedEntry)}`);
+                // if (parsedEntry) {
+                //     const { fildeData, recordedEvent } = parsedEntry;
+                //     this.scanData.push(fildeData);
+                //     this.recordedEvents.push(recordedEvent);
+                // }
             }
         });
     }
@@ -72405,106 +72456,6 @@ exports.calculateSize = calculateSize;
 
 /***/ }),
 
-/***/ "../scrypted/common/src/listen-cluster.ts":
-/*!************************************************!*\
-  !*** ../scrypted/common/src/listen-cluster.ts ***!
-  \************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.listenZeroSingleClient = exports.listenZero = exports.ListenZeroSingleClientTimeoutError = void 0;
-exports.closeQuiet = closeQuiet;
-exports.bindUdp = bindUdp;
-exports.bindZero = bindZero;
-exports.createBindZero = createBindZero;
-exports.createSquentialBindZero = createSquentialBindZero;
-exports.reserveUdpPort = reserveUdpPort;
-exports.createBindUdp = createBindUdp;
-exports.bind = bind;
-const dgram_1 = __importDefault(__webpack_require__(/*! dgram */ "dgram"));
-const events_1 = __webpack_require__(/*! events */ "events");
-async function closeQuiet(socket) {
-    if (!socket)
-        return;
-    try {
-        await new Promise((r, f) => {
-            try {
-                socket.close(r);
-            }
-            catch (e) {
-                f(e);
-            }
-        });
-    }
-    catch (e) {
-    }
-}
-async function bindUdp(server, usePort, address) {
-    server.bind(usePort, address);
-    await (0, events_1.once)(server, 'listening');
-    const port = server.address().port;
-    return {
-        port,
-        url: `udp://127.0.0.1:${port}`,
-    };
-}
-async function bindZero(server) {
-    return bindUdp(server, 0);
-}
-async function createBindZero(socketType) {
-    return createBindUdp(0, socketType);
-}
-async function createSquentialBindZero(socketType) {
-    let attempts = 0;
-    while (true) {
-        const rtpServer = await createBindZero(socketType);
-        try {
-            const rtcpServer = await createBindUdp(rtpServer.port + 1, socketType);
-            return [rtpServer, rtcpServer];
-        }
-        catch (e) {
-            attempts++;
-            closeQuiet(rtpServer.server);
-        }
-        if (attempts === 10)
-            throw new Error('unable to reserve sequential udp ports');
-    }
-}
-async function reserveUdpPort() {
-    const udp = await createBindZero();
-    await new Promise(resolve => udp.server.close(() => resolve(undefined)));
-    return udp.port;
-}
-async function createBindUdp(usePort, socketType) {
-    const server = dgram_1.default.createSocket(socketType || 'udp4');
-    const { port, url } = await bindUdp(server, usePort);
-    return {
-        server,
-        port,
-        url,
-    };
-}
-async function bind(server, port) {
-    server.bind(port);
-    await (0, events_1.once)(server, 'listening');
-    return {
-        port,
-        url: `udp://127.0.0.1:${port}`,
-    };
-}
-var listen_zero_1 = __webpack_require__(/*! ../../server/src/listen-zero */ "../scrypted/server/src/listen-zero.ts");
-Object.defineProperty(exports, "ListenZeroSingleClientTimeoutError", ({ enumerable: true, get: function () { return listen_zero_1.ListenZeroSingleClientTimeoutError; } }));
-Object.defineProperty(exports, "listenZero", ({ enumerable: true, get: function () { return listen_zero_1.listenZero; } }));
-Object.defineProperty(exports, "listenZeroSingleClient", ({ enumerable: true, get: function () { return listen_zero_1.listenZeroSingleClient; } }));
-
-
-/***/ }),
-
 /***/ "../scrypted/common/src/settings-mixin.ts":
 /*!************************************************!*\
   !*** ../scrypted/common/src/settings-mixin.ts ***!
@@ -72601,114 +72552,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = void 0;
 var sleep_1 = __webpack_require__(/*! ../../server/src/sleep */ "../scrypted/server/src/sleep.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_1.sleep; } }));
-
-
-/***/ }),
-
-/***/ "../scrypted/server/src/deferred.ts":
-/*!******************************************!*\
-  !*** ../scrypted/server/src/deferred.ts ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Deferred = void 0;
-class Deferred {
-    constructor() {
-        this.finished = false;
-        this.promise = new Promise((resolve, reject) => {
-            this.resolve = v => {
-                this.finished = true;
-                resolve(v);
-                return this;
-            };
-            this.reject = e => {
-                this.finished = true;
-                reject(e);
-                return this;
-            };
-        });
-    }
-    [Symbol.dispose]() {
-        if (!this.finished)
-            this.reject(new Error('deferred disposed without being resolved'));
-    }
-    async resolvePromise(p) {
-        try {
-            this.resolve(await p);
-        }
-        catch (e) {
-            this.reject(e);
-        }
-    }
-}
-exports.Deferred = Deferred;
-
-
-/***/ }),
-
-/***/ "../scrypted/server/src/listen-zero.ts":
-/*!*********************************************!*\
-  !*** ../scrypted/server/src/listen-zero.ts ***!
-  \*********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ListenZeroSingleClientTimeoutError = void 0;
-exports.listenZero = listenZero;
-exports.listenZeroSingleClient = listenZeroSingleClient;
-const events_1 = __webpack_require__(/*! events */ "events");
-const net_1 = __importDefault(__webpack_require__(/*! net */ "net"));
-const tls_1 = __importDefault(__webpack_require__(/*! tls */ "tls"));
-class ListenZeroSingleClientTimeoutError extends Error {
-    constructor() {
-        super('timeout waiting for client');
-    }
-}
-exports.ListenZeroSingleClientTimeoutError = ListenZeroSingleClientTimeoutError;
-async function listenZero(server, hostname) {
-    server.listen(0, hostname || '127.0.0.1');
-    await (0, events_1.once)(server, 'listening');
-    return server.address().port;
-}
-async function listenZeroSingleClient(hostname, options, listenTimeout = 30000) {
-    const server = options?.tls ? new tls_1.default.Server(options) : new net_1.default.Server(options);
-    const port = await listenZero(server, hostname);
-    let cancel;
-    const clientPromise = new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            server.close();
-            reject(new ListenZeroSingleClientTimeoutError());
-        }, listenTimeout);
-        cancel = () => {
-            clearTimeout(timeout);
-            server.close();
-        };
-        server.on('connection', client => {
-            cancel();
-            resolve(client);
-        });
-    });
-    clientPromise.catch(() => { });
-    let host = hostname;
-    if (!host || host === '0.0.0.0')
-        host = '127.0.0.1';
-    return {
-        server,
-        cancel,
-        url: `tcp://${host}:${port}`,
-        host,
-        port,
-        clientPromise,
-    };
-}
 
 
 /***/ }),
@@ -74274,17 +74117,6 @@ module.exports = require("child_process");
 
 "use strict";
 module.exports = require("crypto");
-
-/***/ }),
-
-/***/ "dgram":
-/*!************************!*\
-  !*** external "dgram" ***!
-  \************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("dgram");
 
 /***/ }),
 

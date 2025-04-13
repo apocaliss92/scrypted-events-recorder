@@ -135,7 +135,6 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
             const chunksize = (end - start) + 1;
             const file = fs.createReadStream(videoClipPath, { start, end });
 
-
             const sendVideo = async () => {
               return new Promise<void>((resolve, reject) => {
                 try {
