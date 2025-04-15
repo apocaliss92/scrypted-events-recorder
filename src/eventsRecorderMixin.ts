@@ -740,7 +740,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         const { tmpClipPath } = this.getStorageDirs();
 
-        const transcodeToH264 = this.codec !== 'h264';
+        // const transcodeToH264 = this.codec !== 'h264';
+        const transcodeToH264 = true;
         this.saveFfmpegProcess = spawn(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
