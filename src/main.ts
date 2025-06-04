@@ -108,11 +108,11 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     const logger = this.getLogger();
 
     try {
-      const [_, __, ___, ____, webhook, ...rest] = url.pathname.split('/');
+      const [_, __, ___, ____, privateWebhook, ...rest] = url.pathname.split('/');
 
       try {
         // Since no API is available, needs to mimic NVR
-        if (webhook === 'thumbnail') {
+        if (privateWebhook === 'thumbnail') {
           const [deviceId, filename] = rest;
           const dev: EventsRecorderMixin = this.currentMixins[deviceId];
           const devConsole = dev.getLogger();
@@ -145,6 +145,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
           });
           return;
         } else {
+          const [webhook] = rest;
           const { deviceId, filename, parameters } = JSON.parse(params);
           const dev: EventsRecorderMixin = this.currentMixins[deviceId];
           const devConsole = dev.getLogger();

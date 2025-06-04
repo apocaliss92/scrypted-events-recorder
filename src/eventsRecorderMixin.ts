@@ -1,6 +1,6 @@
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { sleep } from '@scrypted/common/src/sleep';
-import sdk, { EventDetails, EventListenerRegister, EventRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, Setting, Settings, SettingValue, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventDetails, EventListenerRegister, EventRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, SettingValue, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
@@ -523,11 +523,14 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         const logger = this.getLogger();
         try {
             const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
-            logger.debug('Fetching videoId ', videoId, videoClipPath);
-            const fileURLToPath = url.pathToFileURL(videoClipPath).toString();
-            const videoclipMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+            logger.log('Fetching videoId ', videoId, videoClipPath);
+            await fs.promises.access(videoClipPath);
+            const { videoclipUrl } = await this.getVideoclipWebhookUrls(videoId);
+            const mo = await sdk.mediaManager.createMediaObject(Buffer.from(videoclipUrl), ScryptedMimeTypes.LocalUrl, {
+                sourceId: this.plugin.id
+            });
 
-            return videoclipMo;
+            return mo;
         } catch {
             try {
                 return this.mixinDevice.getVideoClip(videoId);
@@ -1054,7 +1057,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async getVideoclipWebhookUrls(filename: string) {
-        const cloudEndpoint = await sdk.endpointManager.getCloudEndpoint(undefined, { public: false });
+        const cloudEndpoint = await sdk.endpointManager.getCloudEndpoint(undefined, { public: true });
         const [endpoint, parameters] = cloudEndpoint.split('?') ?? '';
         const params = {
             deviceId: this.id,

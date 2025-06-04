@@ -71440,7 +71440,6 @@ const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
 const lodash_1 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 const path_1 = __importDefault(__webpack_require__(/*! path */ "path"));
-const url_1 = __importDefault(__webpack_require__(/*! url */ "url"));
 const detectionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detectionClasses */ "../scrypted-advanced-notifier/src/detectionClasses.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
 const { systemManager } = sdk_1.default;
@@ -71861,32 +71860,56 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const endTry = (0, moment_1.default)(options.endTime).add(additionalDays, 'days');
             videoclips = await getClips(startTry.toDate().getTime(), endTry.toDate().getTime());
         }
-        return videoclips;
+        try {
+            const deviceClips = await this.mixinDevice.getVideoClips(options);
+            videoclips.push(...deviceClips);
+        }
+        catch { }
+        return (0, lodash_1.sortBy)(videoclips, 'startTime');
+        ;
     }
     async getVideoClip(videoId) {
         const logger = this.getLogger();
-        const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
-        logger.debug('Fetching videoId ', videoId, videoClipPath);
-        const fileURLToPath = url_1.default.pathToFileURL(videoClipPath).toString();
-        const videoclipMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
-        return videoclipMo;
+        try {
+            const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
+            logger.log('Fetching videoId ', videoId, videoClipPath);
+            await fs_1.default.promises.access(videoClipPath);
+            const { videoclipUrl } = await this.getVideoclipWebhookUrls(videoId);
+            const mo = await sdk_1.default.mediaManager.createMediaObject(Buffer.from(videoclipUrl), sdk_1.ScryptedMimeTypes.LocalUrl, {
+                sourceId: this.plugin.id
+            });
+            return mo;
+        }
+        catch {
+            try {
+                return this.mixinDevice.getVideoClip(videoId);
+            }
+            catch (e) {
+                logger.log(`Error in getVideoclip`, videoId, e);
+            }
+        }
     }
     async getVideoClipThumbnail(thumbnailId, options) {
         const logger = this.getLogger();
         const { thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: thumbnailId });
         logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
-        const fileURLToPath = url_1.default.pathToFileURL(thumbnailPath).toString();
         try {
             await fs_1.default.promises.access(thumbnailPath);
+            const jpeg = await fs_1.default.promises.readFile(thumbnailPath);
+            const thumbnailMo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+            return thumbnailMo;
         }
-        catch (e) {
-            if (e.toString().includes('ENOENT')) {
-                await this.saveThumbnail(thumbnailId);
+        catch {
+            // if (e.toString().includes('ENOENT')) {
+            //     await this.saveThumbnail(thumbnailId);
+            // }
+            try {
+                return this.getVideoClipThumbnail(thumbnailId, options);
+            }
+            catch (e) {
+                logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
             }
         }
-        const jpeg = await fs_1.default.promises.readFile(thumbnailPath);
-        const thumbnailMo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
-        return thumbnailMo;
     }
     async removeVideoClips(...videoClipIds) {
         const logger = this.getLogger();
@@ -72303,7 +72326,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
     }
     async getVideoclipWebhookUrls(filename) {
-        const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: false });
+        const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: true });
         const [endpoint, parameters] = cloudEndpoint.split('?') ?? '';
         const params = {
             deviceId: this.id,
@@ -72492,10 +72515,10 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
         const params = url.searchParams.get('params') ?? '{}';
         const logger = this.getLogger();
         try {
-            const [_, __, ___, ____, webhook, ...rest] = url.pathname.split('/');
+            const [_, __, ___, ____, privateWebhook, ...rest] = url.pathname.split('/');
             try {
                 // Since no API is available, needs to mimic NVR
-                if (webhook === 'thumbnail') {
+                if (privateWebhook === 'thumbnail') {
                     const [deviceId, filename] = rest;
                     const dev = this.currentMixins[deviceId];
                     const devConsole = dev.getLogger();
@@ -72508,7 +72531,6 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                     const eventTimestamp = Number(filename.split('.')[0]);
                     const { eventImagePath } = dev.getStorageDirs({ eventTimestamp });
                     let jpeg = await fs_1.default.promises.readFile(eventImagePath);
-                    logger.log(height);
                     if (height) {
                         const mo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
                         const convertedImage = await sdk_1.default.mediaManager.convertMediaObject(mo, sdk_1.ScryptedMimeTypes.Image);
@@ -72527,6 +72549,7 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                     return;
                 }
                 else {
+                    const [webhook] = rest;
                     const { deviceId, filename, parameters } = JSON.parse(params);
                     const dev = this.currentMixins[deviceId];
                     const devConsole = dev.getLogger();
@@ -82864,7 +82887,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"mqtt","description":"A librar
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.43","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.45","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
 
 /***/ })
 
