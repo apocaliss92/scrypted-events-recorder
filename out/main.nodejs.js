@@ -71689,8 +71689,25 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         throw new Error("Method not implemented.");
     }
     async getRecordedEvents(options) {
-        return this.recordedEvents.filter(item => item.details.eventTime > options.startTime &&
-            item.details.eventTime < options.endTime).slice(0, options.count);
+        const logger = this.getLogger();
+        try {
+            let events = this.recordedEvents.filter(item => {
+                if (!options) {
+                    return true;
+                }
+                const startOk = options.startTime ? item.details.eventTime > options.startTime : true;
+                const endOk = options.endTime ? item.details.eventTime < options.endTime : true;
+                return startOk && endOk;
+            });
+            if (options?.count) {
+                events = events.slice(0, options.count);
+            }
+            return events;
+        }
+        catch (e) {
+            logger.log('Error in getRecordedEvents', JSON.stringify(this.recordedEvents), e);
+            return [];
+        }
     }
     getLogger() {
         const deviceConsole = this.console;
@@ -71744,7 +71761,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             streamConfig
         })}`);
         try {
-            const { thumbnailsFolder, videoClipsFolder } = this.getStorageDirs();
+            const { thumbnailsFolder, videoClipsFolder } = this.getStorageDirs({});
             try {
                 await fs_1.default.promises.access(thumbnailsFolder);
             }
@@ -71848,7 +71865,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async getVideoClip(videoId) {
         const logger = this.getLogger();
-        const { videoClipPath } = this.getStorageDirs(videoId);
+        const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
         logger.debug('Fetching videoId ', videoId, videoClipPath);
         const fileURLToPath = url_1.default.pathToFileURL(videoClipPath).toString();
         const videoclipMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
@@ -71856,27 +71873,26 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async getVideoClipThumbnail(thumbnailId, options) {
         const logger = this.getLogger();
-        const { thumbnailPath } = this.getStorageDirs(thumbnailId);
+        const { thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: thumbnailId });
         logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
         const fileURLToPath = url_1.default.pathToFileURL(thumbnailPath).toString();
-        let thumbnailMo;
         try {
             await fs_1.default.promises.access(thumbnailPath);
-            thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
         }
         catch (e) {
             if (e.toString().includes('ENOENT')) {
                 await this.saveThumbnail(thumbnailId);
-                thumbnailMo = await sdk_1.default.mediaManager.createMediaObjectFromUrl(fileURLToPath);
             }
         }
+        const jpeg = await fs_1.default.promises.readFile(thumbnailPath);
+        const thumbnailMo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
         return thumbnailMo;
     }
     async removeVideoClips(...videoClipIds) {
         const logger = this.getLogger();
         logger.debug('Removing videoclips ', videoClipIds.join(', '));
         for (const videoClipId of videoClipIds) {
-            const { videoClipPath, thumbnailPath } = this.getStorageDirs(videoClipId);
+            const { videoClipPath, thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: videoClipId });
             await fs_1.default.promises.rm(videoClipPath, { force: true, recursive: true, maxRetries: 10 });
             logger.log(`Videoclip ${videoClipId} removed`);
             await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
@@ -71887,7 +71903,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async scanFs(newMaxMemory) {
         const logger = this.getLogger();
         logger.log(`Starting FS scan: ${JSON.stringify({ newMaxMemory })}`);
-        const { deviceFolder, videoClipsFolder } = this.getStorageDirs();
+        const { deviceFolder, videoClipsFolder } = this.getStorageDirs({});
         const { maxSpaceInGb: maxSpaceInGbSrc } = this.storageSettings.values;
         const maxSpaceInGb = newMaxMemory ?? maxSpaceInGbSrc;
         const { occupiedSpaceInGb, occupiedSpaceInGbNumber, freeMemory } = await (0, util_1.calculateSize)({
@@ -71909,7 +71925,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 const match = file.match(util_1.videoClipRegex);
                 if (match) {
                     const timeStart = match[1];
-                    const { videoClipPath } = this.getStorageDirs(file);
+                    const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: file });
                     return { file, fullPath: videoClipPath, timeStart: Number(timeStart) };
                 }
                 return null;
@@ -71922,7 +71938,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 const { fullPath, file } = fileDetails[i];
                 await fs_1.default.promises.rm(fullPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted videoclip: ${file}`);
-                const { thumbnailPath } = this.getStorageDirs(file);
+                const { thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: file });
                 await fs_1.default.promises.rm(thumbnailPath, { force: true, recursive: true, maxRetries: 10 });
                 logger.log(`Deleted thumbnail: ${thumbnailPath}`);
             }
@@ -71938,7 +71954,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async parseVideoClipFile(videoClipName) {
         const logger = this.getLogger();
         try {
-            const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs(videoClipName);
+            const { videoClipPath, thumbnailPath, filename, tmpClipFilename } = this.getStorageDirs({ videoClipNameSrc: videoClipName });
             const stats = await fs_1.default.promises.stat(videoClipPath);
             if (videoClipName === tmpClipFilename) {
                 return;
@@ -71959,16 +71975,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 thumbnailPath,
                 videoClipPath
             };
-            const recordedEvent = {
-                data: {},
-                details: {
-                    eventId: filename,
-                    eventTime: startTimeNumber,
-                    eventInterface: sortedClassnames[0],
-                    mixinId: this.id,
-                }
-            };
-            return { fildeData, recordedEvent };
+            return { fildeData };
         }
         catch (e) {
             logger.log(`Error parsing file entry: ${JSON.stringify({ videoClipName })}`, e);
@@ -71976,7 +71983,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async indexFs() {
         const logger = this.getLogger();
-        const { videoClipsFolder } = this.getStorageDirs();
+        const { videoClipsFolder, eventsFolder } = this.getStorageDirs({});
         const filesData = [];
         const recordedEvents = [];
         const entries = (await fs_1.default.promises.readdir(videoClipsFolder, { withFileTypes: true })) || [];
@@ -71984,11 +71991,38 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         for (const entry of filteredEntries) {
             const parsedEntry = await this.parseVideoClipFile(entry.name);
             if (parsedEntry) {
-                const { fildeData, recordedEvent } = parsedEntry;
+                const { fildeData } = parsedEntry;
                 filesData.push(fildeData);
-                recordedEvents.push(recordedEvent);
             }
         }
+        try {
+            await fs_1.default.promises.access(eventsFolder);
+            const days = (await fs_1.default.promises.readdir(eventsFolder, { withFileTypes: true }))
+                .filter(dirent => dirent.isDirectory())
+                .map(dirent => dirent.name);
+            for (const dayFolder of days) {
+                const jsonDir = path_1.default.join(eventsFolder, dayFolder);
+                const files = (await fs_1.default.promises.readdir(jsonDir))
+                    .filter(file => file.endsWith(".json"));
+                for (const file of files) {
+                    const fullPath = path_1.default.join(jsonDir, file);
+                    try {
+                        const content = await fs_1.default.promises.readFile(fullPath, "utf-8");
+                        recordedEvents.push(...(JSON.parse(content) ?? []).map(item => ({
+                            ...item,
+                            details: {
+                                ...item.details,
+                                mixinId: this.plugin.id
+                            }
+                        })));
+                    }
+                    catch (err) {
+                        console.warn(`Error reading file ${fullPath}:`, err);
+                    }
+                }
+            }
+        }
+        catch { }
         this.scanData = filesData;
         this.recordedEvents = recordedEvents;
         this.lastIndexFs = Date.now();
@@ -72021,7 +72055,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         const logger = this.getLogger();
         logger.log(`Generating thumbnail for ${filename}`);
         return new Promise((resolve) => {
-            const { thumbnailPath, videoClipPath } = this.getStorageDirs(filename);
+            const { thumbnailPath, videoClipPath } = this.getStorageDirs({ videoClipNameSrc: filename });
             const snapshotFfmpeg = (0, child_process_1.spawn)(this.ffmpegPath, [
                 '-ss', (this.prebuffer / (2 * 1000)).toString(),
                 '-i', `${videoClipPath}`,
@@ -72044,7 +72078,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     async startVideoclipRecording() {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
-        const { tmpClipPath } = this.getStorageDirs();
+        const { tmpClipPath } = this.getStorageDirs({});
         // const transcodeToH264 = this.codec !== 'h264';
         const transcodeToH264 = true;
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
@@ -72090,7 +72124,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     logger,
                     startTime: this.recordingTimeStart,
                 });
-                const { videoClipPath, filenameWithVideoExtension } = this.getStorageDirs(filename);
+                const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: filename });
                 await fs_1.default.promises.rename(tmpClipPath, videoClipPath);
                 logger.log(`Videoclip stored ${videoClipPath}`);
                 await this.saveThumbnail(filename);
@@ -72098,13 +72132,6 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 this.saveRecordingListener && clearTimeout(this.saveRecordingListener);
                 this.storageSettings.values.processPid = undefined;
                 await this.indexFs();
-                // const parsedEntry = await this.parseVideoClipFile(filenameWithVideoExtension);
-                // logger.log(`Parsed entry video ${filenameWithVideoExtension}: ${JSON.stringify(parsedEntry)}`);
-                // if (parsedEntry) {
-                //     const { fildeData, recordedEvent } = parsedEntry;
-                //     this.scanData.push(fildeData);
-                //     this.recordedEvents.push(recordedEvent);
-                // }
             }
         });
     }
@@ -72166,6 +72193,49 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             }
         }
     }
+    async storeEvent(details, data) {
+        const logger = this.getLogger();
+        if (data.detectionId) {
+            try {
+                const mo = await this.cameraDevice.getDetectionInput(data.detectionId);
+                if (!mo) {
+                    return;
+                }
+                const eventTimestamp = data.timestamp ?? Date.now();
+                const { dayEventsPath, eventsJsonPath, eventImagePath } = this.getStorageDirs({ eventTimestamp });
+                try {
+                    await fs_1.default.promises.access(dayEventsPath);
+                }
+                catch {
+                    await fs_1.default.promises.mkdir(dayEventsPath, { recursive: true });
+                }
+                let jsonContent = [];
+                if (fs_1.default.existsSync(eventsJsonPath)) {
+                    const content = await fs_1.default.promises.readFile(eventsJsonPath, "utf-8");
+                    try {
+                        jsonContent = JSON.parse(content);
+                    }
+                    catch (e) { }
+                }
+                const newEvent = {
+                    data, details: {
+                        ...details,
+                        mixinId: this.plugin.id
+                    }
+                };
+                jsonContent.push(newEvent);
+                const jpeg = await sdk_1.default.mediaManager.convertMediaObjectToBuffer(mo, 'image/jpeg');
+                logger.log(`Storing image ${eventImagePath}`);
+                await fs_1.default.promises.writeFile(eventImagePath, jpeg);
+                logger.log(`Updating JSON ${eventsJsonPath}`);
+                await fs_1.default.promises.writeFile(eventsJsonPath, JSON.stringify(jsonContent, null, 2));
+                this.recordedEvents.push(newEvent);
+            }
+            catch (e) {
+                logger.error(`Error storing detection image ${data.detectionId}`, e);
+            }
+        }
+    }
     async startListeners() {
         const logger = this.getLogger();
         try {
@@ -72176,7 +72246,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const isMotionIncluded = detectionClasses.includes(detectionClasses_1.DetectionClass.Motion);
             const classesMap = new Set();
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
-            this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
+            this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, details, data) => {
+                this.storeEvent(details, data).catch(logger.error);
                 const filtered = data.detections.filter(det => {
                     const classname = detectionClasses_1.detectionClassesDefaultMap[det.className];
                     if (ignoreCameraDetections && !det.boundingBox) {
@@ -72232,29 +72303,36 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
     }
     async getVideoclipWebhookUrls(filename) {
-        const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: true });
+        const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: false });
         const [endpoint, parameters] = cloudEndpoint.split('?') ?? '';
         const params = {
             deviceId: this.id,
             filename,
         };
         const videoclipUrl = `${endpoint}videoclip?params=${JSON.stringify(params)}&${parameters}`;
-        const thumbnailUrl = `${endpoint}thumbnail?params=${JSON.stringify(params)}&${parameters}`;
+        const thumbnailUrl = `${endpoint}videoclipThumbnail?params=${JSON.stringify(params)}&${parameters}`;
         return { videoclipUrl, thumbnailUrl };
     }
-    getStorageDirs(videoClipNameSrc) {
+    getStorageDirs(props) {
+        const { videoClipNameSrc, eventTimestamp } = props;
         const { storagePath } = this.plugin.storageSettings.values;
         if (!storagePath) {
             throw new Error('Storage path not defined on the plugin');
         }
+        const date = eventTimestamp ? new Date(eventTimestamp) : undefined;
+        const dayStr = date ? (0, moment_1.default)(date).format('YYYYMMDD') : undefined;
         const deviceFolder = path_1.default.join(storagePath, this.cameraDevice.id);
         const videoClipsFolder = path_1.default.join(deviceFolder, 'videoclips');
         const thumbnailsFolder = path_1.default.join(deviceFolder, 'thumbnails');
+        const eventsFolder = path_1.default.join(deviceFolder, 'events');
         const filename = videoClipNameSrc?.split('.')?.[0] ?? videoClipNameSrc;
         const filenameWithVideoExtension = `${filename}.mp4`;
         const filenameWithImageExtension = `${filename}.jpg`;
         const videoClipPath = filename ? path_1.default.join(videoClipsFolder, `${filenameWithVideoExtension}`) : undefined;
         const thumbnailPath = filename ? path_1.default.join(thumbnailsFolder, `${filenameWithImageExtension}`) : undefined;
+        const dayEventsPath = dayStr ? path_1.default.join(eventsFolder, dayStr) : undefined;
+        const eventsJsonPath = dayEventsPath ? path_1.default.join(dayEventsPath, `events.json`) : undefined;
+        const eventImagePath = dayEventsPath ? path_1.default.join(dayEventsPath, `${eventTimestamp}.jpg`) : undefined;
         const tmpClipFilename = 'tmp_clip.mp4';
         const tmpClipPath = path_1.default.join(videoClipsFolder, tmpClipFilename);
         return {
@@ -72267,6 +72345,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             filename,
             tmpClipPath,
             filenameWithVideoExtension,
+            eventsFolder,
+            dayEventsPath,
+            eventsJsonPath,
+            eventImagePath,
         };
     }
 }
@@ -72408,91 +72490,35 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
     async onRequest(request, response) {
         const url = new URL(`http://localhost${request.url}`);
         const params = url.searchParams.get('params') ?? '{}';
+        const logger = this.getLogger();
         try {
-            const [_, __, ___, ____, _____, webhook] = url.pathname.split('/');
-            // const [_, __, ___, ____, webhook] = url.pathname.split('/');
-            const { deviceId, filename, parameters } = JSON.parse(params);
-            const dev = this.currentMixins[deviceId];
-            const devConsole = dev.getLogger();
-            devConsole.debug(`Request with parameters: ${JSON.stringify({
-                webhook,
-                deviceId,
-                filename,
-                parameters
-            })}`);
+            const [_, __, ___, ____, webhook, ...rest] = url.pathname.split('/');
             try {
-                if (webhook === 'videoclip') {
-                    const { videoClipPath } = dev.getStorageDirs(filename);
-                    const stat = await fs_1.default.promises.stat(videoClipPath);
-                    const fileSize = stat.size;
-                    const range = request.headers.range;
-                    devConsole.debug(`Videoclip requested: ${JSON.stringify({
-                        videoClipPath,
-                        filename,
-                        deviceId,
-                    })}`);
-                    if (range) {
-                        const parts = range.replace(/bytes=/, "").split("-");
-                        const start = parseInt(parts[0], 10);
-                        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-                        const chunksize = (end - start) + 1;
-                        const file = fs_1.default.createReadStream(videoClipPath, { start, end });
-                        const sendVideo = async () => {
-                            return new Promise((resolve, reject) => {
-                                try {
-                                    response.sendStream((async function* () {
-                                        for await (const chunk of file) {
-                                            yield chunk;
-                                        }
-                                    })(), {
-                                        code: 206,
-                                        headers: {
-                                            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                                            'Accept-Ranges': 'bytes',
-                                            'Content-Length': chunksize,
-                                            'Content-Type': 'video/mp4',
-                                        }
-                                    });
-                                    resolve();
-                                }
-                                catch (err) {
-                                    reject(err);
-                                }
-                            });
-                        };
-                        try {
-                            await sendVideo();
-                            return;
-                        }
-                        catch (e) {
-                            devConsole.log('Error fetching videoclip', e);
-                        }
-                    }
-                    else {
-                        response.sendFile(videoClipPath, {
-                            code: 200,
-                            headers: {
-                                'Content-Length': fileSize,
-                                'Content-Type': 'video/mp4',
-                            }
-                        });
-                    }
-                    return;
-                }
-                else if (webhook === 'thumbnail') {
+                // Since no API is available, needs to mimic NVR
+                if (webhook === 'thumbnail') {
+                    const [deviceId, filename] = rest;
+                    const dev = this.currentMixins[deviceId];
+                    const devConsole = dev.getLogger();
+                    const height = url.searchParams.get('height');
                     devConsole.debug(`Thumbnail requested: ${JSON.stringify({
                         filename,
                         deviceId,
+                        height,
                     })}`);
-                    const thumbnailMo = await dev.getVideoClipThumbnail(filename);
-                    if (!thumbnailMo) {
-                        response.send('Generating', {
-                            code: 400
+                    const eventTimestamp = Number(filename.split('.')[0]);
+                    const { eventImagePath } = dev.getStorageDirs({ eventTimestamp });
+                    let jpeg = await fs_1.default.promises.readFile(eventImagePath);
+                    logger.log(height);
+                    if (height) {
+                        const mo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+                        const convertedImage = await sdk_1.default.mediaManager.convertMediaObject(mo, sdk_1.ScryptedMimeTypes.Image);
+                        const resizedImage = await convertedImage.toImage({
+                            resize: {
+                                height: Number(height),
+                            },
                         });
-                        return;
+                        jpeg = await sdk_1.default.mediaManager.convertMediaObjectToBuffer(resizedImage, 'image/jpeg');
                     }
-                    // devConsole.log(thumbnailMo);
-                    const jpeg = await sdk_1.default.mediaManager.convertMediaObjectToBuffer(thumbnailMo, 'image/jpeg');
                     response.send(jpeg, {
                         headers: {
                             'Content-Type': 'image/jpeg',
@@ -72500,9 +72526,92 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                     });
                     return;
                 }
+                else {
+                    const { deviceId, filename, parameters } = JSON.parse(params);
+                    const dev = this.currentMixins[deviceId];
+                    const devConsole = dev.getLogger();
+                    devConsole.debug(`Request with parameters: ${JSON.stringify({
+                        webhook,
+                        deviceId,
+                        filename,
+                        parameters
+                    })}`);
+                    if (webhook === 'videoclip') {
+                        const { videoClipPath } = dev.getStorageDirs({ videoClipNameSrc: filename });
+                        const stat = await fs_1.default.promises.stat(videoClipPath);
+                        const fileSize = stat.size;
+                        const range = request.headers.range;
+                        devConsole.debug(`Videoclip requested: ${JSON.stringify({
+                            videoClipPath,
+                            filename,
+                            deviceId,
+                        })}`);
+                        if (range) {
+                            const parts = range.replace(/bytes=/, "").split("-");
+                            const start = parseInt(parts[0], 10);
+                            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+                            const chunksize = (end - start) + 1;
+                            const file = fs_1.default.createReadStream(videoClipPath, { start, end });
+                            const sendVideo = async () => {
+                                return new Promise((resolve, reject) => {
+                                    try {
+                                        response.sendStream((async function* () {
+                                            for await (const chunk of file) {
+                                                yield chunk;
+                                            }
+                                        })(), {
+                                            code: 206,
+                                            headers: {
+                                                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                                                'Accept-Ranges': 'bytes',
+                                                'Content-Length': chunksize,
+                                                'Content-Type': 'video/mp4',
+                                            }
+                                        });
+                                        resolve();
+                                    }
+                                    catch (err) {
+                                        reject(err);
+                                    }
+                                });
+                            };
+                            try {
+                                await sendVideo();
+                                return;
+                            }
+                            catch (e) {
+                                devConsole.log('Error fetching videoclip', e);
+                            }
+                        }
+                        else {
+                            response.sendFile(videoClipPath, {
+                                code: 200,
+                                headers: {
+                                    'Content-Length': fileSize,
+                                    'Content-Type': 'video/mp4',
+                                }
+                            });
+                        }
+                        return;
+                    }
+                    else if (webhook === 'videoclipThumbnail') {
+                        devConsole.debug(`Thumbnail requested: ${JSON.stringify({
+                            filename,
+                            deviceId,
+                        })}`);
+                        const { thumbnailPath } = dev.getStorageDirs({ videoClipNameSrc: filename });
+                        const jpeg = await fs_1.default.promises.readFile(thumbnailPath);
+                        response.send(jpeg, {
+                            headers: {
+                                'Content-Type': 'image/jpeg',
+                            }
+                        });
+                        return;
+                    }
+                }
             }
             catch (e) {
-                devConsole.log(`Error in webhook`, e);
+                logger.log(`Error in webhook`, e);
                 response.send(`${JSON.stringify(e)}, ${e.message}`, {
                     code: 400,
                 });
@@ -82755,7 +82864,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"mqtt","description":"A librar
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.41","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.43","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
 
 /***/ })
 

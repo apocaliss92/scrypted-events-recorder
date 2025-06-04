@@ -1,13 +1,13 @@
 import { ChildProcessWithoutNullStreams } from "child_process";
 import { DetectionClass } from "../../scrypted-advanced-notifier/src/detectionClasses";
-import { Camera, ScryptedDevice, ScryptedDeviceBase, Settings, VideoCamera } from "@scrypted/sdk";
+import { Camera, ScryptedDevice, ScryptedDeviceBase, Settings, VideoCamera, ObjectDetector } from "@scrypted/sdk";
 import fs from 'fs';
 import path from 'path';
 import { name } from '../package.json';
 
 export const pluginId = name;
 
-export type DeviceType = VideoCamera & Camera & Settings & ScryptedDeviceBase & ScryptedDevice;
+export type DeviceType = VideoCamera & Camera & Settings & ScryptedDeviceBase & ScryptedDevice & ObjectDetector;
 
 export const detectionClassIndex = {
     [DetectionClass.Motion]: 0,
