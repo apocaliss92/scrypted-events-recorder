@@ -511,7 +511,12 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             videoclips = await getClips(startTry.toDate().getTime(), endTry.toDate().getTime());
         }
 
-        return videoclips;
+        try {
+            const deviceClips = await this.mixinDevice.getVideoClips(options);
+            videoclips.push(...deviceClips);
+        } catch { }
+
+        return sortBy(videoclips, 'startTime');;
     }
 
     async getVideoClip(videoId: string): Promise<MediaObject> {
