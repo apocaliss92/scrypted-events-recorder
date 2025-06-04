@@ -1,8 +1,11 @@
 import { ChildProcessWithoutNullStreams } from "child_process";
-import { DetectionClass } from "../../scrypted-advanced-notifier/src/detecionClasses";
+import { DetectionClass } from "../../scrypted-advanced-notifier/src/detectionClasses";
 import { Camera, ScryptedDevice, ScryptedDeviceBase, Settings, VideoCamera } from "@scrypted/sdk";
 import fs from 'fs';
 import path from 'path';
+import { name } from '../package.json';
+
+export const pluginId = name;
 
 export type DeviceType = VideoCamera & Camera & Settings & ScryptedDeviceBase & ScryptedDevice;
 

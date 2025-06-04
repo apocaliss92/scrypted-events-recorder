@@ -70299,27 +70299,29 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
 /***/ }),
 
-/***/ "../scrypted-advanced-notifier/src/detecionClasses.ts":
-/*!************************************************************!*\
-  !*** ../scrypted-advanced-notifier/src/detecionClasses.ts ***!
-  \************************************************************/
+/***/ "../scrypted-advanced-notifier/src/detectionClasses.ts":
+/*!*************************************************************!*\
+  !*** ../scrypted-advanced-notifier/src/detectionClasses.ts ***!
+  \*************************************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parentDetectionClassMap = exports.detectionClassesDefaultMap = exports.isLabelDetection = exports.isPackageClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.classnamePrio = exports.DetectionClass = void 0;
+exports.levenshteinDistance = exports.getParentDetectionClass = exports.detectionClassesDefaultMap = exports.isObjectClassname = exports.isLabelDetection = exports.isAudioClassname = exports.isPackageClassname = exports.isDoorbellClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.doorbellClasses = exports.audioClasses = exports.objectClasses = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.basicDetectionClasses = exports.classnamePrio = exports.DetectionClass = void 0;
 var DetectionClass;
 (function (DetectionClass) {
     DetectionClass["Motion"] = "motion";
     DetectionClass["Person"] = "person";
     DetectionClass["Vehicle"] = "vehicle";
     DetectionClass["Animal"] = "animal";
+    DetectionClass["Audio"] = "audio";
+    DetectionClass["AnyObject"] = "any_object";
     DetectionClass["Face"] = "face";
     DetectionClass["Plate"] = "plate";
     DetectionClass["Package"] = "package";
-    DetectionClass["DoorSensor"] = "sensor_open";
-    DetectionClass["DoorLock"] = "lock_open";
+    DetectionClass["Doorbell"] = "doorbell";
+    DetectionClass["Sensor"] = "sensor";
 })(DetectionClass || (exports.DetectionClass = DetectionClass = {}));
 exports.classnamePrio = {
     [DetectionClass.Face]: 1,
@@ -70330,6 +70332,11 @@ exports.classnamePrio = {
     [DetectionClass.Package]: 5,
     [DetectionClass.Motion]: 6,
 };
+exports.basicDetectionClasses = [
+    DetectionClass.Vehicle,
+    DetectionClass.Person,
+    DetectionClass.Animal,
+];
 exports.defaultDetectionClasses = Object.values(DetectionClass);
 exports.animalClasses = [
     // General
@@ -70478,6 +70485,82 @@ exports.packageClasses = [
     DetectionClass.Package,
     'packet',
 ];
+exports.objectClasses = [
+    DetectionClass.AnyObject,
+    'object',
+];
+exports.audioClasses = [
+    DetectionClass.Audio,
+    "speech", "babbling", "yell", "bellow", "whoop", "whispering", "laughter", "snicker",
+    "crying", "sigh", "singing", "choir", "sodeling", "chant", "mantra", "child_singing",
+    "synthetic_singing", "rapping", "humming", "groan", "grunt", "whistling", "breathing",
+    "wheeze", "snoring", "gasp", "pant", "snort", "cough", "throat_clearing", "sneeze",
+    "sniff", "run", "shuffle", "footsteps", "chewing", "biting", "gargling", "stomach_rumble",
+    "burping", "hiccup", "fart", "hands", "finger_snapping", "clapping", "heartbeat",
+    "heart_murmur", "cheering", "applause", "chatter", "crowd", "children_playing",
+    "pets", "bark", "yip", "howl", "bow-wow", "growling", "whimper_dog", "purr", "meow", "hiss",
+    "caterwaul", "livestock", "clip-clop", "neigh", "cattle", "moo", "cowbell", "pig", "oink",
+    "goat", "bleat", "fowl", "chicken", "cluck", "cock-a-doodle-doo", "turkey", "gobble", "duck",
+    "quack", "goose", "honk", "wild_animals", "roaring_cats", "roar", "chird", "chirp", "squawk",
+    "coo", "crow", "caw", "hoot", "flapping_wings", "dogs", "rats", "patter", "insect", "cricket",
+    "mosquito", "fly", "buzz", "frog", "croak", "rattle", "whale_vocalization", "music",
+    "musical_instrument", "plucked_string_instrument", "guitar", "electric_guitar", "bass_guitar",
+    "acoustic_guitar", "steel_guitar", "tapping", "strum", "banjo", "sitar", "mandolin", "zither",
+    "ukulele", "keyboard", "piano", "electric_piano", "organ", "electronic_organ", "hammond_organ",
+    "synthesizer", "sampler", "harpsichord", "percussion", "drum_kit", "drum_machine", "drum",
+    "snare_drum", "rimshot", "drum_roll", "bass_drum", "timpani", "tabla", "cymbal", "hi-hat",
+    "wood_block", "tambourine", "maraca", "gong", "tubular_bells", "mallet_percussion", "marimba",
+    "glockenspiel", "vibraphone", "steelpan", "orchestra", "brass_instrument", "french_horn",
+    "trumpet", "trombone", "bowed_string_instrument", "string_section", "violin", "pizzicato",
+    "cello", "double_bass", "wind_instrument", "flute", "saxophone", "clarinet", "harp", "bell",
+    "church_bell", "jingle_bell", "bicycle_bell", "tuning_fork", "chime", "wind_chime",
+    "change_ringing", "harmonica", "accordion", "bagpipes", "didgeridoo", "shofar", "theremin",
+    "singing_bowl", "scratching", "pop_music", "hip_hop_music", "beatboxing", "rock_music",
+    "heavy_metal", "punk_rock", "grunge", "progressive_rock", "rock_and_roll", "psychedelic_rock",
+    "rhythm_and_blues", "soul_music", "reggae", "country", "swing_music", "bluegrass", "funk",
+    "folk_music", "middle_eastern_music", "jazz", "disco", "classical_music", "opera",
+    "electronic_music", "house_music", "techno", "dubstep", "drum_and_bass", "electronica",
+    "electronic_dance_music", "ambient_music", "trance_music", "music_of_latin_america",
+    "salsa_music", "flamenco", "blues", "music_for_children", "new-age_music", "vocal_music",
+    "a_capella", "music_of_africa", "afrobeat", "christian_music", "gospel_music", "music_of_asia",
+    "carnatic_music", "music_of_bollywood", "ska", "traditional_music", "independent_music",
+    "song", "background_music", "theme_music", "jingle", "soundtrack_music", "lullaby",
+    "video_game_music", "christmas_music", "dance_music", "wedding_music", "happy_music",
+    "sad_music", "tender_music", "exciting_music", "angry_music", "scary_music", "wind",
+    "rustling_leaves", "wind_noise", "thunderstorm", "thunder", "water", "rain", "raindrop",
+    "rain_on_surface", "stream", "waterfall", "ocean", "waves", "steam", "gurgling", "fire",
+    "crackle", "sailboat", "rowboat", "motorboat", "air_brake", "air_horn",
+    "reversing_beeps", "ice_cream_truck", "aircraft_engine", "jet_engine", "propeller",
+    "fixed-wing_aircraft", "engine", "light_engine", "dental_drill's_drill", "lawn_mower",
+    "chainsaw", "medium_engine", "heavy_engine", "engine_knocking", "engine_starting", "idling",
+    "accelerating", "door", "doorbell", "ding-dong", "sliding_door", "slam", "knock", "tap",
+    "squeak", "cupboard_open_or_close", "drawer_open_or_close", "dishes", "cutlery", "chopping",
+    "frying", "microwave_oven", "blender", "water_tap", "sink", "bathtub", "hair_dryer",
+    "toilet_flush", "toothbrush", "electric_toothbrush", "vacuum_cleaner", "zipper",
+    "keys_jangling", "coin", "scissors", "electric_shaver", "shuffling_cards", "typing",
+    "typewriter", "computer_keyboard", "writing", "alarm", "telephone", "telephone_bell_ringing",
+    "ringtone", "telephone_dialing", "dial_tone", "busy_signal", "alarm_clock", "siren",
+    "civil_defense_siren", "buzzer", "smoke_detector", "fire_alarm", "foghorn", "whistle",
+    "steam_whistle", "mechanisms", "ratchet", "clock", "tick", "tick-tock", "gears", "pulleys",
+    "sewing_machine", "mechanical_fan", "air_conditioning", "cash_register", "printer", "camera",
+    "single-lens_reflex_camera", "tools", "hammer", "jackhammer", "sawing", "filing", "sanding",
+    "power_tool", "drill", "explosion", "gunshot", "machine_gun", "fusillade", "artillery_fire",
+    "cap_gun", "fireworks", "firecracker", "burst", "eruption", "boom", "wood", "chop", "splinter",
+    "crack", "glass", "chink", "shatter", "liquid", "splash", "slosh", "squish", "drip", "pour",
+    "trickle", "gush", "fill", "spray", "pump", "stir", "boiling", "sonar", "arrow", "whoosh",
+    "thump", "thunk", "electronic_tuner", "effects_unit", "chorus_effect", "basketball_bounce",
+    "bang", "slap", "whack", "smash", "breaking", "bouncing", "whip", "flap", "scratch", "scrape",
+    "rub", "roll", "crushing", "crumpling", "tearing", "beep", "ping", "ding", "clang", "squeal",
+    "creak", "rustle", "whir", "clatter", "sizzle", "clicking", "clickety-clack", "rumble", "plop",
+    "jingle", "hum", "zing", "boing", "crunch", "silence", "sine_wave", "harmonic", "chirp_tone",
+    "sound_effect", "pulse", "inside", "outside", "reverberation", "echo", "noise",
+    "environmental_noise", "static", "mains_hum", "distortion", "sidetone", "cacophony",
+    "white_noise", "pink_noise", "throbbing", "vibration", "television", "radio", "field_recording"
+];
+exports.doorbellClasses = [
+    DetectionClass.Doorbell,
+    'ring',
+];
 const isFaceClassname = (classname) => exports.faceClasses.includes(classname);
 exports.isFaceClassname = isFaceClassname;
 const isPlateClassname = (classname) => exports.licensePlateClasses.includes(classname);
@@ -70490,10 +70573,19 @@ const isVehicleClassname = (classname) => exports.vehicleClasses.includes(classn
 exports.isVehicleClassname = isVehicleClassname;
 const isMotionClassname = (classname) => exports.motionClasses.includes(classname);
 exports.isMotionClassname = isMotionClassname;
+const isDoorbellClassname = (classname) => exports.doorbellClasses.includes(classname);
+exports.isDoorbellClassname = isDoorbellClassname;
 const isPackageClassname = (classname) => exports.packageClasses.includes(classname);
 exports.isPackageClassname = isPackageClassname;
+const isAudioClassname = (classname) => exports.audioClasses.includes(classname);
+exports.isAudioClassname = isAudioClassname;
 const isLabelDetection = (classname) => (0, exports.isFaceClassname)(classname) || (0, exports.isPlateClassname)(classname);
 exports.isLabelDetection = isLabelDetection;
+const isObjectClassname = (classname) => (0, exports.isPackageClassname)(classname) ||
+    (0, exports.isAnimalClassname)(classname) ||
+    (0, exports.isPersonClassname)(classname) ||
+    (0, exports.isVehicleClassname)(classname);
+exports.isObjectClassname = isObjectClassname;
 exports.detectionClassesDefaultMap = {
     ...exports.animalClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Animal }), {}),
     ...exports.personClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Person }), {}),
@@ -70502,11 +70594,90 @@ exports.detectionClassesDefaultMap = {
     ...exports.packageClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Package }), {}),
     ...exports.faceClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Face }), {}),
     ...exports.licensePlateClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Plate }), {}),
+    ...exports.objectClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.AnyObject }), {}),
+    ...exports.audioClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Audio }), {}),
+    ...exports.doorbellClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Doorbell }), {}),
 };
-exports.parentDetectionClassMap = {
-    [DetectionClass.Face]: DetectionClass.Person,
-    [DetectionClass.Plate]: DetectionClass.Vehicle,
+const getParentDetectionClass = (det) => {
+    const { className } = det;
+    const baseMap = {
+        [DetectionClass.Face]: DetectionClass.Person,
+        [DetectionClass.Plate]: DetectionClass.Vehicle,
+    };
+    const parentGroup = exports.detectionClassesDefaultMap[className];
+    if (parentGroup && parentGroup !== className) {
+        return parentGroup;
+    }
+    else {
+        return baseMap[className];
+    }
 };
+exports.getParentDetectionClass = getParentDetectionClass;
+// visual similarity
+const similarCharacters = [
+    ['0', 'O', 'D'],
+    ['1', 'I'],
+    ['2', 'Z'],
+    ['4', 'A'],
+    ['5', 'S'],
+    ['8', 'B'],
+    ['6', 'G'],
+    // not sure about this one.
+    ['A', '4'],
+    ['C', 'G'],
+    ['E', 'F'],
+];
+const similarCharactersMap = new Map();
+for (const similarCharacter of similarCharacters) {
+    for (const character of similarCharacter) {
+        if (!similarCharactersMap.has(character)) {
+            similarCharactersMap.set(character, new Set());
+        }
+        for (const similar of similarCharacter) {
+            similarCharactersMap.get(character).add(similar);
+        }
+    }
+}
+const isSameCharacter = (c1, c2) => {
+    if (c1 === c2)
+        return true;
+    return similarCharactersMap.get(c1)?.has(c2);
+};
+const levenshteinDistance = (str1, str2) => {
+    // todo: handle lower/uppercase similarity in similarCharacters above.
+    // ie, b is visualy similar to 6, but does not really look like B.
+    // others include e and C. v, u and Y. l, i, 1.
+    str1 = str1.toUpperCase();
+    str2 = str2.toUpperCase();
+    const len1 = str1.length;
+    const len2 = str2.length;
+    // If either string is empty, the distance is the length of the other string
+    if (len1 === 0)
+        return len2;
+    if (len2 === 0)
+        return len1;
+    let prev = new Array(len2 + 1);
+    let curr = new Array(len2 + 1);
+    // Initialize the first row of the matrix to be the index of the second string
+    for (let i = 0; i <= len2; i++) {
+        prev[i] = i;
+    }
+    for (let i = 1; i <= len1; i++) {
+        // Initialize the current row with the distance from the previous row's first element
+        curr[0] = i;
+        for (let j = 1; j <= len2; j++) {
+            let cost = isSameCharacter(str1.charAt(i - 1), str2.charAt(j - 1)) ? 0 : 1;
+            // Compute the minimum of three possible operations: insertion, deletion, or substitution
+            curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+        }
+        // Swap the previous and current rows for the next iteration
+        const temp = prev;
+        prev = curr;
+        curr = temp;
+    }
+    return prev[len2];
+};
+exports.levenshteinDistance = levenshteinDistance;
 
 
 /***/ }),
@@ -70556,23 +70727,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BasePlugin = exports.getMqttBasicClient = exports.getBaseSettings = exports.applySettingsShow = void 0;
+exports.BasePlugin = exports.getMqttBasicClient = exports.getBaseSettings = exports.logLevelSetting = exports.getBaseLogger = exports.applySettingsShow = void 0;
 const sdk_1 = __importStar(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"));
-const mqtt_client_1 = __importDefault(__webpack_require__(/*! ./mqtt-client */ "../scrypted-apocaliss-base/src/mqtt-client.ts"));
 const axios_1 = __importDefault(__webpack_require__(/*! axios */ "../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs"));
 const https_1 = __importDefault(__webpack_require__(/*! https */ "https"));
+const mqtt_client_1 = __importDefault(__webpack_require__(/*! ./mqtt-client */ "../scrypted-apocaliss-base/src/mqtt-client.ts"));
+const utils_1 = __webpack_require__(/*! ../../scrypted-syslog/src/utils */ "../scrypted-syslog/src/utils.ts");
 const { systemManager } = sdk_1.default;
 const httpsAgent = new https_1.default.Agent({
     rejectUnauthorized: false,
 });
 const applySettingsShow = (storageSettings) => {
+    const hasMqttDevice = !!systemManager.getDeviceByName('MQTT');
+    if (!hasMqttDevice) {
+        storageSettings.settings.useMqttPluginCredentials.defaultValue = false;
+        storageSettings.putSetting('useMqttPluginCredentials', false);
+    }
     const { mqttEnabled, useMqttPluginCredentials, haEnabled, useHaPluginCredentials } = storageSettings.values;
     const { haEnabled: haEnabledSetting, mqttEnabled: mqttEnabledSetting } = storageSettings.settings;
-    if (mqttEnabledSetting.hide || !mqttEnabled) {
-        storageSettings.settings.mqttHost.hide = true;
-        storageSettings.settings.mqttPassword.hide = true;
-        storageSettings.settings.mqttUsename.hide = true;
-        storageSettings.settings.useMqttPluginCredentials.hide = true;
+    if (mqttEnabledSetting?.hide || !mqttEnabled) {
+        storageSettings.settings.mqttHost && (storageSettings.settings.mqttHost.hide = true);
+        storageSettings.settings.mqttPassword && (storageSettings.settings.mqttPassword.hide = true);
+        storageSettings.settings.mqttUsename && (storageSettings.settings.mqttUsename.hide = true);
+        storageSettings.settings.useMqttPluginCredentials && (storageSettings.settings.useMqttPluginCredentials.hide = true);
     }
     else {
         storageSettings.settings.mqttHost.hide = useMqttPluginCredentials;
@@ -70580,11 +70757,11 @@ const applySettingsShow = (storageSettings) => {
         storageSettings.settings.mqttUsename.hide = useMqttPluginCredentials;
         storageSettings.settings.useMqttPluginCredentials.hide = false;
     }
-    if (haEnabledSetting.hide || !haEnabled) {
-        storageSettings.settings.haAccessToken.hide = true;
-        storageSettings.settings.haProtocol.hide = true;
-        storageSettings.settings.haAddress.hide = true;
-        storageSettings.settings.useHaPluginCredentials.hide = true;
+    if (haEnabledSetting?.hide || !haEnabled) {
+        storageSettings.settings.haAccessToken && (storageSettings.settings.haAccessToken.hide = true);
+        storageSettings.settings.haProtocol && (storageSettings.settings.haProtocol.hide = true);
+        storageSettings.settings.haAddress && (storageSettings.settings.haAddress.hide = true);
+        storageSettings.settings.useHaPluginCredentials && (storageSettings.settings.useHaPluginCredentials.hide = true);
     }
     else {
         storageSettings.settings.haAccessToken.hide = useHaPluginCredentials;
@@ -70594,8 +70771,69 @@ const applySettingsShow = (storageSettings) => {
     }
 };
 exports.applySettingsShow = applySettingsShow;
+const getBaseLogger = (props) => {
+    const { console, storage, friendlyName } = props;
+    const log = (type, message, ...optionalParams) => {
+        const now = new Date().toLocaleString();
+        const logLevel = storage.getItem('logLevel');
+        const canDebug = logLevel === utils_1.LogLevel.DEBUG;
+        const canInfo = canDebug || logLevel === utils_1.LogLevel.INFO;
+        let canLog = false;
+        let severity = utils_1.LogLevel.NOTICE;
+        if (type === 'debug') {
+            canLog = canDebug;
+            severity = utils_1.LogLevel.DEBUG;
+        }
+        else if (type === 'info') {
+            severity = utils_1.LogLevel.INFO;
+            canLog = canInfo;
+        }
+        else {
+            canLog = true;
+            if (type === 'error') {
+                severity = utils_1.LogLevel.ERROR;
+            }
+            else if (type === 'warn') {
+                severity = utils_1.LogLevel.WARN;
+            }
+        }
+        if (canLog) {
+            console.log(`${now} - [${severity}]:`, message, ...optionalParams);
+        }
+        if (type === 'error' && storage.values.devNotifier) {
+            storage.values.devNotifier.sendNotification(friendlyName, {
+                body: `${message}${optionalParams?.map(param => '\n' + param)}`,
+                data: {
+                    pushover: {
+                        priority: 1
+                    }
+                }
+            });
+        }
+    };
+    const newLogger = {
+        log: (message, ...optionalParams) => log('log', message, ...optionalParams),
+        info: (message, ...optionalParams) => log('info', message, ...optionalParams),
+        debug: (message, ...optionalParams) => log('debug', message, ...optionalParams),
+        error: (message, ...optionalParams) => log('error', message, ...optionalParams),
+        warn: (message, ...optionalParams) => log('warn', message, ...optionalParams),
+    };
+    return newLogger;
+};
+exports.getBaseLogger = getBaseLogger;
+exports.logLevelSetting = {
+    title: 'Log level',
+    type: 'string',
+    defaultValue: utils_1.LogLevel.NOTICE,
+    immediate: true,
+    choices: [
+        utils_1.LogLevel.NOTICE,
+        utils_1.LogLevel.INFO,
+        utils_1.LogLevel.DEBUG,
+    ]
+};
 const getBaseSettings = (props) => {
-    const { onPluginSwitch, hideMqtt, hideHa = true, baseGroupName = 'Base' } = props;
+    const { onPluginSwitch, hideMqtt, mqttAlwaysEnabled, hideHa = true, baseGroupName = 'Base' } = props;
     const group = baseGroupName === '' ? undefined : baseGroupName;
     const settings = {
         pluginEnabled: {
@@ -70606,27 +70844,18 @@ const getBaseSettings = (props) => {
             group,
             onPut: onPluginSwitch
         },
+        logLevel: {
+            ...exports.logLevelSetting,
+            group,
+        },
         mqttEnabled: {
             title: 'MQTT enabled',
             type: 'boolean',
             defaultValue: true,
             immediate: true,
             group,
-            hide: hideMqtt
-        },
-        debug: {
-            title: 'Log debug messages',
-            type: 'boolean',
-            defaultValue: false,
-            immediate: true,
-            group,
-        },
-        info: {
-            title: 'Log info messages',
-            type: 'boolean',
-            defaultValue: false,
-            immediate: true,
-            group,
+            hide: hideMqtt,
+            readonly: mqttAlwaysEnabled,
         },
         devNotifier: {
             title: 'DEV notifier',
@@ -70640,6 +70869,7 @@ const getBaseSettings = (props) => {
             type: 'boolean',
             immediate: true,
             group,
+            defaultValue: true,
             hide: hideMqtt
         },
         mqttHost: {
@@ -70678,6 +70908,7 @@ const getBaseSettings = (props) => {
             subgroup: 'Homeassistant',
             title: 'Use HA plugin credentials',
             type: 'boolean',
+            defaultValue: true,
             immediate: true,
             hide: hideHa
         },
@@ -70710,7 +70941,7 @@ const getBaseSettings = (props) => {
 };
 exports.getBaseSettings = getBaseSettings;
 const getMqttBasicClient = async (props) => {
-    const { useMqttPluginCredentials, logger, clientId, messageCb } = props;
+    const { useMqttPluginCredentials, logger, clientId, configTopicPattern } = props;
     let mqttHost;
     let mqttUsename;
     let mqttPassword;
@@ -70718,6 +70949,10 @@ const getMqttBasicClient = async (props) => {
     if (useMqttPluginCredentials) {
         logger.debug(`Using MQTT plugin credentials.`);
         const mqttDevice = systemManager.getDeviceByName('MQTT');
+        if (!mqttDevice) {
+            logger.log(`MQTT plugin not installed, please provide the connection information manually`);
+            return;
+        }
         const mqttSettings = await mqttDevice.getSettings();
         const isInternalBroker = (JSON.parse(mqttSettings.find(setting => setting.key === 'enableBroker')?.value || 'false'));
         if (isInternalBroker) {
@@ -70738,12 +70973,7 @@ const getMqttBasicClient = async (props) => {
     if (!mqttHost || !mqttUsename || !mqttPassword) {
         logger.debug('MQTT params not provided');
     }
-    try {
-        client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger, clientId, messageCb);
-    }
-    catch (e) {
-        logger.log('Error setting up MQTT client', e);
-    }
+    client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger, clientId, configTopicPattern);
     return client;
 };
 exports.getMqttBasicClient = getMqttBasicClient;
@@ -70807,10 +71037,19 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
                 httpsAgent
             });
         };
+        const postAutomation = (automationId, automation) => {
+            return axios_1.default.post(`${url}/api/config/automation/config/${automationId}`, automation, {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                },
+                httpsAgent
+            });
+        };
         return {
             getTemplateData,
             getStatesData,
             getCalendarEvents,
+            postAutomation,
         };
     }
     putSetting(key, value) {
@@ -70820,7 +71059,7 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
         const { mqttEnabled, useMqttPluginCredentials, pluginEnabled } = this.storageSettings.values;
         if (mqttEnabled && pluginEnabled) {
             this.initializingMqtt = true;
-            const logger = this.getLogger();
+            const logger = this.getLoggerInternal({});
             if (this.mqttClient) {
                 this.mqttClient.disconnect();
                 this.mqttClient = undefined;
@@ -70882,43 +71121,25 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
     // async releaseMixin(id: string, mixinDevice: any): Promise<void> {
     //     await mixinDevice.release();
     // }
-    getLogger() {
-        if (!this.mainLogger) {
-            const prefix = `[${this.opts.pluginFriendlyName}]`;
-            const log = (type, message, ...optionalParams) => {
-                const now = new Date().toLocaleString();
-                let canLog = false;
-                if (type === 'debug') {
-                    canLog = this.storageSettings.getItem('debug');
-                }
-                else if (type === 'info') {
-                    canLog = this.storageSettings.getItem('info');
-                }
-                else {
-                    canLog = true;
-                }
-                if (canLog) {
-                    this.console.log(` ${now} - `, message, ...optionalParams);
-                }
-                if (type === 'error' && this.storageSettings.values.devNotifier) {
-                    this.storageSettings.values.devNotifier.sendNotification(this.opts.pluginFriendlyName, {
-                        body: `${message}${optionalParams?.map(param => '\n' + param)}`,
-                        data: {
-                            pushover: {
-                                priority: 1
-                            }
-                        }
-                    });
-                }
-            };
-            this.mainLogger = {
-                log: (message, ...optionalParams) => log('log', message, ...optionalParams),
-                info: (message, ...optionalParams) => log('info', message, ...optionalParams),
-                debug: (message, ...optionalParams) => log('debug', message, ...optionalParams),
-                error: (message, ...optionalParams) => log('error', message, ...optionalParams),
-            };
+    getLoggerInternal(props) {
+        const { console, storage, friendlyName } = props;
+        if (console) {
+            return (0, exports.getBaseLogger)({
+                console,
+                storage,
+                friendlyName
+            });
         }
-        return this.mainLogger;
+        else {
+            if (!this.mainLogger) {
+                this.mainLogger = (0, exports.getBaseLogger)({
+                    console: this.console,
+                    storage: this.storageSettings,
+                    friendlyName: this.opts.pluginFriendlyName
+                });
+            }
+            return this.mainLogger;
+        }
     }
 }
 exports.BasePlugin = BasePlugin;
@@ -70937,23 +71158,36 @@ exports.BasePlugin = BasePlugin;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const mqtt_1 = __webpack_require__(/*! mqtt */ "../scrypted-apocaliss-base/node_modules/mqtt/build/index.js");
 const sleep_1 = __webpack_require__(/*! ../../scrypted/server/src/sleep */ "../scrypted/server/src/sleep.ts");
+const topicMatches = (pattern, topic) => {
+    const patternLevels = pattern.split('/');
+    const topicLevels = topic.split('/');
+    for (let i = 0; i < patternLevels.length; i++) {
+        if (patternLevels[i] === '#')
+            return true;
+        if (patternLevels[i] === '+')
+            continue;
+        if (patternLevels[i] !== topicLevels[i])
+            return false;
+    }
+    return patternLevels.length === topicLevels.length;
+};
 class MqttClient {
-    constructor(host, username, password, logger, clientId, messageCb) {
+    constructor(host, username, password, logger, clientId, configTopicPattern) {
         this.topicLastValue = {};
         this.topicCbMap = {};
+        this.currentAutodiscoveryTopics = [];
         this.host = host;
         this.username = username;
         this.password = password;
         this.logger = logger;
         this.clientId = clientId;
-        this.messageCb = messageCb;
+        this.configTopicPattern = configTopicPattern;
     }
     async disconnect() {
-        const mqttClient = await this.getMqttClient();
-        if (mqttClient) {
+        if (this.mqttClient) {
             try {
                 this.logger.log('Disconnecting mqtt client');
-                await mqttClient.endAsync(true);
+                await this.mqttClient.endAsync(true);
             }
             catch (e) {
                 this.logger.log('Error closing MQTT connection', e);
@@ -70961,8 +71195,13 @@ class MqttClient {
         }
     }
     async getMqttClient(forceReconnect) {
+        if (this.connecting) {
+            return this.mqttClient;
+        }
         const _connect = async () => {
             try {
+                const logger = this.logger;
+                this.connecting = true;
                 const client = await (0, mqtt_1.connectAsync)(this.mqttPathmame, {
                     rejectUnauthorized: false,
                     username: this.username,
@@ -70970,30 +71209,49 @@ class MqttClient {
                     clientId: this.clientId,
                     reschedulePings: true,
                 }, true);
-                client.on('message', async (messageTopic, message) => {
-                    const cbs = this.topicCbMap[messageTopic];
-                    const messageString = message.toString();
-                    if (cbs) {
-                        for (const cb of cbs) {
-                            await cb(messageTopic, messageString);
+                if (this.configTopicPattern) {
+                    await client.subscribeAsync([this.configTopicPattern]);
+                }
+                client.on('message', async (messageTopic, message, data) => {
+                    const cbs = [];
+                    for (const [key, data] of Object.entries(this.topicCbMap)) {
+                        if (topicMatches(key, messageTopic)) {
+                            cbs.push(...data);
                         }
                     }
-                    this.messageCb && this.messageCb(messageTopic, messageString);
+                    const messageString = message.toString();
+                    if (cbs?.length) {
+                        logger.info(`Topic ${messageTopic} for ${cbs.length} cbs sent with data ${message}: ${JSON.stringify(data)}`);
+                        for (const cb of cbs) {
+                            cb(messageTopic, messageString, data).catch(logger.log);
+                        }
+                    }
+                    if (this.configTopicPattern) {
+                        !!message &&
+                            messageTopic.endsWith('/config') &&
+                            !this.currentAutodiscoveryTopics.includes(messageTopic) &&
+                            this.currentAutodiscoveryTopics.push(messageTopic);
+                    }
+                });
+                client.on('disconnect', (p) => {
+                    logger.info(`Client disconnecting: ${JSON.stringify(p)}`);
+                });
+                client.on('reconnect', () => {
+                    logger.info(`Client reconnecting`);
                 });
                 client.setMaxListeners(Infinity);
-                this.logger.log(`Connected to mqtt ${this.host}:${this.username}`);
+                this.logger.log('Connected to MQTT', this.mqttPathmame, this.username, this.clientId);
                 this.mqttClient = client;
             }
             catch (e) {
-                this.logger.log('Error connecting to mqtt. Waiting before trying agian', e);
-                // this.mqttClient = undefined;
+                this.logger.log('Error connecting to mqtt. Waiting before trying again. Client id is ', this.clientId, e);
+                await this.mqttClient?.endAsync(true);
                 await (0, sleep_1.sleep)(5000);
             }
+            finally {
+                this.connecting = false;
+            }
         };
-        // client.on('error', data => {
-        //     this.logger.log('Error connecting to mqtt', data);
-        //     this.mqttClient = undefined;
-        // });
         if (!this.mqttClient || forceReconnect) {
             if (forceReconnect && this.mqttClient) {
                 try {
@@ -71008,20 +71266,19 @@ class MqttClient {
             if (!this.mqttPathmame.endsWith('/')) {
                 this.mqttPathmame = `${this.mqttPathmame}/`;
             }
-            this.logger.log('Starting MQTT connection', this.host, this.mqttPathmame);
+            this.logger.log('Starting MQTT connection', this.mqttPathmame, this.username, this.clientId);
             await _connect();
-            if (this.mqttClient) {
-                this.mqttClient.onKeepaliveTimeout = async () => {
-                    this.logger.log('keepalive timeout. Reconnecting');
-                    this.mqttClient.reconnect();
-                };
-            }
+            // if (this.mqttClient) {
+            //     this.mqttClient.onKeepaliveTimeout = async () => {
+            //         this.logger.log('keepalive timeout. Reconnecting');
+            //         this.mqttClient.reconnect();
+            //     }
+            // }
             return this.mqttClient;
-        }
-        else if (!this.mqttClient.connected) {
-            this.logger.log('MQTT disconnected. Reconnecting', this.host, this.username, this.mqttPathmame);
-            await _connect();
-            return this.mqttClient;
+            // } else if (!this.mqttClient.connected) {
+            //     this.logger.log('MQTT disconnected. Reconnecting', this.host, this.username, this.mqttPathmame);
+            //     await _connect();
+            //     return this.mqttClient;
         }
         else {
             return this.mqttClient;
@@ -71039,7 +71296,7 @@ class MqttClient {
             this.logger.log(`Error parsing publish values: ${JSON.stringify({ topic, value })}`, e);
             return;
         }
-        if (retain && this.topicLastValue[topic] === value) {
+        if (this.topicLastValue[topic] === value) {
             this.logger.debug(`Skipping publish, same as previous value: ${JSON.stringify({ topic, value, previousValue: this.topicLastValue[topic] })}`);
             return;
         }
@@ -71055,9 +71312,7 @@ class MqttClient {
                 await client.publishAsync(topic, value, { retain }).catch(e => this.logger.log(`Error publish retry. ${JSON.stringify({ topic, value })}`, e));
             }
             finally {
-                if (retain) {
-                    this.topicLastValue[topic] = value;
-                }
+                this.topicLastValue[topic] = value;
             }
         }
     }
@@ -71073,7 +71328,6 @@ class MqttClient {
         };
     }
     async subscribe(topics, cb) {
-        await this.unsubscribe(topics);
         const client = await this.getMqttClient();
         if (client) {
             await client.subscribeAsync(topics);
@@ -71094,10 +71348,35 @@ class MqttClient {
             }
         }
     }
+    async unsubscribeWithCb(data) {
+        const client = await this.getMqttClient();
+        if (client) {
+            for (const { cb, topic } of data) {
+                for (const thisCb of this.topicCbMap[topic]) {
+                    delete this.topicCbMap[topic];
+                    if (thisCb === cb) {
+                        this.topicCbMap[topic] = this.topicCbMap[topic].filter(elem => elem !== cb);
+                    }
+                }
+                if (!this.topicCbMap[topic].length) {
+                    await client.unsubscribeAsync(topic);
+                }
+            }
+        }
+    }
     async removeAllListeners() {
         const mqttClient = await this.getMqttClient();
         if (mqttClient) {
             mqttClient.removeAllListeners();
+        }
+    }
+    async cleanupAutodiscoveryTopics(activeTopics) {
+        const topicsToDelete = this.currentAutodiscoveryTopics.filter(topic => !activeTopics.includes(topic));
+        if (topicsToDelete.length > 0) {
+            for (const topic of topicsToDelete) {
+                await this.publish(topic, '', true);
+            }
+            this.logger.log(`${topicsToDelete.length} topics to delete found: ${topicsToDelete.join(', ')}`);
         }
     }
 }
@@ -71159,11 +71438,11 @@ const storage_settings_1 = __webpack_require__(/*! @scrypted/sdk/storage-setting
 const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
 const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
 const lodash_1 = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 const path_1 = __importDefault(__webpack_require__(/*! path */ "path"));
 const url_1 = __importDefault(__webpack_require__(/*! url */ "url"));
-const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
+const detectionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detectionClasses */ "../scrypted-advanced-notifier/src/detectionClasses.ts");
 const util_1 = __webpack_require__(/*! ./util */ "./src/util.ts");
-const moment_1 = __importDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 const { systemManager } = sdk_1.default;
 class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     constructor(plugin, mixinDevice, mixinDeviceInterfaces, mixinDeviceState, providerNativeId, group, groupKey) {
@@ -71539,9 +71818,9 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                         duration: Math.round(durationInMs),
                         videoId: filename,
                         thumbnailId: filename,
-                        detectionClasses,
+                        detectionClasses: [...detectionClasses],
                         event,
-                        description: event,
+                        description: util_1.pluginId,
                         resources: {
                             thumbnail: {
                                 href: thumbnailUrl
@@ -71668,7 +71947,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const detectionClasses = [];
             const detectionFlags = detectionsHash.split('');
             detectionFlags.forEach((flag, index) => flag === '1' && detectionClasses.push(util_1.detectionClassIndexReversed[index]));
-            const sortedClassnames = (0, lodash_1.sortBy)(detectionClasses, (classname) => detecionClasses_1.classnamePrio[classname] ?? 100);
+            const sortedClassnames = (0, lodash_1.sortBy)(detectionClasses, (classname) => detectionClasses_1.classnamePrio[classname] ?? 100);
             const startTimeNumber = Number(startTime);
             const endTimeNumber = Number(endTime);
             const fildeData = {
@@ -71766,22 +72045,8 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         this.recordingTimeStart = Date.now();
         const logger = this.getLogger();
         const { tmpClipPath } = this.getStorageDirs();
-        // const { transcodeToH264 } = this.storageSettings.values;
-        // const ffmpegInput: FFmpegInput = {
-        //     container: 'rtsp',
-        //     url: this.rtspUrl,
-        //     mediaStreamOptions: {
-        //         id: undefined,
-        //         video: null,
-        //     },
-        //     inputArguments: [
-        //         '-analyzeduration', '0',
-        //         '-probesize', '512',
-        //         '-rtsp_transport', 'tcp',
-        //         '-i', this.rtspUrl,
-        //     ],            
-        // };
-        const transcodeToH264 = this.codec !== 'h264';
+        // const transcodeToH264 = this.codec !== 'h264';
+        const transcodeToH264 = true;
         this.saveFfmpegProcess = (0, child_process_1.spawn)(this.ffmpegPath, [
             '-rtsp_transport', 'tcp',
             '-i', this.rtspUrl,
@@ -71891,7 +72156,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 clipDuration
             })}`);
             if (shouldExtend) {
-                logger.log(`Extending recording: ${JSON.stringify({
+                logger.debug(`Extending recording: ${JSON.stringify({
                     currentDuration,
                     clipDuration,
                     maxLength,
@@ -71907,13 +72172,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             await this.resetListeners({ skipMainLoop: true });
             this.running = true;
             const { scoreThreshold, detectionClasses, ignoreCameraDetections, prolongClipOnMotion } = this.storageSettings.values;
-            const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detecionClasses_1.DetectionClass.Motion);
-            const isMotionIncluded = detectionClasses.includes(detecionClasses_1.DetectionClass.Motion);
+            const objectDetectionClasses = detectionClasses.filter(detClass => detClass !== detectionClasses_1.DetectionClass.Motion);
+            const isMotionIncluded = detectionClasses.includes(detectionClasses_1.DetectionClass.Motion);
             const classesMap = new Set();
             logger.log(`Starting listener of ${sdk_1.ScryptedInterface.ObjectDetector}`);
             this.detectionListener = systemManager.listenDevice(this.id, sdk_1.ScryptedInterface.ObjectDetector, async (_, __, data) => {
                 const filtered = data.detections.filter(det => {
-                    const classname = detecionClasses_1.detectionClassesDefaultMap[det.className];
+                    const classname = detectionClasses_1.detectionClassesDefaultMap[det.className];
                     if (ignoreCameraDetections && !det.boundingBox) {
                         return false;
                     }
@@ -71954,10 +72219,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     if (this.lastMotionTrigger && (now - this.lastMotionTrigger) < 1 * 1000) {
                         return;
                     }
-                    this.classesDetected.push(detecionClasses_1.DetectionClass.Motion);
+                    this.classesDetected.push(detectionClasses_1.DetectionClass.Motion);
                     this.lastMotionTrigger = now;
                     if (isMotionIncluded || (prolongClipOnMotion && this.recording)) {
-                        this.triggerMotionRecording([detecionClasses_1.DetectionClass.Motion]).catch(logger.log);
+                        this.triggerMotionRecording([detectionClasses_1.DetectionClass.Motion]).catch(logger.log);
                     }
                 }
             });
@@ -72089,6 +72354,9 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
             },
         });
         this.start().then().catch(this.getLogger().log);
+    }
+    getLogger() {
+        return super.getLoggerInternal({});
     }
     async startStop(enabled) {
         if (enabled) {
@@ -72308,50 +72576,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.calculateSize = exports.getVideoClipName = exports.attachProcessEvents = exports.videoClipRegex = exports.clipsToCleanup = exports.cleanupMemoryThresholderInGb = exports.getMainDetectionClass = exports.defaultClasses = exports.detectionClassIndexReversed = exports.detectionClassIndex = void 0;
-const detecionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detecionClasses */ "../scrypted-advanced-notifier/src/detecionClasses.ts");
+exports.calculateSize = exports.getVideoClipName = exports.attachProcessEvents = exports.videoClipRegex = exports.clipsToCleanup = exports.cleanupMemoryThresholderInGb = exports.getMainDetectionClass = exports.defaultClasses = exports.detectionClassIndexReversed = exports.detectionClassIndex = exports.pluginId = void 0;
+const detectionClasses_1 = __webpack_require__(/*! ../../scrypted-advanced-notifier/src/detectionClasses */ "../scrypted-advanced-notifier/src/detectionClasses.ts");
 const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
 const path_1 = __importDefault(__webpack_require__(/*! path */ "path"));
+const package_json_1 = __webpack_require__(/*! ../package.json */ "./package.json");
+exports.pluginId = package_json_1.name;
 exports.detectionClassIndex = {
-    [detecionClasses_1.DetectionClass.Motion]: 0,
-    [detecionClasses_1.DetectionClass.Person]: 1,
-    [detecionClasses_1.DetectionClass.Vehicle]: 2,
-    [detecionClasses_1.DetectionClass.Animal]: 3,
-    [detecionClasses_1.DetectionClass.Face]: 4,
-    [detecionClasses_1.DetectionClass.Plate]: 5,
-    [detecionClasses_1.DetectionClass.Package]: 6,
+    [detectionClasses_1.DetectionClass.Motion]: 0,
+    [detectionClasses_1.DetectionClass.Person]: 1,
+    [detectionClasses_1.DetectionClass.Vehicle]: 2,
+    [detectionClasses_1.DetectionClass.Animal]: 3,
+    [detectionClasses_1.DetectionClass.Face]: 4,
+    [detectionClasses_1.DetectionClass.Plate]: 5,
+    [detectionClasses_1.DetectionClass.Package]: 6,
 };
 exports.detectionClassIndexReversed = Object.entries(exports.detectionClassIndex)
     .reduce((tot, [detectionClass, index]) => ({ ...tot, [index]: detectionClass }), {});
 exports.defaultClasses = [
-    detecionClasses_1.DetectionClass.Person,
-    detecionClasses_1.DetectionClass.Vehicle,
-    detecionClasses_1.DetectionClass.Animal,
-    detecionClasses_1.DetectionClass.Face,
-    detecionClasses_1.DetectionClass.Plate,
-    detecionClasses_1.DetectionClass.Package,
+    detectionClasses_1.DetectionClass.Person,
+    detectionClasses_1.DetectionClass.Vehicle,
+    detectionClasses_1.DetectionClass.Animal,
+    detectionClasses_1.DetectionClass.Face,
+    detectionClasses_1.DetectionClass.Plate,
+    detectionClasses_1.DetectionClass.Package,
 ];
 const getMainDetectionClass = (detectionClasses) => {
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Face)) {
-        return detecionClasses_1.DetectionClass.Face;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Face)) {
+        return detectionClasses_1.DetectionClass.Face;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Plate)) {
-        return detecionClasses_1.DetectionClass.Plate;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Plate)) {
+        return detectionClasses_1.DetectionClass.Plate;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Package)) {
-        return detecionClasses_1.DetectionClass.Package;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Package)) {
+        return detectionClasses_1.DetectionClass.Package;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Person)) {
-        return detecionClasses_1.DetectionClass.Person;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Person)) {
+        return detectionClasses_1.DetectionClass.Person;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Animal)) {
-        return detecionClasses_1.DetectionClass.Animal;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Animal)) {
+        return detectionClasses_1.DetectionClass.Animal;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Vehicle)) {
-        return detecionClasses_1.DetectionClass.Vehicle;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Vehicle)) {
+        return detectionClasses_1.DetectionClass.Vehicle;
     }
-    if (detectionClasses.includes(detecionClasses_1.DetectionClass.Motion)) {
-        return detecionClasses_1.DetectionClass.Motion;
+    if (detectionClasses.includes(detectionClasses_1.DetectionClass.Motion)) {
+        return detectionClasses_1.DetectionClass.Motion;
     }
 };
 exports.getMainDetectionClass = getMainDetectionClass;
@@ -72376,7 +72646,7 @@ const getVideoClipName = (props) => {
     const { startTime, classesDetected, endTime, logger } = props;
     const detectionsHashComponents = new Array(10).fill(0);
     Object.entries(exports.detectionClassIndex).forEach(([detectionClass, index]) => {
-        if (classesDetected.includes(detectionClass) || detectionClass === detecionClasses_1.DetectionClass.Motion) {
+        if (classesDetected.includes(detectionClass) || detectionClass === detectionClasses_1.DetectionClass.Motion) {
             detectionsHashComponents[index] = 1;
         }
     });
@@ -72452,6 +72722,311 @@ exports.calculateSize = calculateSize;
 //         logger.log(`Deleted thumbnail: ${thumbnailPath}`);
 //     }
 // }
+
+
+/***/ }),
+
+/***/ "../scrypted-syslog/src/utils.ts":
+/*!***************************************!*\
+  !*** ../scrypted-syslog/src/utils.ts ***!
+  \***************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseLog = exports.getPluginConsole = exports.LogLevel = exports.RemoteLogServiceEnum = void 0;
+const sdk_1 = __importDefault(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js"));
+const async_queue_1 = __webpack_require__(/*! ../../scrypted/common/src/async-queue */ "../scrypted/common/src/async-queue.ts");
+const net_1 = __importDefault(__webpack_require__(/*! net */ "net"));
+const events_1 = __webpack_require__(/*! events */ "events");
+var RemoteLogServiceEnum;
+(function (RemoteLogServiceEnum) {
+    RemoteLogServiceEnum["Syslog"] = "Syslog";
+})(RemoteLogServiceEnum || (exports.RemoteLogServiceEnum = RemoteLogServiceEnum = {}));
+var LogLevel;
+(function (LogLevel) {
+    LogLevel["ERROR"] = "ERROR";
+    LogLevel["WARN"] = "WARN";
+    LogLevel["NOTICE"] = "NOTICE";
+    LogLevel["INFO"] = "INFO";
+    LogLevel["DEBUG"] = "DEBUG";
+})(LogLevel || (exports.LogLevel = LogLevel = {}));
+const getPluginConsole = async (props) => {
+    const { pluginId, onClosed } = props;
+    const dataQueue = (0, async_queue_1.createAsyncQueue)();
+    const hello = Buffer.from('undefined', 'utf8');
+    dataQueue.enqueue(hello);
+    async function* localGenerator() {
+        while (true) {
+            const dataBuffers = dataQueue.clear();
+            if (dataBuffers.length === 0) {
+                const buf = await dataQueue.dequeue();
+                if (buf.length)
+                    yield buf;
+                continue;
+            }
+            const concat = Buffer.concat(dataBuffers);
+            if (concat.length)
+                yield concat;
+        }
+    }
+    const localQueue = (0, async_queue_1.createAsyncQueueFromGenerator)(localGenerator());
+    const plugin = sdk_1.default.systemManager.getDeviceByName("@scrypted/core");
+    const streamSvc = await plugin.getDevice('consoleservice');
+    const streamSvcDirect = await sdk_1.default.connectRPCObject(streamSvc);
+    const remoteGenerator = await streamSvcDirect.connectStream(localQueue.queue, {
+        pluginId
+    });
+    const plugins = await sdk_1.default.systemManager.getComponent('plugins');
+    const servicePort = await plugins.getRemoteServicePort(pluginId, 'console');
+    const [port, host] = Array.isArray(servicePort) ? servicePort : [servicePort, undefined];
+    const socket = net_1.default.connect({
+        port,
+        host,
+    });
+    await (0, events_1.once)(socket, 'connect');
+    socket.on('close', onClosed);
+    // socket.on('end', () => queue.end());
+    return { remoteGenerator };
+};
+exports.getPluginConsole = getPluginConsole;
+const parseLog = (lineParent) => {
+    const line = lineParent.replaceAll('\n', '');
+    const cameraRegex = /^(\[.*\]) .*, .* - \[(.*)\]: (.*)$/;
+    const matchCamera = line.match(cameraRegex);
+    if (matchCamera) {
+        const cameraName = matchCamera[1];
+        const severity = matchCamera[2];
+        const messageBody = matchCamera[3];
+        const message = `[${severity}]: ${cameraName} - ${messageBody}`;
+        return { severity, message };
+    }
+    else {
+        const pluginRegex = /^.*, .* - \[(.*)\]: (.*)$/;
+        const matchPlugin = line.match(pluginRegex);
+        if (matchPlugin) {
+            const severity = matchPlugin[1];
+            const messageBody = matchPlugin[2];
+            const message = `[${severity}]: ${messageBody}`;
+            return { severity, message };
+        }
+    }
+    return { message: line, severity: LogLevel.NOTICE };
+};
+exports.parseLog = parseLog;
+
+
+/***/ }),
+
+/***/ "../scrypted/common/src/async-queue.ts":
+/*!*********************************************!*\
+  !*** ../scrypted/common/src/async-queue.ts ***!
+  \*********************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createAsyncQueue = createAsyncQueue;
+exports.createAsyncQueueFromGenerator = createAsyncQueueFromGenerator;
+const deferred_1 = __webpack_require__(/*! ./deferred */ "../scrypted/server/src/deferred.ts");
+class EndError extends Error {
+}
+function createAsyncQueue() {
+    let ended;
+    const endDeferred = new deferred_1.Deferred();
+    const waiting = [];
+    const queued = [];
+    const dequeue = async () => {
+        if (queued.length) {
+            const { item, dequeued: enqueue } = queued.shift();
+            enqueue?.resolve();
+            return item;
+        }
+        if (ended)
+            throw ended;
+        const deferred = new deferred_1.Deferred();
+        waiting.push(deferred);
+        return deferred.promise;
+    };
+    const take = () => {
+        if (queued.length) {
+            const { item, dequeued: enqueue } = queued.shift();
+            enqueue?.resolve();
+            return item;
+        }
+        if (ended)
+            throw ended;
+    };
+    const submit = (item, dequeued, signal) => {
+        if (ended)
+            return false;
+        if (waiting.length) {
+            const deferred = waiting.shift();
+            dequeued?.resolve();
+            deferred.resolve(item);
+            return true;
+        }
+        if (signal)
+            dequeued ||= new deferred_1.Deferred();
+        const qi = {
+            item,
+            dequeued,
+        };
+        queued.push(qi);
+        if (!signal)
+            return true;
+        const h = () => {
+            const index = queued.indexOf(qi);
+            if (index === -1)
+                return;
+            queued.splice(index, 1);
+            dequeued?.reject(new Error('abort'));
+        };
+        dequeued?.promise.catch(() => { }).finally(() => signal.removeEventListener('abort', h));
+        signal.addEventListener('abort', h);
+        return true;
+    };
+    function end(e) {
+        if (ended)
+            return false;
+        // catch to prevent unhandled rejection.
+        ended = e || new EndError();
+        endDeferred.resolve();
+        while (waiting.length) {
+            waiting.shift().reject(ended);
+        }
+        return true;
+    }
+    function queue() {
+        return (async function* () {
+            try {
+                while (true) {
+                    try {
+                        const item = await dequeue();
+                        yield item;
+                    }
+                    catch (e) {
+                        // the yield above may raise an error, and the queue should be ended.
+                        end(e);
+                        if (e instanceof EndError)
+                            return;
+                        throw e;
+                    }
+                }
+            }
+            finally {
+                // the yield above may cause an iterator return, and the queue should be ended.
+                end();
+            }
+        })();
+    }
+    function clear(error) {
+        const ret = [];
+        const items = queued.splice(0, queued.length);
+        for (const item of items) {
+            if (error)
+                item.dequeued?.reject(error);
+            else
+                item.dequeued?.resolve(undefined);
+            ret.push(item.item);
+        }
+        return ret;
+    }
+    return {
+        [Symbol.dispose]() {
+            end(new Error('async queue disposed'));
+        },
+        get ended() {
+            return ended;
+        },
+        endPromise: endDeferred.promise,
+        take,
+        clear() {
+            return clear();
+        },
+        queued,
+        async pipe(callback) {
+            for await (const i of queue()) {
+                callback(i);
+            }
+        },
+        submit(item, signal) {
+            return submit(item, undefined, signal);
+        },
+        end,
+        async enqueue(item, signal) {
+            const dequeued = new deferred_1.Deferred();
+            if (!submit(item, dequeued, signal))
+                return false;
+            await dequeued.promise;
+            return true;
+        },
+        dequeue,
+        get queue() {
+            return queue();
+        }
+    };
+}
+function createAsyncQueueFromGenerator(generator) {
+    const q = createAsyncQueue();
+    (async () => {
+        try {
+            for await (const i of generator) {
+                await q.enqueue(i);
+            }
+        }
+        catch (e) {
+            q.end(e);
+        }
+        q.end();
+    })();
+    return q;
+}
+// async function testSlowEnqueue() {
+//     const asyncQueue = createAsyncQueue<number>();
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     (async () => {
+//         console.log('go');
+//         for (let i = 0; i < 10; i++) {
+//             asyncQueue.submit(i);
+//             await sleep(100);
+//         }
+//         asyncQueue.end(new Error('fail'));
+//     })();
+//     const runQueue = async (str?: string) => {
+//         for await (const n of asyncQueue.queue) {
+//             console.log(str, n);
+//         }
+//     }
+//     runQueue('start');
+//     setTimeout(runQueue, 400);
+// }
+// async function testSlowDequeue() {
+//     const asyncQueue = createAsyncQueue<number>();
+//     const runQueue = async (str?: string) => {
+//         for await (const n of asyncQueue.queue) {
+//             await sleep(100);
+//         }
+//     }
+//     runQueue()
+//     .catch(e => console.error('queue threw', e));
+//     console.log('go');
+//     for (let i = 0; i < 10; i++) {
+//         console.log(await asyncQueue.enqueue(i));
+//         console.log(i);
+//     }
+//     asyncQueue.end(new Error('fail'));
+//     console.log(await asyncQueue.enqueue(555));
+// }
+// testSlowDequeue();
 
 
 /***/ }),
@@ -72556,6 +73131,50 @@ Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { 
 
 /***/ }),
 
+/***/ "../scrypted/server/src/deferred.ts":
+/*!******************************************!*\
+  !*** ../scrypted/server/src/deferred.ts ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Deferred = void 0;
+class Deferred {
+    constructor() {
+        this.finished = false;
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = v => {
+                this.finished = true;
+                resolve(v);
+                return this;
+            };
+            this.reject = e => {
+                this.finished = true;
+                reject(e);
+                return this;
+            };
+        });
+    }
+    [Symbol.dispose]() {
+        if (!this.finished)
+            this.reject(new Error('deferred disposed without being resolved'));
+    }
+    async resolvePromise(p) {
+        try {
+            this.resolve(await p);
+        }
+        catch (e) {
+            this.reject(e);
+        }
+    }
+}
+exports.Deferred = Deferred;
+
+
+/***/ }),
+
 /***/ "../scrypted/server/src/sleep.ts":
 /*!***************************************!*\
   !*** ../scrypted/server/src/sleep.ts ***!
@@ -72570,6 +73189,1509 @@ async function sleep(ms) {
     await new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
+/***/ }),
+
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js":
+/*!***********************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js ***!
+  \***********************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sdk = exports.MixinDeviceBase = exports.ScryptedDeviceBase = void 0;
+__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js"), exports);
+const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js");
+const module_1 = __webpack_require__(/*! module */ "module");
+/**
+ * @category Core Reference
+ */
+class ScryptedDeviceBase extends index_1.DeviceBase {
+    constructor(nativeId) {
+        super();
+        this.nativeId = nativeId;
+    }
+    get storage() {
+        if (!this._storage) {
+            this._storage = exports.sdk.deviceManager.getDeviceStorage(this.nativeId);
+        }
+        return this._storage;
+    }
+    get log() {
+        if (!this._log) {
+            this._log = exports.sdk.deviceManager.getDeviceLogger(this.nativeId);
+        }
+        return this._log;
+    }
+    get console() {
+        if (!this._console) {
+            this._console = exports.sdk.deviceManager.getDeviceConsole(this.nativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
+    }
+    _lazyLoadDeviceState() {
+        if (!this._deviceState) {
+            if (this.nativeId) {
+                this._deviceState = exports.sdk.deviceManager.getDeviceState(this.nativeId);
+            }
+            else {
+                this._deviceState = exports.sdk.deviceManager.getDeviceState();
+            }
+        }
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return exports.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
+    }
+}
+exports.ScryptedDeviceBase = ScryptedDeviceBase;
+/**
+ * @category Mixin Reference
+ */
+class MixinDeviceBase extends index_1.DeviceBase {
+    constructor(options) {
+        super();
+        this._listeners = new Set();
+        this.mixinDevice = options.mixinDevice;
+        this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
+        this.mixinStorageSuffix = options.mixinStorageSuffix;
+        this._deviceState = options.mixinDeviceState;
+        this.nativeId = exports.sdk.systemManager.getDeviceById(this.id).nativeId;
+        this.mixinProviderNativeId = options.mixinProviderNativeId;
+        // RpcProxy will trap all properties, and the following check/hack will determine
+        // if the device state came from another node worker thread.
+        // This should ultimately be discouraged and warned at some point in the future.
+        if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
+            this._deviceState = exports.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
+        }
+    }
+    get storage() {
+        if (!this._storage) {
+            const mixinStorageSuffix = this.mixinStorageSuffix;
+            const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
+            this._storage = exports.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
+        }
+        return this._storage;
+    }
+    get console() {
+        if (!this._console) {
+            if (exports.sdk.deviceManager.getMixinConsole)
+                this._console = exports.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
+            else
+                this._console = exports.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return exports.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
+    }
+    _lazyLoadDeviceState() {
+    }
+    manageListener(listener) {
+        this._listeners.add(listener);
+    }
+    release() {
+        for (const l of this._listeners) {
+            l.removeListener();
+        }
+    }
+}
+exports.MixinDeviceBase = MixinDeviceBase;
+(function () {
+    function _createGetState(state) {
+        return function () {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            return this._deviceState?.[state];
+        };
+    }
+    function _createSetState(state) {
+        return function (value) {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            if (!this._deviceState) {
+                console.warn('device state is unavailable. the device must be discovered with deviceManager.onDeviceDiscovered or deviceManager.onDevicesChanged before the state can be set.');
+            }
+            else {
+                // @ts-ignore: accessing private property
+                this._deviceState[state] = value;
+            }
+        };
+    }
+    for (const field of Object.values(index_1.ScryptedInterfaceProperty)) {
+        if (field === index_1.ScryptedInterfaceProperty.nativeId)
+            continue;
+        Object.defineProperty(ScryptedDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+        Object.defineProperty(MixinDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+    }
+})();
+exports.sdk = {};
+try {
+    let loaded = false;
+    try {
+        // todo: remove usage of process.env.SCRYPTED_SDK_MODULE, only existed in prerelease builds.
+        // import.meta is not a reliable way to detect es module support in webpack since webpack
+        // evaluates that to true at runtime.
+        const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        // @ts-expect-error
+        if (esModule && "undefined" !== 'undefined') {}
+        else if (cjsModule) {
+            // @ts-expect-error
+            if (typeof require !== 'undefined') {
+                // @ts-expect-error
+                const sdkModule = require(process.env.SCRYPTED_SDK_MODULE);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+            else {
+                const sdkModule = __webpack_require__("../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive")(cjsModule);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+        }
+    }
+    catch (e) {
+        console.warn("failed to load sdk module", e);
+        throw e;
+    }
+    if (!loaded) {
+        let runtimeAPI;
+        try {
+            runtimeAPI = pluginRuntimeAPI;
+        }
+        catch (e) {
+        }
+        Object.assign(exports.sdk, {
+            log: deviceManager.getDeviceLogger(undefined),
+            deviceManager,
+            endpointManager,
+            mediaManager,
+            systemManager,
+            pluginHostAPI,
+            ...runtimeAPI,
+        });
+    }
+    try {
+        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, index_1.ScryptedInterfaceDescriptors)?.catch(() => { });
+    }
+    catch (e) {
+    }
+}
+catch (e) {
+    console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
+}
+exports["default"] = exports.sdk;
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive":
+/*!********************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/ sync ***!
+  \********************************************************************/
+/***/ ((module) => {
+
+function webpackEmptyContext(req) {
+	var e = new Error("Cannot find module '" + req + "'");
+	e.code = 'MODULE_NOT_FOUND';
+	throw e;
+}
+webpackEmptyContext.keys = () => ([]);
+webpackEmptyContext.resolve = webpackEmptyContext;
+webpackEmptyContext.id = "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive";
+module.exports = webpackEmptyContext;
+
+/***/ }),
+
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js":
+/*!*****************************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
+exports.TYPES_VERSION = "0.3.114";
+class DeviceBase {
+}
+exports.DeviceBase = DeviceBase;
+var ScryptedInterfaceProperty;
+(function (ScryptedInterfaceProperty) {
+    ScryptedInterfaceProperty["id"] = "id";
+    ScryptedInterfaceProperty["info"] = "info";
+    ScryptedInterfaceProperty["interfaces"] = "interfaces";
+    ScryptedInterfaceProperty["mixins"] = "mixins";
+    ScryptedInterfaceProperty["name"] = "name";
+    ScryptedInterfaceProperty["nativeId"] = "nativeId";
+    ScryptedInterfaceProperty["pluginId"] = "pluginId";
+    ScryptedInterfaceProperty["providedInterfaces"] = "providedInterfaces";
+    ScryptedInterfaceProperty["providedName"] = "providedName";
+    ScryptedInterfaceProperty["providedRoom"] = "providedRoom";
+    ScryptedInterfaceProperty["providedType"] = "providedType";
+    ScryptedInterfaceProperty["providerId"] = "providerId";
+    ScryptedInterfaceProperty["room"] = "room";
+    ScryptedInterfaceProperty["type"] = "type";
+    ScryptedInterfaceProperty["scryptedRuntimeArguments"] = "scryptedRuntimeArguments";
+    ScryptedInterfaceProperty["on"] = "on";
+    ScryptedInterfaceProperty["brightness"] = "brightness";
+    ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
+    ScryptedInterfaceProperty["rgb"] = "rgb";
+    ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
+    ScryptedInterfaceProperty["running"] = "running";
+    ScryptedInterfaceProperty["paused"] = "paused";
+    ScryptedInterfaceProperty["docked"] = "docked";
+    ScryptedInterfaceProperty["temperatureSetting"] = "temperatureSetting";
+    ScryptedInterfaceProperty["temperature"] = "temperature";
+    ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
+    ScryptedInterfaceProperty["humidity"] = "humidity";
+    ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
+    ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
+    ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
+    ScryptedInterfaceProperty["lockState"] = "lockState";
+    ScryptedInterfaceProperty["entryOpen"] = "entryOpen";
+    ScryptedInterfaceProperty["batteryLevel"] = "batteryLevel";
+    ScryptedInterfaceProperty["chargeState"] = "chargeState";
+    ScryptedInterfaceProperty["online"] = "online";
+    ScryptedInterfaceProperty["fromMimeType"] = "fromMimeType";
+    ScryptedInterfaceProperty["toMimeType"] = "toMimeType";
+    ScryptedInterfaceProperty["converters"] = "converters";
+    ScryptedInterfaceProperty["binaryState"] = "binaryState";
+    ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
+    ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
+    ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
+    ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
+    ScryptedInterfaceProperty["ambientLight"] = "ambientLight";
+    ScryptedInterfaceProperty["occupied"] = "occupied";
+    ScryptedInterfaceProperty["flooded"] = "flooded";
+    ScryptedInterfaceProperty["ultraviolet"] = "ultraviolet";
+    ScryptedInterfaceProperty["luminance"] = "luminance";
+    ScryptedInterfaceProperty["position"] = "position";
+    ScryptedInterfaceProperty["securitySystemState"] = "securitySystemState";
+    ScryptedInterfaceProperty["pm10Density"] = "pm10Density";
+    ScryptedInterfaceProperty["pm25Density"] = "pm25Density";
+    ScryptedInterfaceProperty["vocDensity"] = "vocDensity";
+    ScryptedInterfaceProperty["noxDensity"] = "noxDensity";
+    ScryptedInterfaceProperty["co2ppm"] = "co2ppm";
+    ScryptedInterfaceProperty["airQuality"] = "airQuality";
+    ScryptedInterfaceProperty["airPurifierState"] = "airPurifierState";
+    ScryptedInterfaceProperty["filterChangeIndication"] = "filterChangeIndication";
+    ScryptedInterfaceProperty["filterLifeLevel"] = "filterLifeLevel";
+    ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
+    ScryptedInterfaceProperty["fan"] = "fan";
+    ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
+    ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
+})(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
+var ScryptedInterfaceMethod;
+(function (ScryptedInterfaceMethod) {
+    ScryptedInterfaceMethod["listen"] = "listen";
+    ScryptedInterfaceMethod["probe"] = "probe";
+    ScryptedInterfaceMethod["setMixins"] = "setMixins";
+    ScryptedInterfaceMethod["setName"] = "setName";
+    ScryptedInterfaceMethod["setRoom"] = "setRoom";
+    ScryptedInterfaceMethod["setType"] = "setType";
+    ScryptedInterfaceMethod["getPluginJson"] = "getPluginJson";
+    ScryptedInterfaceMethod["turnOff"] = "turnOff";
+    ScryptedInterfaceMethod["turnOn"] = "turnOn";
+    ScryptedInterfaceMethod["setBrightness"] = "setBrightness";
+    ScryptedInterfaceMethod["getTemperatureMaxK"] = "getTemperatureMaxK";
+    ScryptedInterfaceMethod["getTemperatureMinK"] = "getTemperatureMinK";
+    ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
+    ScryptedInterfaceMethod["setRgb"] = "setRgb";
+    ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
+    ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
+    ScryptedInterfaceMethod["start"] = "start";
+    ScryptedInterfaceMethod["stop"] = "stop";
+    ScryptedInterfaceMethod["pause"] = "pause";
+    ScryptedInterfaceMethod["resume"] = "resume";
+    ScryptedInterfaceMethod["dock"] = "dock";
+    ScryptedInterfaceMethod["setTemperature"] = "setTemperature";
+    ScryptedInterfaceMethod["setTemperatureUnit"] = "setTemperatureUnit";
+    ScryptedInterfaceMethod["getPictureOptions"] = "getPictureOptions";
+    ScryptedInterfaceMethod["takePicture"] = "takePicture";
+    ScryptedInterfaceMethod["getAudioStream"] = "getAudioStream";
+    ScryptedInterfaceMethod["setAudioVolumes"] = "setAudioVolumes";
+    ScryptedInterfaceMethod["startDisplay"] = "startDisplay";
+    ScryptedInterfaceMethod["stopDisplay"] = "stopDisplay";
+    ScryptedInterfaceMethod["getVideoStream"] = "getVideoStream";
+    ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
+    ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
+    ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
+    ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
+    ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
+    ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
+    ScryptedInterfaceMethod["getRecordingStreamThumbnail"] = "getRecordingStreamThumbnail";
+    ScryptedInterfaceMethod["deleteRecordingStream"] = "deleteRecordingStream";
+    ScryptedInterfaceMethod["setRecordingActive"] = "setRecordingActive";
+    ScryptedInterfaceMethod["ptzCommand"] = "ptzCommand";
+    ScryptedInterfaceMethod["getRecordedEvents"] = "getRecordedEvents";
+    ScryptedInterfaceMethod["getVideoClip"] = "getVideoClip";
+    ScryptedInterfaceMethod["getVideoClips"] = "getVideoClips";
+    ScryptedInterfaceMethod["getVideoClipThumbnail"] = "getVideoClipThumbnail";
+    ScryptedInterfaceMethod["removeVideoClips"] = "removeVideoClips";
+    ScryptedInterfaceMethod["setVideoStreamOptions"] = "setVideoStreamOptions";
+    ScryptedInterfaceMethod["startIntercom"] = "startIntercom";
+    ScryptedInterfaceMethod["stopIntercom"] = "stopIntercom";
+    ScryptedInterfaceMethod["lock"] = "lock";
+    ScryptedInterfaceMethod["unlock"] = "unlock";
+    ScryptedInterfaceMethod["addPassword"] = "addPassword";
+    ScryptedInterfaceMethod["getPasswords"] = "getPasswords";
+    ScryptedInterfaceMethod["removePassword"] = "removePassword";
+    ScryptedInterfaceMethod["activate"] = "activate";
+    ScryptedInterfaceMethod["deactivate"] = "deactivate";
+    ScryptedInterfaceMethod["isReversible"] = "isReversible";
+    ScryptedInterfaceMethod["closeEntry"] = "closeEntry";
+    ScryptedInterfaceMethod["openEntry"] = "openEntry";
+    ScryptedInterfaceMethod["getDevice"] = "getDevice";
+    ScryptedInterfaceMethod["releaseDevice"] = "releaseDevice";
+    ScryptedInterfaceMethod["adoptDevice"] = "adoptDevice";
+    ScryptedInterfaceMethod["discoverDevices"] = "discoverDevices";
+    ScryptedInterfaceMethod["createDevice"] = "createDevice";
+    ScryptedInterfaceMethod["getCreateDeviceSettings"] = "getCreateDeviceSettings";
+    ScryptedInterfaceMethod["reboot"] = "reboot";
+    ScryptedInterfaceMethod["getRefreshFrequency"] = "getRefreshFrequency";
+    ScryptedInterfaceMethod["refresh"] = "refresh";
+    ScryptedInterfaceMethod["getMediaStatus"] = "getMediaStatus";
+    ScryptedInterfaceMethod["load"] = "load";
+    ScryptedInterfaceMethod["seek"] = "seek";
+    ScryptedInterfaceMethod["skipNext"] = "skipNext";
+    ScryptedInterfaceMethod["skipPrevious"] = "skipPrevious";
+    ScryptedInterfaceMethod["convert"] = "convert";
+    ScryptedInterfaceMethod["convertMedia"] = "convertMedia";
+    ScryptedInterfaceMethod["getSettings"] = "getSettings";
+    ScryptedInterfaceMethod["putSetting"] = "putSetting";
+    ScryptedInterfaceMethod["armSecuritySystem"] = "armSecuritySystem";
+    ScryptedInterfaceMethod["disarmSecuritySystem"] = "disarmSecuritySystem";
+    ScryptedInterfaceMethod["setAirPurifierState"] = "setAirPurifierState";
+    ScryptedInterfaceMethod["getReadmeMarkdown"] = "getReadmeMarkdown";
+    ScryptedInterfaceMethod["getOauthUrl"] = "getOauthUrl";
+    ScryptedInterfaceMethod["onOauthCallback"] = "onOauthCallback";
+    ScryptedInterfaceMethod["canMixin"] = "canMixin";
+    ScryptedInterfaceMethod["getMixin"] = "getMixin";
+    ScryptedInterfaceMethod["releaseMixin"] = "releaseMixin";
+    ScryptedInterfaceMethod["onRequest"] = "onRequest";
+    ScryptedInterfaceMethod["onConnection"] = "onConnection";
+    ScryptedInterfaceMethod["onPush"] = "onPush";
+    ScryptedInterfaceMethod["run"] = "run";
+    ScryptedInterfaceMethod["eval"] = "eval";
+    ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
+    ScryptedInterfaceMethod["saveScript"] = "saveScript";
+    ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
+    ScryptedInterfaceMethod["trackObjects"] = "trackObjects";
+    ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
+    ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
+    ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
+    ScryptedInterfaceMethod["generateObjectDetections"] = "generateObjectDetections";
+    ScryptedInterfaceMethod["getDetectionModel"] = "getDetectionModel";
+    ScryptedInterfaceMethod["setHumidity"] = "setHumidity";
+    ScryptedInterfaceMethod["setFan"] = "setFan";
+    ScryptedInterfaceMethod["startRTCSignalingSession"] = "startRTCSignalingSession";
+    ScryptedInterfaceMethod["createRTCSignalingSession"] = "createRTCSignalingSession";
+    ScryptedInterfaceMethod["getScryptedUserAccessControl"] = "getScryptedUserAccessControl";
+    ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
+    ScryptedInterfaceMethod["connectStream"] = "connectStream";
+    ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
+})(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
+exports.ScryptedInterfaceDescriptors = {
+    "ScryptedDevice": {
+        "name": "ScryptedDevice",
+        "methods": [
+            "listen",
+            "probe",
+            "setMixins",
+            "setName",
+            "setRoom",
+            "setType"
+        ],
+        "properties": [
+            "id",
+            "info",
+            "interfaces",
+            "mixins",
+            "name",
+            "nativeId",
+            "pluginId",
+            "providedInterfaces",
+            "providedName",
+            "providedRoom",
+            "providedType",
+            "providerId",
+            "room",
+            "type"
+        ]
+    },
+    "ScryptedPlugin": {
+        "name": "ScryptedPlugin",
+        "methods": [
+            "getPluginJson"
+        ],
+        "properties": []
+    },
+    "ScryptedPluginRuntime": {
+        "name": "ScryptedPluginRuntime",
+        "methods": [],
+        "properties": [
+            "scryptedRuntimeArguments"
+        ]
+    },
+    "OnOff": {
+        "name": "OnOff",
+        "methods": [
+            "turnOff",
+            "turnOn"
+        ],
+        "properties": [
+            "on"
+        ]
+    },
+    "Brightness": {
+        "name": "Brightness",
+        "methods": [
+            "setBrightness"
+        ],
+        "properties": [
+            "brightness"
+        ]
+    },
+    "ColorSettingTemperature": {
+        "name": "ColorSettingTemperature",
+        "methods": [
+            "getTemperatureMaxK",
+            "getTemperatureMinK",
+            "setColorTemperature"
+        ],
+        "properties": [
+            "colorTemperature"
+        ]
+    },
+    "ColorSettingRgb": {
+        "name": "ColorSettingRgb",
+        "methods": [
+            "setRgb"
+        ],
+        "properties": [
+            "rgb"
+        ]
+    },
+    "ColorSettingHsv": {
+        "name": "ColorSettingHsv",
+        "methods": [
+            "setHsv"
+        ],
+        "properties": [
+            "hsv"
+        ]
+    },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
+    },
+    "Notifier": {
+        "name": "Notifier",
+        "methods": [
+            "sendNotification"
+        ],
+        "properties": []
+    },
+    "StartStop": {
+        "name": "StartStop",
+        "methods": [
+            "start",
+            "stop"
+        ],
+        "properties": [
+            "running"
+        ]
+    },
+    "Pause": {
+        "name": "Pause",
+        "methods": [
+            "pause",
+            "resume"
+        ],
+        "properties": [
+            "paused"
+        ]
+    },
+    "Dock": {
+        "name": "Dock",
+        "methods": [
+            "dock"
+        ],
+        "properties": [
+            "docked"
+        ]
+    },
+    "TemperatureSetting": {
+        "name": "TemperatureSetting",
+        "methods": [
+            "setTemperature"
+        ],
+        "properties": [
+            "temperatureSetting"
+        ]
+    },
+    "Thermometer": {
+        "name": "Thermometer",
+        "methods": [
+            "setTemperatureUnit"
+        ],
+        "properties": [
+            "temperature",
+            "temperatureUnit"
+        ]
+    },
+    "HumiditySensor": {
+        "name": "HumiditySensor",
+        "methods": [],
+        "properties": [
+            "humidity"
+        ]
+    },
+    "Camera": {
+        "name": "Camera",
+        "methods": [
+            "getPictureOptions",
+            "takePicture"
+        ],
+        "properties": []
+    },
+    "Microphone": {
+        "name": "Microphone",
+        "methods": [
+            "getAudioStream"
+        ],
+        "properties": []
+    },
+    "AudioVolumeControl": {
+        "name": "AudioVolumeControl",
+        "methods": [
+            "setAudioVolumes"
+        ],
+        "properties": [
+            "audioVolumes"
+        ]
+    },
+    "Display": {
+        "name": "Display",
+        "methods": [
+            "startDisplay",
+            "stopDisplay"
+        ],
+        "properties": []
+    },
+    "VideoCamera": {
+        "name": "VideoCamera",
+        "methods": [
+            "getVideoStream",
+            "getVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "VideoCameraMask": {
+        "name": "VideoCameraMask",
+        "methods": [
+            "getPrivacyMasks",
+            "setPrivacyMasks"
+        ],
+        "properties": []
+    },
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
+        ],
+        "properties": []
+    },
+    "VideoRecorder": {
+        "name": "VideoRecorder",
+        "methods": [
+            "getRecordingStream",
+            "getRecordingStreamCurrentTime",
+            "getRecordingStreamOptions",
+            "getRecordingStreamThumbnail"
+        ],
+        "properties": [
+            "recordingActive"
+        ]
+    },
+    "VideoRecorderManagement": {
+        "name": "VideoRecorderManagement",
+        "methods": [
+            "deleteRecordingStream",
+            "setRecordingActive"
+        ],
+        "properties": []
+    },
+    "PanTiltZoom": {
+        "name": "PanTiltZoom",
+        "methods": [
+            "ptzCommand"
+        ],
+        "properties": [
+            "ptzCapabilities"
+        ]
+    },
+    "EventRecorder": {
+        "name": "EventRecorder",
+        "methods": [
+            "getRecordedEvents"
+        ],
+        "properties": []
+    },
+    "VideoClips": {
+        "name": "VideoClips",
+        "methods": [
+            "getVideoClip",
+            "getVideoClips",
+            "getVideoClipThumbnail",
+            "removeVideoClips"
+        ],
+        "properties": []
+    },
+    "VideoCameraConfiguration": {
+        "name": "VideoCameraConfiguration",
+        "methods": [
+            "setVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "Intercom": {
+        "name": "Intercom",
+        "methods": [
+            "startIntercom",
+            "stopIntercom"
+        ],
+        "properties": []
+    },
+    "Lock": {
+        "name": "Lock",
+        "methods": [
+            "lock",
+            "unlock"
+        ],
+        "properties": [
+            "lockState"
+        ]
+    },
+    "PasswordStore": {
+        "name": "PasswordStore",
+        "methods": [
+            "addPassword",
+            "getPasswords",
+            "removePassword"
+        ],
+        "properties": []
+    },
+    "Scene": {
+        "name": "Scene",
+        "methods": [
+            "activate",
+            "deactivate",
+            "isReversible"
+        ],
+        "properties": []
+    },
+    "Entry": {
+        "name": "Entry",
+        "methods": [
+            "closeEntry",
+            "openEntry"
+        ],
+        "properties": []
+    },
+    "EntrySensor": {
+        "name": "EntrySensor",
+        "methods": [],
+        "properties": [
+            "entryOpen"
+        ]
+    },
+    "DeviceProvider": {
+        "name": "DeviceProvider",
+        "methods": [
+            "getDevice",
+            "releaseDevice"
+        ],
+        "properties": []
+    },
+    "DeviceDiscovery": {
+        "name": "DeviceDiscovery",
+        "methods": [
+            "adoptDevice",
+            "discoverDevices"
+        ],
+        "properties": []
+    },
+    "DeviceCreator": {
+        "name": "DeviceCreator",
+        "methods": [
+            "createDevice",
+            "getCreateDeviceSettings"
+        ],
+        "properties": []
+    },
+    "Battery": {
+        "name": "Battery",
+        "methods": [],
+        "properties": [
+            "batteryLevel"
+        ]
+    },
+    "Charger": {
+        "name": "Charger",
+        "methods": [],
+        "properties": [
+            "chargeState"
+        ]
+    },
+    "Reboot": {
+        "name": "Reboot",
+        "methods": [
+            "reboot"
+        ],
+        "properties": []
+    },
+    "Refresh": {
+        "name": "Refresh",
+        "methods": [
+            "getRefreshFrequency",
+            "refresh"
+        ],
+        "properties": []
+    },
+    "MediaPlayer": {
+        "name": "MediaPlayer",
+        "methods": [
+            "getMediaStatus",
+            "load",
+            "seek",
+            "skipNext",
+            "skipPrevious"
+        ],
+        "properties": []
+    },
+    "Online": {
+        "name": "Online",
+        "methods": [],
+        "properties": [
+            "online"
+        ]
+    },
+    "BufferConverter": {
+        "name": "BufferConverter",
+        "methods": [
+            "convert"
+        ],
+        "properties": [
+            "fromMimeType",
+            "toMimeType"
+        ]
+    },
+    "MediaConverter": {
+        "name": "MediaConverter",
+        "methods": [
+            "convertMedia"
+        ],
+        "properties": [
+            "converters"
+        ]
+    },
+    "Settings": {
+        "name": "Settings",
+        "methods": [
+            "getSettings",
+            "putSetting"
+        ],
+        "properties": []
+    },
+    "BinarySensor": {
+        "name": "BinarySensor",
+        "methods": [],
+        "properties": [
+            "binaryState"
+        ]
+    },
+    "TamperSensor": {
+        "name": "TamperSensor",
+        "methods": [],
+        "properties": [
+            "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
+        ]
+    },
+    "PowerSensor": {
+        "name": "PowerSensor",
+        "methods": [],
+        "properties": [
+            "powerDetected"
+        ]
+    },
+    "AudioSensor": {
+        "name": "AudioSensor",
+        "methods": [],
+        "properties": [
+            "audioDetected"
+        ]
+    },
+    "MotionSensor": {
+        "name": "MotionSensor",
+        "methods": [],
+        "properties": [
+            "motionDetected"
+        ]
+    },
+    "AmbientLightSensor": {
+        "name": "AmbientLightSensor",
+        "methods": [],
+        "properties": [
+            "ambientLight"
+        ]
+    },
+    "OccupancySensor": {
+        "name": "OccupancySensor",
+        "methods": [],
+        "properties": [
+            "occupied"
+        ]
+    },
+    "FloodSensor": {
+        "name": "FloodSensor",
+        "methods": [],
+        "properties": [
+            "flooded"
+        ]
+    },
+    "UltravioletSensor": {
+        "name": "UltravioletSensor",
+        "methods": [],
+        "properties": [
+            "ultraviolet"
+        ]
+    },
+    "LuminanceSensor": {
+        "name": "LuminanceSensor",
+        "methods": [],
+        "properties": [
+            "luminance"
+        ]
+    },
+    "PositionSensor": {
+        "name": "PositionSensor",
+        "methods": [],
+        "properties": [
+            "position"
+        ]
+    },
+    "SecuritySystem": {
+        "name": "SecuritySystem",
+        "methods": [
+            "armSecuritySystem",
+            "disarmSecuritySystem"
+        ],
+        "properties": [
+            "securitySystemState"
+        ]
+    },
+    "PM10Sensor": {
+        "name": "PM10Sensor",
+        "methods": [],
+        "properties": [
+            "pm10Density"
+        ]
+    },
+    "PM25Sensor": {
+        "name": "PM25Sensor",
+        "methods": [],
+        "properties": [
+            "pm25Density"
+        ]
+    },
+    "VOCSensor": {
+        "name": "VOCSensor",
+        "methods": [],
+        "properties": [
+            "vocDensity"
+        ]
+    },
+    "NOXSensor": {
+        "name": "NOXSensor",
+        "methods": [],
+        "properties": [
+            "noxDensity"
+        ]
+    },
+    "CO2Sensor": {
+        "name": "CO2Sensor",
+        "methods": [],
+        "properties": [
+            "co2ppm"
+        ]
+    },
+    "AirQualitySensor": {
+        "name": "AirQualitySensor",
+        "methods": [],
+        "properties": [
+            "airQuality"
+        ]
+    },
+    "AirPurifier": {
+        "name": "AirPurifier",
+        "methods": [
+            "setAirPurifierState"
+        ],
+        "properties": [
+            "airPurifierState"
+        ]
+    },
+    "FilterMaintenance": {
+        "name": "FilterMaintenance",
+        "methods": [],
+        "properties": [
+            "filterChangeIndication",
+            "filterLifeLevel"
+        ]
+    },
+    "Readme": {
+        "name": "Readme",
+        "methods": [
+            "getReadmeMarkdown"
+        ],
+        "properties": []
+    },
+    "OauthClient": {
+        "name": "OauthClient",
+        "methods": [
+            "getOauthUrl",
+            "onOauthCallback"
+        ],
+        "properties": []
+    },
+    "MixinProvider": {
+        "name": "MixinProvider",
+        "methods": [
+            "canMixin",
+            "getMixin",
+            "releaseMixin"
+        ],
+        "properties": []
+    },
+    "HttpRequestHandler": {
+        "name": "HttpRequestHandler",
+        "methods": [
+            "onRequest"
+        ],
+        "properties": []
+    },
+    "EngineIOHandler": {
+        "name": "EngineIOHandler",
+        "methods": [
+            "onConnection"
+        ],
+        "properties": []
+    },
+    "PushHandler": {
+        "name": "PushHandler",
+        "methods": [
+            "onPush"
+        ],
+        "properties": []
+    },
+    "Program": {
+        "name": "Program",
+        "methods": [
+            "run"
+        ],
+        "properties": []
+    },
+    "Scriptable": {
+        "name": "Scriptable",
+        "methods": [
+            "eval",
+            "loadScripts",
+            "saveScript"
+        ],
+        "properties": []
+    },
+    "ClusterForkInterface": {
+        "name": "ClusterForkInterface",
+        "methods": [
+            "forkInterface"
+        ],
+        "properties": []
+    },
+    "ObjectTracker": {
+        "name": "ObjectTracker",
+        "methods": [
+            "trackObjects"
+        ],
+        "properties": []
+    },
+    "ObjectDetector": {
+        "name": "ObjectDetector",
+        "methods": [
+            "getDetectionInput",
+            "getObjectTypes"
+        ],
+        "properties": []
+    },
+    "ObjectDetection": {
+        "name": "ObjectDetection",
+        "methods": [
+            "detectObjects",
+            "generateObjectDetections",
+            "getDetectionModel"
+        ],
+        "properties": []
+    },
+    "ObjectDetectionPreview": {
+        "name": "ObjectDetectionPreview",
+        "methods": [],
+        "properties": []
+    },
+    "ObjectDetectionGenerator": {
+        "name": "ObjectDetectionGenerator",
+        "methods": [],
+        "properties": []
+    },
+    "HumiditySetting": {
+        "name": "HumiditySetting",
+        "methods": [
+            "setHumidity"
+        ],
+        "properties": [
+            "humiditySetting"
+        ]
+    },
+    "Fan": {
+        "name": "Fan",
+        "methods": [
+            "setFan"
+        ],
+        "properties": [
+            "fan"
+        ]
+    },
+    "RTCSignalingChannel": {
+        "name": "RTCSignalingChannel",
+        "methods": [
+            "startRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "RTCSignalingClient": {
+        "name": "RTCSignalingClient",
+        "methods": [
+            "createRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "LauncherApplication": {
+        "name": "LauncherApplication",
+        "methods": [],
+        "properties": [
+            "applicationInfo"
+        ]
+    },
+    "ScryptedUser": {
+        "name": "ScryptedUser",
+        "methods": [
+            "getScryptedUserAccessControl"
+        ],
+        "properties": []
+    },
+    "VideoFrameGenerator": {
+        "name": "VideoFrameGenerator",
+        "methods": [
+            "generateVideoFrames"
+        ],
+        "properties": []
+    },
+    "StreamService": {
+        "name": "StreamService",
+        "methods": [
+            "connectStream"
+        ],
+        "properties": []
+    },
+    "TTY": {
+        "name": "TTY",
+        "methods": [],
+        "properties": []
+    },
+    "TTYSettings": {
+        "name": "TTYSettings",
+        "methods": [
+            "getTTYSettings"
+        ],
+        "properties": []
+    },
+    "ScryptedSystemDevice": {
+        "name": "ScryptedSystemDevice",
+        "methods": [],
+        "properties": [
+            "systemDevice"
+        ]
+    },
+    "ScryptedDeviceCreator": {
+        "name": "ScryptedDeviceCreator",
+        "methods": [],
+        "properties": []
+    },
+    "ScryptedSettings": {
+        "name": "ScryptedSettings",
+        "methods": [],
+        "properties": []
+    }
+};
+/**
+ * @category Core Reference
+ */
+var ScryptedDeviceType;
+(function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
+    ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
+    ScryptedDeviceType["Camera"] = "Camera";
+    ScryptedDeviceType["Fan"] = "Fan";
+    ScryptedDeviceType["Light"] = "Light";
+    ScryptedDeviceType["Switch"] = "Switch";
+    ScryptedDeviceType["Outlet"] = "Outlet";
+    ScryptedDeviceType["Sensor"] = "Sensor";
+    ScryptedDeviceType["Scene"] = "Scene";
+    ScryptedDeviceType["Program"] = "Program";
+    ScryptedDeviceType["Automation"] = "Automation";
+    ScryptedDeviceType["Vacuum"] = "Vacuum";
+    ScryptedDeviceType["Notifier"] = "Notifier";
+    ScryptedDeviceType["Thermostat"] = "Thermostat";
+    ScryptedDeviceType["Lock"] = "Lock";
+    ScryptedDeviceType["PasswordControl"] = "PasswordControl";
+    /**
+     * Displays have audio and video output.
+     */
+    ScryptedDeviceType["Display"] = "Display";
+    /**
+     * Smart Displays have two way audio and video.
+     */
+    ScryptedDeviceType["SmartDisplay"] = "SmartDisplay";
+    ScryptedDeviceType["Speaker"] = "Speaker";
+    /**
+     * Smart Speakers have two way audio.
+     */
+    ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
+    ScryptedDeviceType["Event"] = "Event";
+    ScryptedDeviceType["Entry"] = "Entry";
+    ScryptedDeviceType["Garage"] = "Garage";
+    ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
+    ScryptedDeviceType["DataSource"] = "DataSource";
+    ScryptedDeviceType["API"] = "API";
+    ScryptedDeviceType["Doorbell"] = "Doorbell";
+    ScryptedDeviceType["Irrigation"] = "Irrigation";
+    ScryptedDeviceType["Valve"] = "Valve";
+    ScryptedDeviceType["Person"] = "Person";
+    ScryptedDeviceType["SecuritySystem"] = "SecuritySystem";
+    ScryptedDeviceType["WindowCovering"] = "WindowCovering";
+    ScryptedDeviceType["Siren"] = "Siren";
+    ScryptedDeviceType["AirPurifier"] = "AirPurifier";
+    ScryptedDeviceType["Unknown"] = "Unknown";
+})(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
+var HumidityMode;
+(function (HumidityMode) {
+    HumidityMode["Humidify"] = "Humidify";
+    HumidityMode["Dehumidify"] = "Dehumidify";
+    HumidityMode["Auto"] = "Auto";
+    HumidityMode["Off"] = "Off";
+})(HumidityMode || (exports.HumidityMode = HumidityMode = {}));
+var FanMode;
+(function (FanMode) {
+    FanMode["Auto"] = "Auto";
+    FanMode["Manual"] = "Manual";
+})(FanMode || (exports.FanMode = FanMode = {}));
+var TemperatureUnit;
+(function (TemperatureUnit) {
+    TemperatureUnit["C"] = "C";
+    TemperatureUnit["F"] = "F";
+})(TemperatureUnit || (exports.TemperatureUnit = TemperatureUnit = {}));
+var ThermostatMode;
+(function (ThermostatMode) {
+    ThermostatMode["Off"] = "Off";
+    ThermostatMode["Cool"] = "Cool";
+    ThermostatMode["Heat"] = "Heat";
+    ThermostatMode["HeatCool"] = "HeatCool";
+    ThermostatMode["Auto"] = "Auto";
+    ThermostatMode["FanOnly"] = "FanOnly";
+    ThermostatMode["Purifier"] = "Purifier";
+    ThermostatMode["Eco"] = "Eco";
+    ThermostatMode["Dry"] = "Dry";
+    ThermostatMode["On"] = "On";
+})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
+var PanTiltZoomMovement;
+(function (PanTiltZoomMovement) {
+    PanTiltZoomMovement["Absolute"] = "Absolute";
+    PanTiltZoomMovement["Relative"] = "Relative";
+    PanTiltZoomMovement["Continuous"] = "Continuous";
+    PanTiltZoomMovement["Preset"] = "Preset";
+    PanTiltZoomMovement["Home"] = "Home";
+})(PanTiltZoomMovement || (exports.PanTiltZoomMovement = PanTiltZoomMovement = {}));
+var LockState;
+(function (LockState) {
+    LockState["Locked"] = "Locked";
+    LockState["Unlocked"] = "Unlocked";
+    LockState["Jammed"] = "Jammed";
+})(LockState || (exports.LockState = LockState = {}));
+var ChargeState;
+(function (ChargeState) {
+    ChargeState["Trickle"] = "trickle";
+    ChargeState["Charging"] = "charging";
+    ChargeState["NotCharging"] = "not-charging";
+})(ChargeState || (exports.ChargeState = ChargeState = {}));
+var AirPurifierStatus;
+(function (AirPurifierStatus) {
+    AirPurifierStatus["Inactive"] = "Inactive";
+    AirPurifierStatus["Idle"] = "Idle";
+    AirPurifierStatus["Active"] = "Active";
+    AirPurifierStatus["ActiveNightMode"] = "ActiveNightMode";
+})(AirPurifierStatus || (exports.AirPurifierStatus = AirPurifierStatus = {}));
+var AirPurifierMode;
+(function (AirPurifierMode) {
+    AirPurifierMode["Manual"] = "Manual";
+    AirPurifierMode["Automatic"] = "Automatic";
+})(AirPurifierMode || (exports.AirPurifierMode = AirPurifierMode = {}));
+var AirQuality;
+(function (AirQuality) {
+    AirQuality["Unknown"] = "Unknown";
+    AirQuality["Excellent"] = "Excellent";
+    AirQuality["Good"] = "Good";
+    AirQuality["Fair"] = "Fair";
+    AirQuality["Inferior"] = "Inferior";
+    AirQuality["Poor"] = "Poor";
+})(AirQuality || (exports.AirQuality = AirQuality = {}));
+var SecuritySystemMode;
+(function (SecuritySystemMode) {
+    SecuritySystemMode["Disarmed"] = "Disarmed";
+    SecuritySystemMode["HomeArmed"] = "HomeArmed";
+    SecuritySystemMode["AwayArmed"] = "AwayArmed";
+    SecuritySystemMode["NightArmed"] = "NightArmed";
+})(SecuritySystemMode || (exports.SecuritySystemMode = SecuritySystemMode = {}));
+var SecuritySystemObstruction;
+(function (SecuritySystemObstruction) {
+    SecuritySystemObstruction["Sensor"] = "Sensor";
+    SecuritySystemObstruction["Occupied"] = "Occupied";
+    SecuritySystemObstruction["Time"] = "Time";
+    SecuritySystemObstruction["Error"] = "Error";
+})(SecuritySystemObstruction || (exports.SecuritySystemObstruction = SecuritySystemObstruction = {}));
+var MediaPlayerState;
+(function (MediaPlayerState) {
+    MediaPlayerState["Idle"] = "Idle";
+    MediaPlayerState["Playing"] = "Playing";
+    MediaPlayerState["Paused"] = "Paused";
+    MediaPlayerState["Buffering"] = "Buffering";
+})(MediaPlayerState || (exports.MediaPlayerState = MediaPlayerState = {}));
+var ScryptedInterface;
+(function (ScryptedInterface) {
+    ScryptedInterface["ScryptedDevice"] = "ScryptedDevice";
+    ScryptedInterface["ScryptedPlugin"] = "ScryptedPlugin";
+    ScryptedInterface["ScryptedPluginRuntime"] = "ScryptedPluginRuntime";
+    ScryptedInterface["OnOff"] = "OnOff";
+    ScryptedInterface["Brightness"] = "Brightness";
+    ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
+    ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
+    ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
+    ScryptedInterface["Notifier"] = "Notifier";
+    ScryptedInterface["StartStop"] = "StartStop";
+    ScryptedInterface["Pause"] = "Pause";
+    ScryptedInterface["Dock"] = "Dock";
+    ScryptedInterface["TemperatureSetting"] = "TemperatureSetting";
+    ScryptedInterface["Thermometer"] = "Thermometer";
+    ScryptedInterface["HumiditySensor"] = "HumiditySensor";
+    ScryptedInterface["Camera"] = "Camera";
+    ScryptedInterface["Microphone"] = "Microphone";
+    ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
+    ScryptedInterface["Display"] = "Display";
+    ScryptedInterface["VideoCamera"] = "VideoCamera";
+    ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
+    ScryptedInterface["VideoRecorder"] = "VideoRecorder";
+    ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
+    ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
+    ScryptedInterface["EventRecorder"] = "EventRecorder";
+    ScryptedInterface["VideoClips"] = "VideoClips";
+    ScryptedInterface["VideoCameraConfiguration"] = "VideoCameraConfiguration";
+    ScryptedInterface["Intercom"] = "Intercom";
+    ScryptedInterface["Lock"] = "Lock";
+    ScryptedInterface["PasswordStore"] = "PasswordStore";
+    ScryptedInterface["Scene"] = "Scene";
+    ScryptedInterface["Entry"] = "Entry";
+    ScryptedInterface["EntrySensor"] = "EntrySensor";
+    ScryptedInterface["DeviceProvider"] = "DeviceProvider";
+    ScryptedInterface["DeviceDiscovery"] = "DeviceDiscovery";
+    ScryptedInterface["DeviceCreator"] = "DeviceCreator";
+    ScryptedInterface["Battery"] = "Battery";
+    ScryptedInterface["Charger"] = "Charger";
+    ScryptedInterface["Reboot"] = "Reboot";
+    ScryptedInterface["Refresh"] = "Refresh";
+    ScryptedInterface["MediaPlayer"] = "MediaPlayer";
+    ScryptedInterface["Online"] = "Online";
+    ScryptedInterface["BufferConverter"] = "BufferConverter";
+    ScryptedInterface["MediaConverter"] = "MediaConverter";
+    ScryptedInterface["Settings"] = "Settings";
+    ScryptedInterface["BinarySensor"] = "BinarySensor";
+    ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
+    ScryptedInterface["PowerSensor"] = "PowerSensor";
+    ScryptedInterface["AudioSensor"] = "AudioSensor";
+    ScryptedInterface["MotionSensor"] = "MotionSensor";
+    ScryptedInterface["AmbientLightSensor"] = "AmbientLightSensor";
+    ScryptedInterface["OccupancySensor"] = "OccupancySensor";
+    ScryptedInterface["FloodSensor"] = "FloodSensor";
+    ScryptedInterface["UltravioletSensor"] = "UltravioletSensor";
+    ScryptedInterface["LuminanceSensor"] = "LuminanceSensor";
+    ScryptedInterface["PositionSensor"] = "PositionSensor";
+    ScryptedInterface["SecuritySystem"] = "SecuritySystem";
+    ScryptedInterface["PM10Sensor"] = "PM10Sensor";
+    ScryptedInterface["PM25Sensor"] = "PM25Sensor";
+    ScryptedInterface["VOCSensor"] = "VOCSensor";
+    ScryptedInterface["NOXSensor"] = "NOXSensor";
+    ScryptedInterface["CO2Sensor"] = "CO2Sensor";
+    ScryptedInterface["AirQualitySensor"] = "AirQualitySensor";
+    ScryptedInterface["AirPurifier"] = "AirPurifier";
+    ScryptedInterface["FilterMaintenance"] = "FilterMaintenance";
+    ScryptedInterface["Readme"] = "Readme";
+    ScryptedInterface["OauthClient"] = "OauthClient";
+    ScryptedInterface["MixinProvider"] = "MixinProvider";
+    ScryptedInterface["HttpRequestHandler"] = "HttpRequestHandler";
+    ScryptedInterface["EngineIOHandler"] = "EngineIOHandler";
+    ScryptedInterface["PushHandler"] = "PushHandler";
+    ScryptedInterface["Program"] = "Program";
+    ScryptedInterface["Scriptable"] = "Scriptable";
+    ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
+    ScryptedInterface["ObjectTracker"] = "ObjectTracker";
+    ScryptedInterface["ObjectDetector"] = "ObjectDetector";
+    ScryptedInterface["ObjectDetection"] = "ObjectDetection";
+    ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
+    ScryptedInterface["ObjectDetectionGenerator"] = "ObjectDetectionGenerator";
+    ScryptedInterface["HumiditySetting"] = "HumiditySetting";
+    ScryptedInterface["Fan"] = "Fan";
+    ScryptedInterface["RTCSignalingChannel"] = "RTCSignalingChannel";
+    ScryptedInterface["RTCSignalingClient"] = "RTCSignalingClient";
+    ScryptedInterface["LauncherApplication"] = "LauncherApplication";
+    ScryptedInterface["ScryptedUser"] = "ScryptedUser";
+    ScryptedInterface["VideoFrameGenerator"] = "VideoFrameGenerator";
+    ScryptedInterface["StreamService"] = "StreamService";
+    ScryptedInterface["TTY"] = "TTY";
+    ScryptedInterface["TTYSettings"] = "TTYSettings";
+    ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
+    ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
+    ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
+})(ScryptedInterface || (exports.ScryptedInterface = ScryptedInterface = {}));
+var ScryptedMimeTypes;
+(function (ScryptedMimeTypes) {
+    ScryptedMimeTypes["Url"] = "text/x-uri";
+    ScryptedMimeTypes["InsecureLocalUrl"] = "text/x-insecure-local-uri";
+    ScryptedMimeTypes["LocalUrl"] = "text/x-local-uri";
+    ScryptedMimeTypes["ServerId"] = "text/x-server-id";
+    ScryptedMimeTypes["PushEndpoint"] = "text/x-push-endpoint";
+    ScryptedMimeTypes["SchemePrefix"] = "x-scrypted/x-scrypted-scheme-";
+    ScryptedMimeTypes["MediaStreamUrl"] = "text/x-media-url";
+    ScryptedMimeTypes["MediaObject"] = "x-scrypted/x-scrypted-media-object";
+    ScryptedMimeTypes["RequestMediaObject"] = "x-scrypted/x-scrypted-request-media-object";
+    ScryptedMimeTypes["RequestMediaStream"] = "x-scrypted/x-scrypted-request-stream";
+    ScryptedMimeTypes["MediaStreamFeedback"] = "x-scrypted/x-media-stream-feedback";
+    ScryptedMimeTypes["FFmpegInput"] = "x-scrypted/x-ffmpeg-input";
+    ScryptedMimeTypes["FFmpegTranscodeStream"] = "x-scrypted/x-ffmpeg-transcode-stream";
+    ScryptedMimeTypes["RTCSignalingChannel"] = "x-scrypted/x-scrypted-rtc-signaling-channel";
+    ScryptedMimeTypes["RTCSignalingSession"] = "x-scrypted/x-scrypted-rtc-signaling-session";
+    ScryptedMimeTypes["RTCConnectionManagement"] = "x-scrypted/x-scrypted-rtc-connection-management";
+    ScryptedMimeTypes["Image"] = "x-scrypted/x-scrypted-image";
+})(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
+//# sourceMappingURL=index.js.map
 
 /***/ }),
 
@@ -80623,6 +82745,17 @@ module.exports = /*#__PURE__*/JSON.parse('{"application/1d-interleaved-parityfec
 
 "use strict";
 module.exports = /*#__PURE__*/JSON.parse('{"name":"mqtt","description":"A library for the MQTT protocol","version":"5.10.2","contributors":["Adam Rudd <adamvrr@gmail.com>","Matteo Collina <matteo.collina@gmail.com> (https://github.com/mcollina)","Siarhei Buntsevich <scarry0506@gmail.com> (https://github.com/scarry1992)","Yoseph Maguire <yomaguir@microsoft.com> (https://github.com/YoDaMa)","Daniel Lando <daniel.sorridi@gmail.com> (https://github.com/robertsLando)"],"keywords":["mqtt","publish/subscribe","publish","subscribe"],"license":"MIT","repository":{"type":"git","url":"git://github.com/mqttjs/MQTT.js.git"},"main":"./build/index.js","module":"./dist/mqtt.esm.js","bin":{"mqtt_pub":"./build/bin/pub.js","mqtt_sub":"./build/bin/sub.js","mqtt":"./build/bin/mqtt.js"},"files":["dist/","CONTRIBUTING.md","LICENSE.md","help/","build/","src/"],"exports":{".":{"browser":{"import":"./dist/mqtt.esm.js","default":"./dist/mqtt.min.js"},"default":"./build/index.js"},"./package.json":"./package.json","./*.map":"./build/*.js.map","./dist/*":"./dist/*.js","./*":"./build/*.js"},"types":"build/index.d.ts","typesVersions":{"*":{"*":["./build/index.d.ts"]}},"scripts":{"lint":"eslint --ext .ts .","lint-fix":"eslint --fix --ext .ts .","build:ts":"rimraf build/ && tsc -p tsconfig.build.json","build:browser":"node esbuild.js","build":"npm run build:ts && npm run build:browser","prepare":"npm run build","unit-test:node":"node_modules/.bin/nyc node -r esbuild-register test/runTests.ts","unit-test:browser":"wtr","test:node":"npm run unit-test:node && codecov","test:browser":"npm run build && npm run unit-test:browser","test":"npm run test:node","changelog":"conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md","changelog-init":"conventional-changelog -p angular -i CHANGELOG.md -s -r 0","release":"read -p \'GITHUB_TOKEN: \' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"},"release-it":{"github":{"release":true},"git":{"tagName":"v${version}","commitMessage":"chore(release): ${version}"},"hooks":{"before:init":["npm run test"]},"npm":{"publish":true},"plugins":{"@release-it/conventional-changelog":{"preset":"angular","infile":"CHANGELOG.md"}}},"publishConfig":{"provenance":true},"pre-commit":["lint"],"engines":{"node":">=16.0.0"},"browser":{"./mqtt.js":"./dist/mqtt.js","fs":false,"tls":false,"net":false},"dependencies":{"@types/readable-stream":"^4.0.5","@types/ws":"^8.5.9","commist":"^3.2.0","concat-stream":"^2.0.0","debug":"^4.3.4","help-me":"^5.0.0","lru-cache":"^10.0.1","minimist":"^1.2.8","mqtt-packet":"^9.0.1","number-allocator":"^1.0.14","readable-stream":"^4.4.2","reinterval":"^1.1.0","rfdc":"^1.3.0","split2":"^4.2.0","worker-timers":"^7.1.4","ws":"^8.17.1"},"devDependencies":{"@esm-bundle/chai":"^4.3.4-fix.0","@release-it/conventional-changelog":"^7.0.2","@types/chai":"^4.3.10","@types/node":"^20.9.0","@types/sinon":"^17.0.1","@types/tape":"^5.6.4","@typescript-eslint/eslint-plugin":"^6.10.0","@typescript-eslint/parser":"^6.10.0","@web/test-runner":"^0.18.0","@web/test-runner-playwright":"^0.11.0","aedes-cli":"^0.8.0","chai":"^4.3.10","chokidar":"^3.5.3","codecov":"^3.8.2","conventional-changelog-cli":"^4.1.0","end-of-stream":"^1.4.4","esbuild":"^0.19.5","esbuild-plugin-polyfill-node":"^0.3.0","esbuild-register":"^3.5.0","eslint":"^8.53.0","eslint-config-airbnb-base":"^15.0.0","eslint-config-airbnb-typescript":"^17.1.0","eslint-config-prettier":"^9.0.0","eslint-plugin-import":"^2.29.0","eslint-plugin-prettier":"^5.0.1","global":"^4.4.0","leaked-handles":"^5.2.0","mkdirp":"^3.0.1","mqtt-connection":"^4.1.0","mqtt-level-store":"^3.1.0","nyc":"^15.1.0","pre-commit":"^1.2.2","prettier":"^3.0.3","release-it":"^16.2.1","rimraf":"^5.0.5","should":"^13.2.3","sinon":"^17.0.1","snazzy":"^9.0.0","tape":"^5.7.2","ts-node":"^10.9.1","typescript":"^5.2.2"}}');
+
+/***/ }),
+
+/***/ "./package.json":
+/*!**********************!*\
+  !*** ./package.json ***!
+  \**********************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.41","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
 
 /***/ })
 

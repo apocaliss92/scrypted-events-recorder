@@ -43,6 +43,10 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     this.start().then().catch(this.getLogger().log);
   }
 
+  getLogger() {
+    return super.getLoggerInternal({});
+  }
+
   async startStop(enabled: boolean) {
     if (enabled) {
       await this.start();

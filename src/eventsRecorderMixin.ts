@@ -1,19 +1,16 @@
 import { SettingsMixinDeviceBase } from "@scrypted/common/src/settings-mixin";
 import { sleep } from '@scrypted/common/src/sleep';
-import sdk, { EventListenerRegister, EventRecorder, FFmpegInput, MediaObject, MediaStreamUrl, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, ScryptedMimeTypes, Setting, Settings, SettingValue, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
+import sdk, { EventListenerRegister, EventRecorder, MediaObject, ObjectsDetected, RecordedEvent, RecordedEventOptions, RecordingStreamThumbnailOptions, RequestRecordingStreamOptions, ResponseMediaStreamOptions, ScryptedInterface, Setting, Settings, SettingValue, VideoClip, VideoClipOptions, VideoClips, VideoClipThumbnailOptions, VideoRecorder, WritableDeviceState } from '@scrypted/sdk';
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import fs from 'fs';
 import { sortBy, uniq } from 'lodash';
+import moment from "moment";
 import path from 'path';
 import url from 'url';
-import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detecionClasses';
+import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detectionClasses';
 import ObjectDetectionPlugin from './main';
-import { attachProcessEvents, calculateSize, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, VideoclipFileData, videoClipRegex } from './util';
-import moment from "moment";
-import { listenZeroSingleClient } from '@scrypted/common/src/listen-cluster';
-import { Deferred } from '@scrypted/common/src/deferred';
-import { RtspServer } from "@scrypted/common/src/rtsp-server";
+import { attachProcessEvents, calculateSize, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, pluginId, VideoclipFileData, videoClipRegex } from './util';
 
 const { systemManager } = sdk;
 
@@ -465,9 +462,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                         duration: Math.round(durationInMs),
                         videoId: filename,
                         thumbnailId: filename,
-                        detectionClasses,
+                        detectionClasses: [...detectionClasses],
                         event,
-                        description: event,
+                        description: pluginId,
                         resources: {
                             thumbnail: {
                                 href: thumbnailUrl
