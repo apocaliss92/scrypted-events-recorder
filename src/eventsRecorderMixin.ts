@@ -521,32 +521,43 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async getVideoClip(videoId: string): Promise<MediaObject> {
         const logger = this.getLogger();
-        const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
-        logger.debug('Fetching videoId ', videoId, videoClipPath);
-        const fileURLToPath = url.pathToFileURL(videoClipPath).toString();
-        const videoclipMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
+        try {
+            const { videoClipPath } = this.getStorageDirs({ videoClipNameSrc: videoId });
+            logger.debug('Fetching videoId ', videoId, videoClipPath);
+            const fileURLToPath = url.pathToFileURL(videoClipPath).toString();
+            const videoclipMo = await sdk.mediaManager.createMediaObjectFromUrl(fileURLToPath);
 
-        return videoclipMo;
+            return videoclipMo;
+        } catch {
+            try {
+                return this.mixinDevice.getVideoClip(videoId);
+            } catch (e) {
+                logger.log(`Error in getVideoclip`, videoId, e);
+            }
+        }
     }
 
     async getVideoClipThumbnail(thumbnailId: string, options?: VideoClipThumbnailOptions): Promise<MediaObject> {
         const logger = this.getLogger();
         const { thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: thumbnailId });
         logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
-        const fileURLToPath = url.pathToFileURL(thumbnailPath).toString();
 
         try {
             await fs.promises.access(thumbnailPath);
-        } catch (e) {
-            if (e.toString().includes('ENOENT')) {
-                await this.saveThumbnail(thumbnailId);
+            const jpeg = await fs.promises.readFile(thumbnailPath);
+            const thumbnailMo = await sdk.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+
+            return thumbnailMo;
+        } catch {
+            // if (e.toString().includes('ENOENT')) {
+            //     await this.saveThumbnail(thumbnailId);
+            // }
+            try {
+                return this.getVideoClipThumbnail(thumbnailId, options);
+            } catch (e) {
+                logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
             }
         }
-
-        const jpeg = await fs.promises.readFile(thumbnailPath);
-        const thumbnailMo = await sdk.mediaManager.createMediaObject(jpeg, 'image/jpeg');
-
-        return thumbnailMo;
     }
 
     async removeVideoClips(...videoClipIds: string[]): Promise<void> {
