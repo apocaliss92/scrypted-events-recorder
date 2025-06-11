@@ -71701,6 +71701,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             if (options?.count) {
                 events = events.slice(0, options.count);
             }
+            logger.log(`RecordedEvents: ${JSON.stringify(events)}`);
             return events;
         }
         catch (e) {
@@ -71866,7 +71867,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         catch { }
         const logger = this.getLogger();
-        logger.log(JSON.stringify(videoclips));
+        logger.debug(JSON.stringify(videoclips));
         return (0, lodash_1.sortBy)(videoclips, 'startTime');
         ;
     }
@@ -71907,11 +71908,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     try {
                         await fs_1.default.promises.access(videoClipPath);
                         logger.log('Snapshot not found, trying to generate');
-                        await this.saveThumbnail(thumbnailId, '2');
+                        await this.saveThumbnail(thumbnailId);
                         const jpeg = await fs_1.default.promises.readFile(thumbnailPath);
                         thumbnailMo = await sdk_1.default.mediaManager.createMediaObject(jpeg, 'image/jpeg');
                     }
                     catch {
+                        logger.log('Videoclip probably corrupted, removing');
+                        await fs_1.default.promises.rm(videoClipPath);
                         throw new Error();
                     }
                 }
@@ -71922,15 +71925,17 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             return thumbnailMo;
         }
         catch {
-            // try {
-            //     if (this.mixinDevice.interfaces.includes(ScryptedInterface.VideoClips)) {
-            //         return this.mixinDevice.getVideoClipThumbnail(thumbnailId, options);
-            //     } else {
-            //         return null
-            //     }
-            // } catch (e) {
-            //     // logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
-            // }
+            try {
+                if (this.mixinDevice.interfaces.includes(sdk_1.ScryptedInterface.VideoClips)) {
+                    return this.mixinDevice.getVideoClipThumbnail(thumbnailId, options);
+                }
+                else {
+                    return null;
+                }
+            }
+            catch (e) {
+                // logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
+            }
         }
     }
     async removeVideoClips(...videoClipIds) {
@@ -82911,7 +82916,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"mqtt","description":"A librar
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.46","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.47","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
 
 /***/ })
 

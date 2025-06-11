@@ -7,7 +7,6 @@ import fs from 'fs';
 import { sortBy, uniq } from 'lodash';
 import moment from "moment";
 import path from 'path';
-import url from 'url';
 import { classnamePrio, DetectionClass, detectionClassesDefaultMap } from '../../scrypted-advanced-notifier/src/detectionClasses';
 import ObjectDetectionPlugin from './main';
 import { attachProcessEvents, calculateSize, cleanupMemoryThresholderInGb, clipsToCleanup, defaultClasses, detectionClassIndex, detectionClassIndexReversed, DeviceType, getMainDetectionClass, getVideoClipName, pluginId, VideoclipFileData, videoClipRegex } from './util';
@@ -326,6 +325,8 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 events = events.slice(0, options.count);
             }
 
+            logger.debug(`RecordedEvents: ${JSON.stringify(events)}`);
+
             return events;
         } catch (e) {
             logger.log('Error in getRecordedEvents', JSON.stringify(this.recordedEvents), e);
@@ -517,7 +518,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         } catch { }
 
         const logger = this.getLogger();
-        logger.log(JSON.stringify(videoclips));
+        logger.debug(`Videoclips: ${JSON.stringify(videoclips)}`);
 
         return sortBy(videoclips, 'startTime');;
     }
