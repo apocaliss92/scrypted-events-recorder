@@ -222,8 +222,11 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
               filename,
               deviceId,
             })}`);
-            const { thumbnailPath } = dev.getStorageDirs({ videoClipNameSrc: filename });
-            const jpeg = await fs.promises.readFile(thumbnailPath);
+            const mo = await dev.getVideoClipThumbnail(filename);
+            const jpeg = await sdk.mediaManager.convertMediaObjectToBuffer(mo, 'image/jpeg');
+            // const { thumbnailPath } = dev.getStorageDirs({ videoClipNameSrc: filename });
+
+            // const jpeg = await fs.promises.readFile(thumbnailPath);
 
             response.send(jpeg, {
               headers: {

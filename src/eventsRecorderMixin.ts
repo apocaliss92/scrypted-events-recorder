@@ -516,6 +516,9 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             videoclips.push(...deviceClips);
         } catch { }
 
+        const logger = this.getLogger();
+        logger.log(JSON.stringify(videoclips));
+
         return sortBy(videoclips, 'startTime');;
     }
 
@@ -542,23 +545,44 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
     async getVideoClipThumbnail(thumbnailId: string, options?: VideoClipThumbnailOptions): Promise<MediaObject> {
         const logger = this.getLogger();
-        const { thumbnailPath } = this.getStorageDirs({ videoClipNameSrc: thumbnailId });
-        logger.debug('Fetching thumbnailId ', thumbnailId, thumbnailPath);
+        const { thumbnailPath, videoClipPath } = this.getStorageDirs({ videoClipNameSrc: thumbnailId });
+        logger.log('Fetching thumbnailId ', thumbnailId, thumbnailPath);
 
+        let thumbnailMo: MediaObject;
         try {
-            await fs.promises.access(thumbnailPath);
-            const jpeg = await fs.promises.readFile(thumbnailPath);
-            const thumbnailMo = await sdk.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+            try {
+                await fs.promises.access(thumbnailPath);
+
+                const jpeg = await fs.promises.readFile(thumbnailPath);
+                thumbnailMo = await sdk.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+            } catch (e) {
+                if (e.message.includes('ENOENT')) {
+                    try {
+                        await fs.promises.access(videoClipPath);
+                        logger.log('Snapshot not found, trying to generate');
+                        await this.saveThumbnail(thumbnailId);
+                        const jpeg = await fs.promises.readFile(thumbnailPath);
+                        thumbnailMo = await sdk.mediaManager.createMediaObject(jpeg, 'image/jpeg');
+                    } catch {
+                        logger.log('Videoclip probably corrupted, removing')
+                        await fs.promises.rm(videoClipPath);
+                        throw new Error();
+                    }
+                } else {
+                    throw new Error();
+                }
+            }
 
             return thumbnailMo;
         } catch {
-            // if (e.toString().includes('ENOENT')) {
-            //     await this.saveThumbnail(thumbnailId);
-            // }
             try {
-                return this.getVideoClipThumbnail(thumbnailId, options);
+                if (this.mixinDevice.interfaces.includes(ScryptedInterface.VideoClips)) {
+                    return this.mixinDevice.getVideoClipThumbnail(thumbnailId, options);
+                } else {
+                    return null
+                }
             } catch (e) {
-                logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
+                // logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
             }
         }
     }
@@ -761,14 +785,15 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
         await this.resetListeners({});
     }
 
-    async saveThumbnail(filename: string) {
+    async saveThumbnail(filename: string, ss = (this.prebuffer / (2 * 1000)).toString()) {
         const logger = this.getLogger();
         logger.log(`Generating thumbnail for ${filename}`);
+        const { thumbnailPath, videoClipPath } = this.getStorageDirs({ videoClipNameSrc: filename });
+
         return new Promise<void>((resolve) => {
-            const { thumbnailPath, videoClipPath } = this.getStorageDirs({ videoClipNameSrc: filename });
 
             const snapshotFfmpeg = spawn(this.ffmpegPath, [
-                '-ss', (this.prebuffer / (2 * 1000)).toString(),
+                '-ss', ss,
                 '-i', `${videoClipPath}`,
                 thumbnailPath
             ], {
@@ -838,7 +863,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
 
                 const filename = getVideoClipName({
                     classesDetected: uniq(this.classesDetected),
-                    endTime: this.lastClipRecordedTime,
+                    endTime: this.lastClipRecordedTime ?? Date.now(),
                     logger,
                     startTime: this.recordingTimeStart,
                 });
@@ -966,7 +991,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 await fs.promises.writeFile(eventImagePath, jpeg);
 
                 logger.log(`Updating JSON ${eventsJsonPath}`);
-                await fs.promises.writeFile(eventsJsonPath, JSON.stringify(jsonContent, null, 2));
+                await fs.promises.writeFile(eventsJsonPath, JSON.stringify(jsonContent));
 
                 this.recordedEvents.push(newEvent);
             } catch (e) {
