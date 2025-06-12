@@ -567,6 +567,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                     } catch {
                         logger.log('Videoclip probably corrupted, removing')
                         await fs.promises.rm(videoClipPath);
+                        await this.indexFs();
                         throw new Error();
                     }
                 } else {
@@ -582,9 +583,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 } else {
                     return null
                 }
-            } catch (e) {
-                // logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
-            }
+            } catch {}
         }
     }
 
@@ -688,7 +687,7 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             const endTimeNumber = Number(endTime);
 
             const fildeData: VideoclipFileData = {
-                detectionClasses,
+                detectionClasses: sortedClassnames,
                 endTime: endTimeNumber,
                 startTime: startTimeNumber,
                 size: stats.size,
