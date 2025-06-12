@@ -283,7 +283,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     ) {
       const ret: string[] = [
         ScryptedInterface.VideoClips,
-        // ScryptedInterface.EventRecorder,
+        ScryptedInterface.EventRecorder,
         // ScryptedInterface.VideoRecorder,
         ScryptedInterface.Settings,
       ];
