@@ -2,16 +2,12 @@ import sdk, { HttpRequest, HttpRequestHandler, HttpResponse, Image, ScryptedDevi
 import { StorageSettings } from "@scrypted/sdk/storage-settings";
 import { EventsRecorderMixin } from './eventsRecorderMixin';
 import fs from 'fs';
-import path from 'path';
 import { BasePlugin, getBaseSettings } from '../../scrypted-apocaliss-base/src/basePlugin';
 import moment from 'moment';
 
-// Overlays a small delete button on every RECORDED CLIPS thumbnail in
-// Scrypted core's own UI, reading deviceId/filename straight out of the
-// thumbnail's own <img src> (it's built by getVideoclipWebhookUrls() and
-// already contains both). Served as a static file via the `clipDeleteOverlay.js`
-// webhook below, and injected into core's index.html by
-// ensureClipDeleteOverlayInjected() so no browser extension is needed.
+// Optional helper script for a Tampermonkey/userscript overlay (see
+// scrypted-clip-delete-overlay.user.js). Served as a static file; not injected
+// into @scrypted/core — plugins must not mutate another plugin's UI files.
 const CLIP_DELETE_OVERLAY_JS = `(function () {
   const THUMB_MARKER = 'videoclipThumbnail?';
   const DELETE_MARKER = 'deleteVideoclip?';
@@ -144,58 +140,6 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
     process.on('SIGINT', this.cleanAllListeners);
     process.on('SIGTERM', this.cleanAllListeners);
     process.on('uncaughtException', this.cleanAllListeners);
-
-    await this.ensureClipDeleteOverlayInjected();
-  }
-
-  // Injects <script src=".../clipDeleteOverlay.js"> into Scrypted core's own
-  // index.html, so the "delete clip" button on RECORDED CLIPS thumbnails
-  // works out of the box with no browser extension. Idempotent (checks a
-  // marker comment first) and re-run on every plugin start, so it self-heals
-  // if a core update ever overwrites index.html.
-  async ensureClipDeleteOverlayInjected() {
-    const logger = this.getLogger();
-    const marker = '<!-- events-recorder:clip-delete-overlay -->';
-
-    try {
-      // This plugin's bundle lives at .../plugins/@apocaliss92/scrypted-events-recorder/zip/unzipped,
-      // and core is a sibling under .../plugins/@scrypted/core. Derive the
-      // shared "plugins" root from our own __dirname rather than hardcoding
-      // an absolute path, since it can vary by install (docker volume, etc).
-      const pluginsRootMatch = __dirname.match(/^(.*[\\/]plugins)[\\/]/);
-      if (!pluginsRootMatch) {
-        logger.debug(`Could not determine plugins root from ${__dirname}, skipping core UI overlay injection`);
-        return;
-      }
-
-      const indexHtmlPath = path.join(pluginsRootMatch[1], '@scrypted', 'core', 'zip', 'unzipped', 'fs', 'dist', 'index.html');
-
-      let html: string;
-      try {
-        html = await fs.promises.readFile(indexHtmlPath, 'utf8');
-      } catch {
-        logger.debug(`Core index.html not found at ${indexHtmlPath}, skipping overlay injection`);
-        return;
-      }
-
-      if (html.includes(marker)) {
-        return;
-      }
-
-      if (!html.includes('</body>')) {
-        logger.debug('Core index.html has no </body>, skipping overlay injection');
-        return;
-      }
-
-      const scriptBase = await sdk.endpointManager.getPath(undefined, { public: true });
-      const scriptUrl = `${scriptBase}clipDeleteOverlay.js`;
-      const injected = html.replace('</body>', `${marker}\n<script defer src="${scriptUrl}"></script>\n</body>`);
-
-      await fs.promises.writeFile(indexHtmlPath, injected);
-      logger.log(`Injected clip-delete overlay script into core UI (${indexHtmlPath})`);
-    } catch (e) {
-      logger.log('Failed to inject clip-delete overlay into core UI', e);
-    }
   }
 
   cleanAllListeners() {
@@ -230,10 +174,7 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
       const [_, __, ___, ____, privateWebhook, ...rest] = url.pathname.split('/');
 
       try {
-        // Static, device-agnostic script served straight from the plugin so
-        // the "delete clip" overlay button works without any browser
-        // extension - see ensureClipDeleteOverlayInjected(), which injects a
-        // <script src="this URL"> into Scrypted core's own index.html.
+        // Optional static helper for the Tampermonkey userscript overlay.
         if (privateWebhook === 'public' && rest[0] === 'clipDeleteOverlay.js') {
           response.send(CLIP_DELETE_OVERLAY_JS, {
             headers: {
@@ -367,6 +308,11 @@ export class EventsRecorderPlugin extends BasePlugin implements Settings, HttpRe
             });
             return;
           } else if (webhook === 'deleteVideoclip') {
+            // Public webhook — reject path traversal / unexpected names.
+            if (typeof filename !== 'string' || !/^[\w.\-]+$/.test(filename)) {
+              response.send('Invalid filename', { code: 400 });
+              return;
+            }
             devConsole.log(`Deleting videoclip via webhook: ${filename}`);
             await dev.removeVideoClips(filename);
             await dev.indexFs();
