@@ -120,6 +120,36 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
             defaultValue: false,
             immediate: true,
         },
+        clipToDelete: {
+            title: 'Clip to delete',
+            description: 'Pick a recorded clip and press "Delete selected clip" below to permanently remove it (video + thumbnail).',
+            type: 'string',
+            combobox: true,
+            immediate: true,
+            onGet: async () => ({
+                choices: this.scanData.slice()
+                    .sort((a, b) => b.startTime - a.startTime)
+                    .map(item => this.describeClipChoice(item)),
+            }),
+        },
+        deleteSelectedClip: {
+            title: 'Delete selected clip',
+            description: 'Deletes the clip currently selected above. This cannot be undone.',
+            type: 'button',
+            onPut: async () => {
+                const logger = this.getLogger();
+                const selected = this.storageSettings.values.clipToDelete as string;
+                const filename = this.parseClipChoice(selected);
+                if (!filename) {
+                    logger.log(`No clip selected to delete`);
+                    return;
+                }
+
+                await this.removeVideoClips(filename);
+                this.storageSettings.values.clipToDelete = undefined;
+                await this.indexFs();
+            },
+        },
         processPid: {
             type: 'string',
             hide: true,
@@ -471,28 +501,34 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 const { detectionClasses, endTime, filename, startTime } = item;
 
                 if (startTime >= startTimeInner && startTime <= endTimeInner) {
-                    const durationInMs = endTime - startTime;
-                    const event = getMainDetectionClass(detectionClasses);
+                    try {
+                        const durationInMs = endTime - startTime;
+                        const event = getMainDetectionClass(detectionClasses);
 
-                    const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
-                    videoclips.push({
-                        id: filename,
-                        startTime,
-                        duration: Math.round(durationInMs),
-                        videoId: filename,
-                        thumbnailId: filename,
-                        detectionClasses: [...detectionClasses],
-                        event,
-                        description: pluginId,
-                        resources: {
-                            thumbnail: {
-                                href: thumbnailUrl
-                            },
-                            video: {
-                                href: videoclipUrl
+                        const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
+                        videoclips.push({
+                            id: filename,
+                            startTime,
+                            duration: Math.round(durationInMs),
+                            videoId: filename,
+                            thumbnailId: filename,
+                            detectionClasses: [...detectionClasses],
+                            event,
+                            description: pluginId,
+                            resources: {
+                                thumbnail: {
+                                    href: thumbnailUrl
+                                },
+                                video: {
+                                    href: videoclipUrl
+                                }
                             }
-                        }
-                    });
+                        });
+                    } catch (e) {
+                        // Do not let a single clip's webhook URL generation (e.g. missing
+                        // public/cloud endpoint support) blow up the entire clips list.
+                        this.getLogger().error(`Error building video clip entry for ${filename}`, e);
+                    }
                 }
             }
 
@@ -585,6 +621,24 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
                 }
             } catch {}
         }
+    }
+
+    // Builds a human-readable label for the "Clip to delete" dropdown that still
+    // embeds the underlying filename, so the selection can be parsed back out
+    // without needing separate value/label support (Setting.choices is string[]).
+    describeClipChoice(item: VideoclipFileData) {
+        const durationInSeconds = Math.round((item.endTime - item.startTime) / 1000);
+        const date = new Date(item.startTime).toLocaleString();
+        return `${date} (${durationInSeconds}s, ${item.detectionClasses.join(', ')}) — ${item.filename}`;
+    }
+
+    parseClipChoice(choice: string) {
+        if (!choice) {
+            return undefined;
+        }
+
+        const match = choice.match(/— (.+)$/);
+        return match ? match[1] : choice;
     }
 
     async removeVideoClips(...videoClipIds: string[]): Promise<void> {
@@ -951,9 +1005,25 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     async storeEvent(details: EventDetails, data: ObjectsDetected) {
         const logger = this.getLogger();
 
-        if (data.detectionId) {
+        {
             try {
-                const mo = await this.cameraDevice.getDetectionInput(data.detectionId);
+                let mo: MediaObject;
+
+                if (data.detectionId) {
+                    mo = await this.cameraDevice.getDetectionInput(data.detectionId);
+                }
+
+                if (!mo) {
+                    // Cameras that run detection on-board (e.g. UniFi Direct) report
+                    // detections without a detectionId/detection input frame available.
+                    // Fall back to a live snapshot so these events still get indexed
+                    // instead of being silently dropped.
+                    try {
+                        mo = await this.cameraDevice.takePicture();
+                    } catch (e) {
+                        logger.debug(`No detection input or snapshot available for event ${data.detectionId}`, e);
+                    }
+                }
 
                 if (!mo) {
                     return;
@@ -1082,15 +1152,28 @@ export class EventsRecorderMixin extends SettingsMixinDeviceBase<DeviceType> imp
     }
 
     async getVideoclipWebhookUrls(filename: string) {
-        const cloudEndpoint = await sdk.endpointManager.getCloudEndpoint(undefined, { public: true });
+        // Use a relative path rather than an absolute cloud/local endpoint:
+        // - getCloudEndpoint() always round-trips through
+        //   mediaManager.convertMediaObjectToUrl(), which throws ("no converter
+        //   found: text/x-local-uri to text/x-uri") unless a plugin providing
+        //   that MIME conversion (e.g. Scrypted Cloud) is installed.
+        // - getLocalEndpoint() avoids that, but returns an absolute URL bound to
+        //   whatever IP/port the server detects itself as (e.g. https://10.0.1.10:10443),
+        //   which can differ from the hostname the browser is actually using
+        //   (e.g. https://server:10443), causing cert/host mismatches and blocked
+        //   requests in the browser.
+        // getPath() returns a same-origin relative path, so it always works
+        // regardless of the hostname used to reach the server.
+        const cloudEndpoint = await sdk.endpointManager.getPath(undefined, { public: true });
         const [endpoint, parameters] = cloudEndpoint.split('?') ?? '';
         const params = {
             deviceId: this.id,
             filename,
         }
 
-        const videoclipUrl = `${endpoint}videoclip?params=${JSON.stringify(params)}&${parameters}`;
-        const thumbnailUrl = `${endpoint}videoclipThumbnail?params=${JSON.stringify(params)}&${parameters}`;
+        const extraParams = parameters ? `&${parameters}` : '';
+        const videoclipUrl = `${endpoint}videoclip?params=${JSON.stringify(params)}${extraParams}`;
+        const thumbnailUrl = `${endpoint}videoclipThumbnail?params=${JSON.stringify(params)}${extraParams}`;
 
         return { videoclipUrl, thumbnailUrl };
     }
