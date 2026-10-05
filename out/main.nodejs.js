@@ -1,13 +1,14 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"
 /*!*******************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js ***!
   \*******************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -23,9 +24,13 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sdk = exports.MixinDeviceBase = exports.ScryptedDeviceBase = void 0;
-__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js"), exports);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(__webpack_exports__, "__esModule", ({ value: true }));
+__webpack_exports__.sdk = __webpack_exports__.MixinDeviceBase = __webpack_exports__.ScryptedDeviceBase = void 0;
+__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js"), __webpack_exports__);
+const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
 const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js");
 const module_1 = __webpack_require__(/*! module */ "module");
 /**
@@ -38,39 +43,39 @@ class ScryptedDeviceBase extends index_1.DeviceBase {
     }
     get storage() {
         if (!this._storage) {
-            this._storage = exports.sdk.deviceManager.getDeviceStorage(this.nativeId);
+            this._storage = __webpack_exports__.sdk.deviceManager.getDeviceStorage(this.nativeId);
         }
         return this._storage;
     }
     get log() {
         if (!this._log) {
-            this._log = exports.sdk.deviceManager.getDeviceLogger(this.nativeId);
+            this._log = __webpack_exports__.sdk.deviceManager.getDeviceLogger(this.nativeId);
         }
         return this._log;
     }
     get console() {
         if (!this._console) {
-            this._console = exports.sdk.deviceManager.getDeviceConsole(this.nativeId);
+            this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.nativeId);
         }
         return this._console;
     }
     async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
             sourceId: this.id,
         });
     }
     getMediaObjectConsole(mediaObject) {
         if (typeof mediaObject.sourceId !== 'string')
             return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
     }
     _lazyLoadDeviceState() {
         if (!this._deviceState) {
             if (this.nativeId) {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState(this.nativeId);
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState(this.nativeId);
             }
             else {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState();
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState();
             }
         }
     }
@@ -78,10 +83,10 @@ class ScryptedDeviceBase extends index_1.DeviceBase {
      * Fire an event for this device.
      */
     onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
+        return __webpack_exports__.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
     }
 }
-exports.ScryptedDeviceBase = ScryptedDeviceBase;
+__webpack_exports__.ScryptedDeviceBase = ScryptedDeviceBase;
 /**
  * @category Mixin Reference
  */
@@ -93,47 +98,47 @@ class MixinDeviceBase extends index_1.DeviceBase {
         this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
         this.mixinStorageSuffix = options.mixinStorageSuffix;
         this._deviceState = options.mixinDeviceState;
-        this.nativeId = exports.sdk.systemManager.getDeviceById(this.id).nativeId;
+        this.nativeId = __webpack_exports__.sdk.systemManager.getDeviceById(this.id).nativeId;
         this.mixinProviderNativeId = options.mixinProviderNativeId;
         // RpcProxy will trap all properties, and the following check/hack will determine
         // if the device state came from another node worker thread.
         // This should ultimately be discouraged and warned at some point in the future.
         if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
-            this._deviceState = exports.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
+            this._deviceState = __webpack_exports__.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
         }
     }
     get storage() {
         if (!this._storage) {
             const mixinStorageSuffix = this.mixinStorageSuffix;
             const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
-            this._storage = exports.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
+            this._storage = __webpack_exports__.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
         }
         return this._storage;
     }
     get console() {
         if (!this._console) {
-            if (exports.sdk.deviceManager.getMixinConsole)
-                this._console = exports.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
+            if (__webpack_exports__.sdk.deviceManager.getMixinConsole)
+                this._console = __webpack_exports__.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
             else
-                this._console = exports.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
+                this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
         }
         return this._console;
     }
     async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
             sourceId: this.id,
         });
     }
     getMediaObjectConsole(mediaObject) {
         if (typeof mediaObject.sourceId !== 'string')
             return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
     }
     /**
      * Fire an event for this device.
      */
     onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
+        return __webpack_exports__.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
     }
     _lazyLoadDeviceState() {
     }
@@ -146,7 +151,7 @@ class MixinDeviceBase extends index_1.DeviceBase {
         }
     }
 }
-exports.MixinDeviceBase = MixinDeviceBase;
+__webpack_exports__.MixinDeviceBase = MixinDeviceBase;
 (function () {
     function _createGetState(state) {
         return function () {
@@ -181,7 +186,7 @@ exports.MixinDeviceBase = MixinDeviceBase;
         });
     }
 })();
-exports.sdk = {};
+__webpack_exports__.sdk = {};
 try {
     let loaded = false;
     try {
@@ -191,7 +196,8 @@ try {
         const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
         const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
         // @ts-expect-error
-        if (esModule && "undefined" !== 'undefined') {}
+        if (esModule && "undefined" !== 'undefined') // removed by dead control flow
+{}
         else if (cjsModule) {
             // @ts-expect-error
             if (typeof require !== 'undefined') {
@@ -229,7 +235,23 @@ try {
         });
     }
     try {
-        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, index_1.ScryptedInterfaceDescriptors)?.catch(() => { });
+        let descriptors = {
+            ...index_1.ScryptedInterfaceDescriptors,
+        };
+        try {
+            const sdkJson = JSON.parse(fs_1.default.readFileSync('../sdk.json').toString());
+            const customDescriptors = sdkJson.interfaceDescriptors;
+            if (customDescriptors) {
+                descriptors = {
+                    ...descriptors,
+                    ...customDescriptors,
+                };
+            }
+        }
+        catch (e) {
+            console.warn('failed to load custom interface descriptors', e);
+        }
+        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, descriptors)?.catch(() => { });
     }
     catch (e) {
     }
@@ -237,19 +259,19 @@ try {
 catch (e) {
     console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
 }
-exports["default"] = exports.sdk;
+exports.default = exports.sdk;
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src sync recursive":
+/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src sync recursive"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/ sync ***!
   \****************************************************************************/
-/***/ ((module) => {
+(module) {
 
 function webpackEmptyContext(req) {
-	var e = new Error("Cannot find module '" + req + "'");
+	const e = new Error("Cannot find module '" + req + "'");
 	e.code = 'MODULE_NOT_FOUND';
 	throw e;
 }
@@ -258,19 +280,19 @@ webpackEmptyContext.resolve = webpackEmptyContext;
 webpackEmptyContext.id = "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src sync recursive";
 module.exports = webpackEmptyContext;
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js"
 /*!*************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
   \*************************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.113";
+exports.TYPES_VERSION = "0.5.51";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -305,6 +327,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["temperature"] = "temperature";
     ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
     ScryptedInterfaceProperty["humidity"] = "humidity";
+    ScryptedInterfaceProperty["resolution"] = "resolution";
     ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
     ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
     ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
@@ -341,6 +364,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
     ScryptedInterfaceProperty["fan"] = "fan";
     ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
+    ScryptedInterfaceProperty["chatCompletionCapabilities"] = "chatCompletionCapabilities";
     ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
 })(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
 var ScryptedInterfaceMethod;
@@ -441,7 +465,6 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
     ScryptedInterfaceMethod["saveScript"] = "saveScript";
     ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
-    ScryptedInterfaceMethod["trackObjects"] = "trackObjects";
     ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
     ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
     ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
@@ -455,6 +478,12 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
     ScryptedInterfaceMethod["connectStream"] = "connectStream";
     ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
+    ScryptedInterfaceMethod["getChatCompletion"] = "getChatCompletion";
+    ScryptedInterfaceMethod["streamChatCompletion"] = "streamChatCompletion";
+    ScryptedInterfaceMethod["getTextEmbedding"] = "getTextEmbedding";
+    ScryptedInterfaceMethod["getImageEmbedding"] = "getImageEmbedding";
+    ScryptedInterfaceMethod["callLLMTool"] = "callLLMTool";
+    ScryptedInterfaceMethod["getLLMTools"] = "getLLMTools";
 })(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
 exports.ScryptedInterfaceDescriptors = {
     "ScryptedDevice": {
@@ -636,6 +665,13 @@ exports.ScryptedInterfaceDescriptors = {
             "takePicture"
         ],
         "properties": []
+    },
+    "Resolution": {
+        "name": "Resolution",
+        "methods": [],
+        "properties": [
+            "resolution"
+        ]
     },
     "Microphone": {
         "name": "Microphone",
@@ -1108,13 +1144,6 @@ exports.ScryptedInterfaceDescriptors = {
         ],
         "properties": []
     },
-    "ObjectTracker": {
-        "name": "ObjectTracker",
-        "methods": [
-            "trackObjects"
-        ],
-        "properties": []
-    },
     "ObjectDetector": {
         "name": "ObjectDetector",
         "methods": [
@@ -1214,6 +1243,38 @@ exports.ScryptedInterfaceDescriptors = {
         ],
         "properties": []
     },
+    "ChatCompletion": {
+        "name": "ChatCompletion",
+        "methods": [
+            "getChatCompletion",
+            "streamChatCompletion"
+        ],
+        "properties": [
+            "chatCompletionCapabilities"
+        ]
+    },
+    "TextEmbedding": {
+        "name": "TextEmbedding",
+        "methods": [
+            "getTextEmbedding"
+        ],
+        "properties": []
+    },
+    "ImageEmbedding": {
+        "name": "ImageEmbedding",
+        "methods": [
+            "getImageEmbedding"
+        ],
+        "properties": []
+    },
+    "LLMTools": {
+        "name": "LLMTools",
+        "methods": [
+            "callLLMTool",
+            "getLLMTools"
+        ],
+        "properties": []
+    },
     "ScryptedSystemDevice": {
         "name": "ScryptedSystemDevice",
         "methods": [],
@@ -1272,12 +1333,14 @@ var ScryptedDeviceType;
      * Smart Speakers have two way audio.
      */
     ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
+    ScryptedDeviceType["RemoteDesktop"] = "RemoteDesktop";
     ScryptedDeviceType["Event"] = "Event";
     ScryptedDeviceType["Entry"] = "Entry";
     ScryptedDeviceType["Garage"] = "Garage";
     ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
     ScryptedDeviceType["DataSource"] = "DataSource";
     ScryptedDeviceType["API"] = "API";
+    ScryptedDeviceType["Buttons"] = "Buttons";
     ScryptedDeviceType["Doorbell"] = "Doorbell";
     ScryptedDeviceType["Irrigation"] = "Irrigation";
     ScryptedDeviceType["Valve"] = "Valve";
@@ -1286,6 +1349,10 @@ var ScryptedDeviceType;
     ScryptedDeviceType["WindowCovering"] = "WindowCovering";
     ScryptedDeviceType["Siren"] = "Siren";
     ScryptedDeviceType["AirPurifier"] = "AirPurifier";
+    ScryptedDeviceType["Internet"] = "Internet";
+    ScryptedDeviceType["Network"] = "Network";
+    ScryptedDeviceType["Bridge"] = "Bridge";
+    ScryptedDeviceType["LLM"] = "LLM";
     ScryptedDeviceType["Unknown"] = "Unknown";
 })(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
 var HumidityMode;
@@ -1401,6 +1468,7 @@ var ScryptedInterface;
     ScryptedInterface["Thermometer"] = "Thermometer";
     ScryptedInterface["HumiditySensor"] = "HumiditySensor";
     ScryptedInterface["Camera"] = "Camera";
+    ScryptedInterface["Resolution"] = "Resolution";
     ScryptedInterface["Microphone"] = "Microphone";
     ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
     ScryptedInterface["Display"] = "Display";
@@ -1461,7 +1529,6 @@ var ScryptedInterface;
     ScryptedInterface["Program"] = "Program";
     ScryptedInterface["Scriptable"] = "Scriptable";
     ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
-    ScryptedInterface["ObjectTracker"] = "ObjectTracker";
     ScryptedInterface["ObjectDetector"] = "ObjectDetector";
     ScryptedInterface["ObjectDetection"] = "ObjectDetection";
     ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
@@ -1476,6 +1543,10 @@ var ScryptedInterface;
     ScryptedInterface["StreamService"] = "StreamService";
     ScryptedInterface["TTY"] = "TTY";
     ScryptedInterface["TTYSettings"] = "TTYSettings";
+    ScryptedInterface["ChatCompletion"] = "ChatCompletion";
+    ScryptedInterface["TextEmbedding"] = "TextEmbedding";
+    ScryptedInterface["ImageEmbedding"] = "ImageEmbedding";
+    ScryptedInterface["LLMTools"] = "LLMTools";
     ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
     ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
     ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
@@ -1502,13 +1573,13 @@ var ScryptedMimeTypes;
 })(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/abort-controller/dist/abort-controller.js":
+/***/ "../scrypted-apocaliss-base/node_modules/abort-controller/dist/abort-controller.js"
 /*!*****************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/abort-controller/dist/abort-controller.js ***!
   \*****************************************************************************************/
-/***/ ((module, exports, __webpack_require__) => {
+(module, exports, __webpack_require__) {
 
 "use strict";
 /**
@@ -1640,13 +1711,13 @@ module.exports.AbortSignal = AbortSignal
 //# sourceMappingURL=abort-controller.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/index.js"
 /*!*****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/index.js ***!
   \*****************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 module.exports =
 {
@@ -1656,13 +1727,13 @@ module.exports =
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/abort.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/abort.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/abort.js ***!
   \*********************************************************************/
-/***/ ((module) => {
+(module) {
 
 // API
 module.exports = abort;
@@ -1695,13 +1766,13 @@ function clean(key)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/async.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/async.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/async.js ***!
   \*********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var defer = __webpack_require__(/*! ./defer.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/defer.js");
 
@@ -1739,13 +1810,13 @@ function async(callback)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/defer.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/defer.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/defer.js ***!
   \*********************************************************************/
-/***/ ((module) => {
+(module) {
 
 module.exports = defer;
 
@@ -1775,13 +1846,13 @@ function defer(fn)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/iterate.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/iterate.js"
 /*!***********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/iterate.js ***!
   \***********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var async = __webpack_require__(/*! ./async.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/async.js")
   , abort = __webpack_require__(/*! ./abort.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/abort.js")
@@ -1860,13 +1931,13 @@ function runJob(iterator, key, item, callback)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/state.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/state.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/state.js ***!
   \*********************************************************************/
-/***/ ((module) => {
+(module) {
 
 // API
 module.exports = state;
@@ -1907,13 +1978,13 @@ function state(list, sortMethod)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/terminator.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/lib/terminator.js"
 /*!**************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/lib/terminator.js ***!
   \**************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var abort = __webpack_require__(/*! ./abort.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/abort.js")
   , async = __webpack_require__(/*! ./async.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/async.js")
@@ -1946,13 +2017,13 @@ function terminator(callback)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/parallel.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/parallel.js"
 /*!********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/parallel.js ***!
   \********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var iterate    = __webpack_require__(/*! ./lib/iterate.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/iterate.js")
   , initState  = __webpack_require__(/*! ./lib/state.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/state.js")
@@ -1999,13 +2070,13 @@ function parallel(list, iterator, callback)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/serial.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/serial.js"
 /*!******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/serial.js ***!
   \******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var serialOrdered = __webpack_require__(/*! ./serialOrdered.js */ "../scrypted-apocaliss-base/node_modules/asynckit/serialOrdered.js");
 
@@ -2026,13 +2097,13 @@ function serial(list, iterator, callback)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/asynckit/serialOrdered.js":
+/***/ "../scrypted-apocaliss-base/node_modules/asynckit/serialOrdered.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/asynckit/serialOrdered.js ***!
   \*************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var iterate    = __webpack_require__(/*! ./lib/iterate.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/iterate.js")
   , initState  = __webpack_require__(/*! ./lib/state.js */ "../scrypted-apocaliss-base/node_modules/asynckit/lib/state.js")
@@ -2111,13 +2182,13 @@ function descending(a, b)
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/bl/BufferList.js":
+/***/ "../scrypted-apocaliss-base/node_modules/bl/BufferList.js"
 /*!****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/bl/BufferList.js ***!
   \****************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -2522,13 +2593,13 @@ BufferList.isBufferList = function isBufferList (b) {
 module.exports = BufferList
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/bl/bl.js":
+/***/ "../scrypted-apocaliss-base/node_modules/bl/bl.js"
 /*!********************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/bl/bl.js ***!
   \********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -2617,13 +2688,13 @@ module.exports.BufferListStream = BufferListStream
 module.exports.BufferList = BufferList
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/combined-stream/lib/combined_stream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/combined-stream/lib/combined_stream.js"
 /*!**************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/combined-stream/lib/combined_stream.js ***!
   \**************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var util = __webpack_require__(/*! util */ "util");
 var Stream = (__webpack_require__(/*! stream */ "stream").Stream);
@@ -2835,13 +2906,13 @@ CombinedStream.prototype._emitError = function(err) {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/debug/src/browser.js":
+/***/ "../scrypted-apocaliss-base/node_modules/debug/src/browser.js"
 /*!********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/debug/src/browser.js ***!
   \********************************************************************/
-/***/ ((module, exports, __webpack_require__) => {
+(module, exports, __webpack_require__) {
 
 /* eslint-env browser */
 
@@ -3117,13 +3188,13 @@ formatters.j = function (v) {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/debug/src/common.js":
+/***/ "../scrypted-apocaliss-base/node_modules/debug/src/common.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/debug/src/common.js ***!
   \*******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 
 /**
@@ -3419,13 +3490,13 @@ function setup(env) {
 module.exports = setup;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/debug/src/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/debug/src/index.js"
 /*!******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/debug/src/index.js ***!
   \******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /**
  * Detect Electron renderer / nwjs process, which is node, but we should
@@ -3439,13 +3510,13 @@ if (typeof process === 'undefined' || process.type === 'renderer' || process.bro
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/debug/src/node.js":
+/***/ "../scrypted-apocaliss-base/node_modules/debug/src/node.js"
 /*!*****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/debug/src/node.js ***!
   \*****************************************************************/
-/***/ ((module, exports, __webpack_require__) => {
+(module, exports, __webpack_require__) {
 
 /**
  * Module dependencies.
@@ -3712,13 +3783,13 @@ formatters.O = function (v) {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/delayed-stream/lib/delayed_stream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/delayed-stream/lib/delayed_stream.js"
 /*!************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/delayed-stream/lib/delayed_stream.js ***!
   \************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var Stream = (__webpack_require__(/*! stream */ "stream").Stream);
 var util = __webpack_require__(/*! util */ "util");
@@ -3829,13 +3900,13 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/event-target-shim/dist/event-target-shim.js":
+/***/ "../scrypted-apocaliss-base/node_modules/event-target-shim/dist/event-target-shim.js"
 /*!*******************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/event-target-shim/dist/event-target-shim.js ***!
   \*******************************************************************************************/
-/***/ ((module, exports) => {
+(module, exports) {
 
 "use strict";
 /**
@@ -4711,13 +4782,13 @@ module.exports.defineEventAttribute = defineEventAttribute
 //# sourceMappingURL=event-target-shim.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/add-unique-number.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/add-unique-number.js"
 /*!***************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/add-unique-number.js ***!
   \***************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4733,13 +4804,13 @@ const createAddUniqueNumber = (generateUniqueNumber) => {
 };
 //# sourceMappingURL=add-unique-number.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/cache.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/cache.js"
 /*!***************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/cache.js ***!
   \***************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4754,13 +4825,13 @@ const createCache = (lastNumberWeakMap) => {
 };
 //# sourceMappingURL=cache.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/generate-unique-number.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/generate-unique-number.js"
 /*!********************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/factories/generate-unique-number.js ***!
   \********************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4814,13 +4885,13 @@ const createGenerateUniqueNumber = (cache, lastNumberWeakMap) => {
 };
 //# sourceMappingURL=generate-unique-number.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/module.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/module.js"
 /*!******************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/module.js ***!
   \******************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4847,91 +4918,91 @@ const addUniqueNumber = (0,_factories_add_unique_number__WEBPACK_IMPORTED_MODULE
 
 //# sourceMappingURL=module.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-factory.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-factory.js"
 /*!*******************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-factory.js ***!
   \*******************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=add-unique-number-factory.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-function.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-function.js"
 /*!********************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/add-unique-number-function.js ***!
   \********************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=add-unique-number-function.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-factory.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-factory.js"
 /*!*******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-factory.js ***!
   \*******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=cache-factory.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-function.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-function.js"
 /*!********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/cache-function.js ***!
   \********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=cache-function.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-factory.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-factory.js"
 /*!************************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-factory.js ***!
   \************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=generate-unique-number-factory.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-function.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-function.js"
 /*!*************************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/generate-unique-number-function.js ***!
   \*************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=generate-unique-number-function.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/index.js"
 /*!***********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/fast-unique-numbers/build/es2019/types/index.js ***!
   \***********************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -4949,13 +5020,13 @@ __webpack_require__.r(__webpack_exports__);
 
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/follow-redirects/debug.js":
+/***/ "../scrypted-apocaliss-base/node_modules/follow-redirects/debug.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/follow-redirects/debug.js ***!
   \*************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var debug;
 
@@ -4974,13 +5045,13 @@ module.exports = function () {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/follow-redirects/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/follow-redirects/index.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/follow-redirects/index.js ***!
   \*************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var url = __webpack_require__(/*! url */ "url");
 var URL = url.URL;
@@ -5670,13 +5741,13 @@ module.exports = wrap({ http: http, https: https });
 module.exports.wrap = wrap;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/form-data/lib/form_data.js":
+/***/ "../scrypted-apocaliss-base/node_modules/form-data/lib/form_data.js"
 /*!**************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/form-data/lib/form_data.js ***!
   \**************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 var CombinedStream = __webpack_require__(/*! combined-stream */ "../scrypted-apocaliss-base/node_modules/combined-stream/lib/combined_stream.js");
 var util = __webpack_require__(/*! util */ "util");
@@ -6181,13 +6252,13 @@ FormData.prototype.toString = function () {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/form-data/lib/populate.js":
+/***/ "../scrypted-apocaliss-base/node_modules/form-data/lib/populate.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/form-data/lib/populate.js ***!
   \*************************************************************************/
-/***/ ((module) => {
+(module) {
 
 // populates missing values
 module.exports = function(dst, src) {
@@ -6201,13 +6272,13 @@ module.exports = function(dst, src) {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/has-flag/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/has-flag/index.js"
 /*!*****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/has-flag/index.js ***!
   \*****************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -6220,13 +6291,13 @@ module.exports = (flag, argv = process.argv) => {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/inherits/inherits.js":
+/***/ "../scrypted-apocaliss-base/node_modules/inherits/inherits.js"
 /*!********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/inherits/inherits.js ***!
   \********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 try {
   var util = __webpack_require__(/*! util */ "util");
@@ -6239,13 +6310,13 @@ try {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/inherits/inherits_browser.js":
+/***/ "../scrypted-apocaliss-base/node_modules/inherits/inherits_browser.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/inherits/inherits_browser.js ***!
   \****************************************************************************/
-/***/ ((module) => {
+(module) {
 
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
@@ -6276,13 +6347,13 @@ if (typeof Object.create === 'function') {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js"
 /*!*************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js ***!
   \*************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -6361,13 +6432,13 @@ var Container = function(n) {
 //# sourceMappingURL=index.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js"
 /*!******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js ***!
   \******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -6375,9 +6446,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   HashContainer: () => (/* binding */ HashContainer),
 /* harmony export */   HashContainerIterator: () => (/* binding */ HashContainerIterator)
 /* harmony export */ });
-/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
-/* harmony import */ var _utils_checkObject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../utils/checkObject */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
+/* harmony import */ var _utils_checkObject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/checkObject */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, i) {
         extendStatics = Object.setPrototypeOf || {
@@ -6414,14 +6485,14 @@ var HashContainerIterator = function(t) {
         if (n.iteratorType === 0) {
             n.pre = function() {
                 if (this.o.L === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L;
                 return this;
             };
             n.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m;
                 return this;
@@ -6429,14 +6500,14 @@ var HashContainerIterator = function(t) {
         } else {
             n.pre = function() {
                 if (this.o.m === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m;
                 return this;
             };
             n.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L;
                 return this;
@@ -6445,7 +6516,7 @@ var HashContainerIterator = function(t) {
         return n;
     }
     return HashContainerIterator;
-}(_ContainerBase__WEBPACK_IMPORTED_MODULE_1__.ContainerIterator);
+}(_ContainerBase__WEBPACK_IMPORTED_MODULE_0__.ContainerIterator);
 
 
 
@@ -6474,7 +6545,7 @@ var HashContainer = function(t) {
         this.M -= 1;
     };
     HashContainer.prototype.v = function(t, i, r) {
-        if (r === undefined) r = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_2__["default"])(t);
+        if (r === undefined) r = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_1__["default"])(t);
         var e;
         if (r) {
             var n = t[this.HASH_TAG];
@@ -6518,7 +6589,7 @@ var HashContainer = function(t) {
         return ++this.M;
     };
     HashContainer.prototype.g = function(t, i) {
-        if (i === undefined) i = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_2__["default"])(t);
+        if (i === undefined) i = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_1__["default"])(t);
         if (i) {
             var r = t[this.HASH_TAG];
             if (r === undefined) return this.h;
@@ -6540,7 +6611,7 @@ var HashContainer = function(t) {
     };
     HashContainer.prototype.eraseElementByKey = function(t, i) {
         var r;
-        if (i === undefined) i = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_2__["default"])(t);
+        if (i === undefined) i = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_1__["default"])(t);
         if (i) {
             var e = t[this.HASH_TAG];
             if (e === undefined) return false;
@@ -6558,7 +6629,7 @@ var HashContainer = function(t) {
     HashContainer.prototype.eraseElementByIterator = function(t) {
         var i = t.o;
         if (i === this.h) {
-            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
         }
         this.G(i);
         return t.next();
@@ -6575,28 +6646,28 @@ var HashContainer = function(t) {
         return this.M;
     };
     return HashContainer;
-}(_ContainerBase__WEBPACK_IMPORTED_MODULE_1__.Container);
+}(_ContainerBase__WEBPACK_IMPORTED_MODULE_0__.Container);
 
 
 //# sourceMappingURL=index.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashMap.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashMap.js"
 /*!***************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashMap.js ***!
   \***************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js");
-/* harmony import */ var _utils_checkObject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/checkObject */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js");
+/* harmony import */ var _utils_checkObject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/checkObject */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, r) {
         extendStatics = Object.setPrototypeOf || {
@@ -6724,7 +6795,7 @@ var HashMapIterator = function(t) {
     Object.defineProperty(HashMapIterator.prototype, "pointer", {
         get: function() {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
             }
             var t = this;
             return new Proxy([], {
@@ -6747,7 +6818,7 @@ var HashMapIterator = function(t) {
         return new HashMapIterator(this.o, this.h, this.container, this.iteratorType);
     };
     return HashMapIterator;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__.HashContainerIterator);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__.HashContainerIterator);
 
 var HashMap = function(t) {
     __extends(HashMap, t);
@@ -6786,7 +6857,7 @@ var HashMap = function(t) {
         return this.v(t, r, n);
     };
     HashMap.prototype.getElementByKey = function(t, r) {
-        if (r === undefined) r = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_2__["default"])(t);
+        if (r === undefined) r = (0,_utils_checkObject__WEBPACK_IMPORTED_MODULE_1__["default"])(t);
         if (r) {
             var n = t[this.HASH_TAG];
             return n !== undefined ? this._[n].p : undefined;
@@ -6841,27 +6912,27 @@ var HashMap = function(t) {
         }.bind(this)();
     };
     return HashMap;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__.HashContainer);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__.HashContainer);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HashMap);
 //# sourceMappingURL=HashMap.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashSet.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashSet.js"
 /*!***************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/HashSet.js ***!
   \***************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/HashContainer/Base/index.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, r) {
         extendStatics = Object.setPrototypeOf || {
@@ -6987,7 +7058,7 @@ var HashSetIterator = function(t) {
     Object.defineProperty(HashSetIterator.prototype, "pointer", {
         get: function() {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
             }
             return this.o.u;
         },
@@ -6998,7 +7069,7 @@ var HashSetIterator = function(t) {
         return new HashSetIterator(this.o, this.h, this.container, this.iteratorType);
     };
     return HashSetIterator;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__.HashContainerIterator);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__.HashContainerIterator);
 
 var HashSet = function(t) {
     __extends(HashSet, t);
@@ -7081,19 +7152,19 @@ var HashSet = function(t) {
         }.bind(this)();
     };
     return HashSet;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__.HashContainer);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__.HashContainer);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (HashSet);
 //# sourceMappingURL=HashSet.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/PriorityQueue.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/PriorityQueue.js"
 /*!**********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/PriorityQueue.js ***!
   \**********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -7274,13 +7345,13 @@ var PriorityQueue = function(i) {
 //# sourceMappingURL=PriorityQueue.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Queue.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Queue.js"
 /*!**************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Queue.js ***!
   \**************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -7359,13 +7430,13 @@ var Queue = function(t) {
 //# sourceMappingURL=Queue.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Stack.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Stack.js"
 /*!**************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/OtherContainer/Stack.js ***!
   \**************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -7434,21 +7505,21 @@ var Stack = function(t) {
 //# sourceMappingURL=Stack.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js"
 /*!*********************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js ***!
   \*********************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   RandomIterator: () => (/* binding */ RandomIterator)
 /* harmony export */ });
-/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, r) {
         extendStatics = Object.setPrototypeOf || {
@@ -7482,14 +7553,14 @@ var RandomIterator = function(t) {
         if (o.iteratorType === 0) {
             o.pre = function() {
                 if (this.o === 0) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o -= 1;
                 return this;
             };
             o.next = function() {
                 if (this.o === this.container.size()) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o += 1;
                 return this;
@@ -7497,14 +7568,14 @@ var RandomIterator = function(t) {
         } else {
             o.pre = function() {
                 if (this.o === this.container.size() - 1) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o += 1;
                 return this;
             };
             o.next = function() {
                 if (this.o === -1) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o -= 1;
                 return this;
@@ -7523,19 +7594,19 @@ var RandomIterator = function(t) {
         configurable: true
     });
     return RandomIterator;
-}(_ContainerBase__WEBPACK_IMPORTED_MODULE_1__.ContainerIterator);
+}(_ContainerBase__WEBPACK_IMPORTED_MODULE_0__.ContainerIterator);
 
 
 //# sourceMappingURL=RandomIterator.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js"
 /*!************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js ***!
   \************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -7578,21 +7649,21 @@ var SequentialContainer = function(n) {
 //# sourceMappingURL=index.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Deque.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Deque.js"
 /*!*******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Deque.js ***!
   \*******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
-/* harmony import */ var _Base_RandomIterator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base/RandomIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
+/* harmony import */ var _Base_RandomIterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base/RandomIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, i) {
         extendStatics = Object.setPrototypeOf || {
@@ -7749,7 +7820,7 @@ var DequeIterator = function(t) {
         return new DequeIterator(this.o, this.container, this.iteratorType);
     };
     return DequeIterator;
-}(_Base_RandomIterator__WEBPACK_IMPORTED_MODULE_0__.RandomIterator);
+}(_Base_RandomIterator__WEBPACK_IMPORTED_MODULE_1__.RandomIterator);
 
 var Deque = function(t) {
     __extends(Deque, t);
@@ -8087,28 +8158,28 @@ var Deque = function(t) {
         }.bind(this)();
     };
     return Deque;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__["default"]);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Deque);
 //# sourceMappingURL=Deque.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/LinkList.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/LinkList.js"
 /*!**********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/LinkList.js ***!
   \**********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
 /* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, i) {
         extendStatics = Object.setPrototypeOf || {
@@ -8236,14 +8307,14 @@ var LinkListIterator = function(t) {
         if (e.iteratorType === 0) {
             e.pre = function() {
                 if (this.o.L === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L;
                 return this;
             };
             e.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m;
                 return this;
@@ -8251,14 +8322,14 @@ var LinkListIterator = function(t) {
         } else {
             e.pre = function() {
                 if (this.o.m === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m;
                 return this;
             };
             e.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L;
                 return this;
@@ -8269,13 +8340,13 @@ var LinkListIterator = function(t) {
     Object.defineProperty(LinkListIterator.prototype, "pointer", {
         get: function() {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
             }
             return this.o.p;
         },
         set: function(t) {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
             }
             this.o.p = t;
         },
@@ -8388,7 +8459,7 @@ var LinkList = function(t) {
     LinkList.prototype.eraseElementByIterator = function(t) {
         var i = t.o;
         if (i === this.h) {
-            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
         }
         t = t.next();
         this.G(i);
@@ -8561,27 +8632,27 @@ var LinkList = function(t) {
         }.bind(this)();
     };
     return LinkList;
-}(_Base__WEBPACK_IMPORTED_MODULE_2__["default"]);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LinkList);
 //# sourceMappingURL=LinkList.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Vector.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Vector.js"
 /*!********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Vector.js ***!
   \********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
-/* harmony import */ var _Base_RandomIterator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base/RandomIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/index.js");
+/* harmony import */ var _Base_RandomIterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base/RandomIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/SequentialContainer/Base/RandomIterator.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(t, r) {
         extendStatics = Object.setPrototypeOf || {
@@ -8753,7 +8824,7 @@ var VectorIterator = function(t) {
         return new VectorIterator(this.o, this.container, this.iteratorType);
     };
     return VectorIterator;
-}(_Base_RandomIterator__WEBPACK_IMPORTED_MODULE_0__.RandomIterator);
+}(_Base_RandomIterator__WEBPACK_IMPORTED_MODULE_1__.RandomIterator);
 
 var Vector = function(t) {
     __extends(Vector, t);
@@ -8901,27 +8972,27 @@ var Vector = function(t) {
         }.bind(this)();
     };
     return Vector;
-}(_Base__WEBPACK_IMPORTED_MODULE_1__["default"]);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Vector);
 //# sourceMappingURL=Vector.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeIterator.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeIterator.js"
 /*!*************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeIterator.js ***!
   \*************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(r, t) {
         extendStatics = Object.setPrototypeOf || {
@@ -8956,14 +9027,14 @@ var TreeIterator = function(r) {
         if (n.iteratorType === 0) {
             n.pre = function() {
                 if (this.o === this.h.K) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L();
                 return this;
             };
             n.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m();
                 return this;
@@ -8971,14 +9042,14 @@ var TreeIterator = function(r) {
         } else {
             n.pre = function() {
                 if (this.o === this.h.N) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o = this.o.m();
                 return this;
             };
             n.next = function() {
                 if (this.o === this.h) {
-                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                    (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
                 }
                 this.o = this.o.L();
                 return this;
@@ -9016,19 +9087,19 @@ var TreeIterator = function(r) {
         configurable: true
     });
     return TreeIterator;
-}(_ContainerBase__WEBPACK_IMPORTED_MODULE_1__.ContainerIterator);
+}(_ContainerBase__WEBPACK_IMPORTED_MODULE_0__.ContainerIterator);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TreeIterator);
 //# sourceMappingURL=TreeIterator.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeNode.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeNode.js"
 /*!*********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeNode.js ***!
   \*********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -9170,13 +9241,13 @@ var TreeNodeEnableIndex = function(e) {
 //# sourceMappingURL=TreeNode.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js"
 /*!******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js ***!
   \******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -9184,8 +9255,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _TreeNode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TreeNode */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeNode.js");
-/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _ContainerBase__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../ContainerBase */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/ContainerBase/index.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(e, r) {
         extendStatics = Object.setPrototypeOf || {
@@ -9659,7 +9730,7 @@ var TreeContainer = function(e) {
     TreeContainer.prototype.updateKeyByIterator = function(e, r) {
         var i = e.o;
         if (i === this.h) {
-            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
+            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
         }
         if (this.M === 1) {
             i.u = r;
@@ -9712,7 +9783,7 @@ var TreeContainer = function(e) {
     TreeContainer.prototype.eraseElementByIterator = function(e) {
         var r = e.o;
         if (r === this.h) {
-            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_1__.throwIteratorAccessError)();
+            (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
         }
         var i = r.N === undefined;
         var t = e.iteratorType === 0;
@@ -9782,28 +9853,28 @@ var TreeContainer = function(e) {
         return traversal(this.W);
     };
     return TreeContainer;
-}(_ContainerBase__WEBPACK_IMPORTED_MODULE_2__.Container);
+}(_ContainerBase__WEBPACK_IMPORTED_MODULE_1__.Container);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (TreeContainer);
 //# sourceMappingURL=index.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedMap.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedMap.js"
 /*!******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedMap.js ***!
   \******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js");
 /* harmony import */ var _Base_TreeIterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base/TreeIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeIterator.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(r, e) {
         extendStatics = Object.setPrototypeOf || {
@@ -9946,7 +10017,7 @@ var OrderedMapIterator = function(r) {
     Object.defineProperty(OrderedMapIterator.prototype, "pointer", {
         get: function() {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
             }
             var r = this;
             return new Proxy([], {
@@ -10065,28 +10136,28 @@ var OrderedMap = function(r) {
         return this.P(this.W);
     };
     return OrderedMap;
-}(_Base__WEBPACK_IMPORTED_MODULE_2__["default"]);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OrderedMap);
 //# sourceMappingURL=OrderedMap.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedSet.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedSet.js"
 /*!******************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/OrderedSet.js ***!
   \******************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Base */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/index.js");
 /* harmony import */ var _Base_TreeIterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Base/TreeIterator */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/container/TreeContainer/Base/TreeIterator.js");
-/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
+/* harmony import */ var _utils_throwError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/throwError */ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js");
 var __extends = undefined && undefined.t || function() {
     var extendStatics = function(e, t) {
         extendStatics = Object.setPrototypeOf || {
@@ -10229,7 +10300,7 @@ var OrderedSetIterator = function(e) {
     Object.defineProperty(OrderedSetIterator.prototype, "pointer", {
         get: function() {
             if (this.o === this.h) {
-                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_0__.throwIteratorAccessError)();
+                (0,_utils_throwError__WEBPACK_IMPORTED_MODULE_2__.throwIteratorAccessError)();
             }
             return this.o.u;
         },
@@ -10328,19 +10399,19 @@ var OrderedSet = function(e) {
         return this.P(this.W);
     };
     return OrderedSet;
-}(_Base__WEBPACK_IMPORTED_MODULE_2__["default"]);
+}(_Base__WEBPACK_IMPORTED_MODULE_0__["default"]);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (OrderedSet);
 //# sourceMappingURL=OrderedSet.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/index.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/index.js ***!
   \*************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -10388,13 +10459,13 @@ __webpack_require__.r(__webpack_exports__);
 //# sourceMappingURL=index.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js"
 /*!*************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/checkObject.js ***!
   \*************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -10408,13 +10479,13 @@ function checkObject(t) {
 //# sourceMappingURL=checkObject.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js":
+/***/ "../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js"
 /*!************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/js-sdsl/dist/esm/utils/throwError.js ***!
   \************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -10427,13 +10498,13 @@ function throwIteratorAccessError() {
 //# sourceMappingURL=throwError.js.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mime-db/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mime-db/index.js"
 /*!****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mime-db/index.js ***!
   \****************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /*!
  * mime-db
@@ -10449,13 +10520,13 @@ function throwIteratorAccessError() {
 module.exports = __webpack_require__(/*! ./db.json */ "../scrypted-apocaliss-base/node_modules/mime-db/db.json")
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mime-types/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mime-types/index.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mime-types/index.js ***!
   \*******************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 /*!
@@ -10648,13 +10719,13 @@ function populateMaps (extensions, types) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/constants.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/constants.js"
 /*!************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/constants.js ***!
   \************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* Protocol - protocol constants */
 const protocol = module.exports
@@ -10949,13 +11020,13 @@ protocol.MQTT5_AUTH_CODES = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/generate.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/generate.js"
 /*!***********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/generate.js ***!
   \***********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 const writeToStream = __webpack_require__(/*! ./writeToStream */ "../scrypted-apocaliss-base/node_modules/mqtt-packet/writeToStream.js")
 const { EventEmitter } = __webpack_require__(/*! events */ "events")
@@ -11016,26 +11087,26 @@ class Accumulator extends EventEmitter {
 module.exports = generate
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/mqtt.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/mqtt.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/mqtt.js ***!
   \*******************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 exports.parser = __webpack_require__(/*! ./parser */ "../scrypted-apocaliss-base/node_modules/mqtt-packet/parser.js").parser
 exports.generate = __webpack_require__(/*! ./generate */ "../scrypted-apocaliss-base/node_modules/mqtt-packet/generate.js")
 exports.writeToStream = __webpack_require__(/*! ./writeToStream */ "../scrypted-apocaliss-base/node_modules/mqtt-packet/writeToStream.js")
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/numbers.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/numbers.js"
 /*!**********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/numbers.js ***!
   \**********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 const { Buffer } = __webpack_require__(/*! buffer */ "buffer")
 const max = 65536
@@ -11098,13 +11169,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/packet.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/packet.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/packet.js ***!
   \*********************************************************************/
-/***/ ((module) => {
+(module) {
 
 class Packet {
   constructor () {
@@ -11121,13 +11192,13 @@ class Packet {
 module.exports = Packet
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/parser.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/parser.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/parser.js ***!
   \*********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 const bl = __webpack_require__(/*! bl */ "../scrypted-apocaliss-base/node_modules/bl/bl.js")
 const { EventEmitter } = __webpack_require__(/*! events */ "events")
@@ -11940,13 +12011,13 @@ class Parser extends EventEmitter {
 module.exports = Parser
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/writeToStream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt-packet/writeToStream.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt-packet/writeToStream.js ***!
   \****************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 const protocol = __webpack_require__(/*! ./constants */ "../scrypted-apocaliss-base/node_modules/mqtt-packet/constants.js")
 const { Buffer } = __webpack_require__(/*! buffer */ "buffer")
@@ -13077,13 +13148,13 @@ function isStringOrBuffer (field) {
 module.exports = generate
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/index.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/index.js ***!
   \*******************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -13119,13 +13190,13 @@ exports["default"] = mqtt;
 __exportStar(__webpack_require__(/*! ./mqtt */ "../scrypted-apocaliss-base/node_modules/mqtt/build/mqtt.js"), exports);
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/BufferedDuplex.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/BufferedDuplex.js"
 /*!********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/BufferedDuplex.js ***!
   \********************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -13207,13 +13278,13 @@ class BufferedDuplex extends readable_stream_1.Duplex {
 exports.BufferedDuplex = BufferedDuplex;
 //# sourceMappingURL=BufferedDuplex.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/KeepaliveManager.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/KeepaliveManager.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/KeepaliveManager.js ***!
   \**********************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -13290,13 +13361,13 @@ class KeepaliveManager {
 exports["default"] = KeepaliveManager;
 //# sourceMappingURL=KeepaliveManager.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/TypedEmitter.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/TypedEmitter.js"
 /*!******************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/TypedEmitter.js ***!
   \******************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -13313,13 +13384,13 @@ exports.TypedEventEmitter = TypedEventEmitter;
 (0, shared_1.applyMixin)(TypedEventEmitter, events_1.default);
 //# sourceMappingURL=TypedEmitter.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/client.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/client.js"
 /*!************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/client.js ***!
   \************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -14534,13 +14605,13 @@ MqttClient.VERSION = shared_1.MQTTJS_VERSION;
 exports["default"] = MqttClient;
 //# sourceMappingURL=client.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ali.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ali.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ali.js ***!
   \*****************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -14652,13 +14723,13 @@ const buildStream = (client, opts) => {
 exports["default"] = buildStream;
 //# sourceMappingURL=ali.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/index.js"
 /*!*******************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/index.js ***!
   \*******************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -14854,13 +14925,13 @@ exports.connectAsync = connectAsync;
 exports["default"] = connect;
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tcp.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tcp.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tcp.js ***!
   \*****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -14882,13 +14953,13 @@ const buildStream = (client, opts) => {
 exports["default"] = buildStream;
 //# sourceMappingURL=tcp.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tls.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tls.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/tls.js ***!
   \*****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -14930,13 +15001,13 @@ const buildStream = (client, opts) => {
 exports["default"] = buildStream;
 //# sourceMappingURL=tls.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ws.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ws.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/ws.js ***!
   \****************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15159,13 +15230,13 @@ const browserStreamBuilder = (client, opts) => {
 exports.browserStreamBuilder = browserStreamBuilder;
 //# sourceMappingURL=ws.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/wx.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/wx.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/connect/wx.js ***!
   \****************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15284,13 +15355,13 @@ const buildStream = (client, opts) => {
 exports["default"] = buildStream;
 //# sourceMappingURL=wx.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/default-message-id-provider.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/default-message-id-provider.js"
 /*!*********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/default-message-id-provider.js ***!
   \*********************************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -15318,13 +15389,13 @@ class DefaultMessageIdProvider {
 exports["default"] = DefaultMessageIdProvider;
 //# sourceMappingURL=default-message-id-provider.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/get-timer.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/get-timer.js"
 /*!***************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/get-timer.js ***!
   \***************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15381,13 +15452,13 @@ const getTimer = (variant) => {
 exports["default"] = getTimer;
 //# sourceMappingURL=get-timer.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/ack.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/ack.js"
 /*!******************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/ack.js ***!
   \******************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15522,13 +15593,13 @@ const handleAck = (client, packet) => {
 exports["default"] = handleAck;
 //# sourceMappingURL=ack.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/auth.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/auth.js"
 /*!*******************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/auth.js ***!
   \*******************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15562,13 +15633,13 @@ const handleAuth = (client, packet) => {
 exports["default"] = handleAuth;
 //# sourceMappingURL=auth.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/connack.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/connack.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/connack.js ***!
   \**********************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15619,13 +15690,13 @@ const handleConnack = (client, packet) => {
 exports["default"] = handleConnack;
 //# sourceMappingURL=connack.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/index.js"
 /*!********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/index.js ***!
   \********************************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15697,13 +15768,13 @@ const handle = (client, packet, done) => {
 exports["default"] = handle;
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/publish.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/publish.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/publish.js ***!
   \**********************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -15813,13 +15884,13 @@ const handlePublish = (client, packet, done) => {
 exports["default"] = handlePublish;
 //# sourceMappingURL=publish.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/pubrel.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/pubrel.js"
 /*!*********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/handlers/pubrel.js ***!
   \*********************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -15848,13 +15919,13 @@ const handlePubrel = (client, packet, done) => {
 exports["default"] = handlePubrel;
 //# sourceMappingURL=pubrel.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/is-browser.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/is-browser.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/is-browser.js ***!
   \****************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -15885,13 +15956,13 @@ exports.isReactNativeBrowser = isReactNativeEnv();
 exports["default"] = isBrowser;
 //# sourceMappingURL=is-browser.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/shared.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/shared.js"
 /*!************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/shared.js ***!
   \************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -15936,13 +16007,13 @@ exports.nextTick = typeof (process === null || process === void 0 ? void 0 : pro
 exports.MQTTJS_VERSION = __webpack_require__(/*! ../../package.json */ "../scrypted-apocaliss-base/node_modules/mqtt/package.json").version;
 //# sourceMappingURL=shared.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/store.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/store.js"
 /*!***********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/store.js ***!
   \***********************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16026,13 +16097,13 @@ class Store {
 exports["default"] = Store;
 //# sourceMappingURL=store.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-recv.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-recv.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-recv.js ***!
   \**********************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -16060,13 +16131,13 @@ class TopicAliasRecv {
 exports["default"] = TopicAliasRecv;
 //# sourceMappingURL=topic-alias-recv.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-send.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-send.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/topic-alias-send.js ***!
   \**********************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16123,13 +16194,13 @@ class TopicAliasSend {
 exports["default"] = TopicAliasSend;
 //# sourceMappingURL=topic-alias-send.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/unique-message-id-provider.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/unique-message-id-provider.js"
 /*!********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/unique-message-id-provider.js ***!
   \********************************************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16159,13 +16230,13 @@ class UniqueMessageIdProvider {
 exports["default"] = UniqueMessageIdProvider;
 //# sourceMappingURL=unique-message-id-provider.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/validations.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/lib/validations.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/lib/validations.js ***!
   \*****************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -16201,13 +16272,13 @@ function validateTopics(topics) {
 exports.validateTopics = validateTopics;
 //# sourceMappingURL=validations.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/mqtt.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/build/mqtt.js"
 /*!******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/build/mqtt.js ***!
   \******************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16262,13 +16333,13 @@ var ack_1 = __webpack_require__(/*! ./lib/handlers/ack */ "../scrypted-apocaliss
 Object.defineProperty(exports, "ReasonCodes", ({ enumerable: true, get: function () { return ack_1.ReasonCodes; } }));
 //# sourceMappingURL=mqtt.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ms/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ms/index.js"
 /*!***********************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ms/index.js ***!
   \***********************************************************/
-/***/ ((module) => {
+(module) {
 
 /**
  * Helpers.
@@ -16434,13 +16505,13 @@ function plural(ms, msAbs, n, name) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/number-allocator/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/number-allocator/index.js"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/number-allocator/index.js ***!
   \*************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 // Copyright Takatoshi Kondo 2021
 //
@@ -16451,13 +16522,13 @@ const NumberAllocator = __webpack_require__(/*! ./lib/number-allocator.js */ "..
 module.exports.NumberAllocator = NumberAllocator
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/number-allocator/lib/number-allocator.js":
+/***/ "../scrypted-apocaliss-base/node_modules/number-allocator/lib/number-allocator.js"
 /*!****************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/number-allocator/lib/number-allocator.js ***!
   \****************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 // Copyright Takatoshi Kondo 2021
@@ -16711,13 +16782,13 @@ NumberAllocator.prototype.dump = function () {
 module.exports = NumberAllocator
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/process-nextick-args/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/process-nextick-args/index.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/process-nextick-args/index.js ***!
   \*****************************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -16767,25 +16838,25 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/process/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/process/index.js"
 /*!****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/process/index.js ***!
   \****************************************************************/
-/***/ ((module) => {
+(module) {
 
 // for now just expose the builtin process global from node.js
 module.exports = global.process;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/proxy-from-env/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/proxy-from-env/index.js"
 /*!***********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/proxy-from-env/index.js ***!
   \***********************************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -16898,13 +16969,13 @@ function getEnv(key) {
 exports.getProxyForUrl = getProxyForUrl;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/add-abort-signal.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/add-abort-signal.js"
 /*!********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/add-abort-signal.js ***!
   \********************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -16961,13 +17032,13 @@ module.exports.addAbortSignalNoValidate = function (signal, stream) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/buffer_list.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/buffer_list.js"
 /*!***************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/buffer_list.js ***!
   \***************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -17129,13 +17200,13 @@ module.exports = class BufferList {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/compose.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/compose.js"
 /*!***********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/compose.js ***!
   \***********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -17334,13 +17405,13 @@ module.exports = function compose(...streams) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/destroy.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/destroy.js"
 /*!***********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/destroy.js ***!
   \***********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -17635,13 +17706,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplex.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplex.js"
 /*!**********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplex.js ***!
   \**********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 // Copyright Joyent, Inc. and other Node contributors.
@@ -17789,13 +17860,13 @@ Duplex.from = function (body) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplexify.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplexify.js"
 /*!*************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/duplexify.js ***!
   \*************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -18177,13 +18248,13 @@ function _duplexify(pair) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/end-of-stream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/end-of-stream.js"
 /*!*****************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/end-of-stream.js ***!
   \*****************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -18471,13 +18542,13 @@ module.exports = eos
 module.exports.finished = finished
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/from.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/from.js"
 /*!********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/from.js ***!
   \********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -18580,13 +18651,13 @@ function from(Readable, iterable, opts) {
 module.exports = from
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/legacy.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/legacy.js"
 /*!**********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/legacy.js ***!
   \**********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -18680,13 +18751,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/operators.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/operators.js"
 /*!*************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/operators.js ***!
   \*************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -19148,13 +19219,13 @@ module.exports.promiseReturningOperators = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/passthrough.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/passthrough.js"
 /*!***************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/passthrough.js ***!
   \***************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 // Copyright Joyent, Inc. and other Node contributors.
@@ -19198,13 +19269,13 @@ PassThrough.prototype._transform = function (chunk, encoding, cb) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/pipeline.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/pipeline.js"
 /*!************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/pipeline.js ***!
   \************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -19679,13 +19750,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/readable.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/readable.js"
 /*!************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/readable.js ***!
   \************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -20977,13 +21048,13 @@ Readable.wrap = function (src, options) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/state.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/state.js"
 /*!*********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/state.js ***!
   \*********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -21027,13 +21098,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/transform.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/transform.js"
 /*!*************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/transform.js ***!
   \*************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 // Copyright Joyent, Inc. and other Node contributors.
@@ -21218,13 +21289,13 @@ Transform.prototype._read = function () {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/utils.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/utils.js"
 /*!*********************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/utils.js ***!
   \*********************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -21558,13 +21629,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/writable.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/writable.js"
 /*!************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/streams/writable.js ***!
   \************************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -22385,13 +22456,13 @@ Writable.toWeb = function (streamWritable) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/validators.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/validators.js"
 /*!******************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/internal/validators.js ***!
   \******************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 /* eslint jsdoc/require-jsdoc: "error" */
@@ -22926,13 +22997,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/errors.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/errors.js"
 /*!**********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/errors.js ***!
   \**********************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -23278,13 +23349,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/index.js"
 /*!*********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/index.js ***!
   \*********************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -23354,13 +23425,13 @@ if (Stream && process.env.READABLE_STREAM === 'disable') {
 module.exports["default"] = module.exports
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/primordials.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/primordials.js"
 /*!***************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/primordials.js ***!
   \***************************************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -23472,13 +23543,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/util.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/util.js"
 /*!********************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/ours/util.js ***!
   \********************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -23683,13 +23754,13 @@ module.exports = {
 module.exports.promisify.custom = Symbol.for('nodejs.util.promisify.custom')
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream.js"
 /*!*****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream.js ***!
   \*****************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* replacement start */
 
@@ -23834,13 +23905,13 @@ Stream._uint8ArrayToBuffer = function _uint8ArrayToBuffer(chunk) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream/promises.js":
+/***/ "../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream/promises.js"
 /*!**************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/readable-stream/lib/stream/promises.js ***!
   \**************************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -23888,13 +23959,13 @@ module.exports = {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/rfdc/default.js":
+/***/ "../scrypted-apocaliss-base/node_modules/rfdc/default.js"
 /*!***************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/rfdc/default.js ***!
   \***************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -23902,13 +23973,13 @@ module.exports = {
 module.exports = __webpack_require__(/*! ./index.js */ "../scrypted-apocaliss-base/node_modules/rfdc/index.js")()
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/rfdc/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/rfdc/index.js"
 /*!*************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/rfdc/index.js ***!
   \*************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -24111,13 +24182,13 @@ function rfdcCircles (opts) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/supports-color/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/supports-color/index.js"
 /*!***********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/supports-color/index.js ***!
   \***********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -24257,13 +24328,13 @@ module.exports = {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/call-notification.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/call-notification.js"
 /*!*************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/call-notification.js ***!
   \*************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24275,13 +24346,13 @@ const isCallNotification = (message) => {
 };
 //# sourceMappingURL=call-notification.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/clear-response.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/clear-response.js"
 /*!**********************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/guards/clear-response.js ***!
   \**********************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24293,13 +24364,13 @@ const isClearResponse = (message) => {
 };
 //# sourceMappingURL=clear-response.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/module.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/module.js"
 /*!*******************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers-broker/build/es2019/module.js ***!
   \*******************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24452,13 +24523,13 @@ const load = (url) => {
 };
 //# sourceMappingURL=module.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/factories/load-or-return-broker.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/factories/load-or-return-broker.js"
 /*!*************************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/factories/load-or-return-broker.js ***!
   \*************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24481,13 +24552,13 @@ const createLoadOrReturnBroker = (loadBroker, worker) => {
 };
 //# sourceMappingURL=load-or-return-broker.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/module.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/module.js"
 /*!************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/module.js ***!
   \************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24510,13 +24581,13 @@ const setInterval = (...args) => loadOrReturnBroker().setInterval(...args);
 const setTimeout = (...args) => loadOrReturnBroker().setTimeout(...args);
 //# sourceMappingURL=module.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/worker/worker.js":
+/***/ "../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/worker/worker.js"
 /*!*******************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/worker-timers/build/es2019/worker/worker.js ***!
   \*******************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
@@ -24527,13 +24598,13 @@ __webpack_require__.r(__webpack_exports__);
 const worker = `(()=>{"use strict";const e=new Map,t=new Map,r=(e,t)=>{let r,o;const i=performance.now();r=i,o=e-Math.max(0,i-t);return{expected:r+o,remainingDelay:o}},o=(e,t,r,i)=>{const s=performance.now();s>r?postMessage({id:null,method:"call",params:{timerId:t,timerType:i}}):e.set(t,setTimeout(o,r-s,e,t,r,i))};addEventListener("message",(i=>{let{data:s}=i;try{if("clear"===s.method){const{id:r,params:{timerId:o,timerType:i}}=s;if("interval"===i)(t=>{const r=e.get(t);if(void 0===r)throw new Error('There is no interval scheduled with the given id "'.concat(t,'".'));clearTimeout(r),e.delete(t)})(o),postMessage({error:null,id:r});else{if("timeout"!==i)throw new Error('The given type "'.concat(i,'" is not supported'));(e=>{const r=t.get(e);if(void 0===r)throw new Error('There is no timeout scheduled with the given id "'.concat(e,'".'));clearTimeout(r),t.delete(e)})(o),postMessage({error:null,id:r})}}else{if("set"!==s.method)throw new Error('The given method "'.concat(s.method,'" is not supported'));{const{params:{delay:i,now:n,timerId:a,timerType:d}}=s;if("interval"===d)((t,i,s)=>{const{expected:n,remainingDelay:a}=r(t,s);e.set(i,setTimeout(o,a,e,i,n,"interval"))})(i,a,n);else{if("timeout"!==d)throw new Error('The given type "'.concat(d,'" is not supported'));((e,i,s)=>{const{expected:n,remainingDelay:a}=r(e,s);t.set(i,setTimeout(o,a,t,i,n,"timeout"))})(i,a,n)}}}}catch(e){postMessage({error:{message:e.message},id:s.id,result:null})}}))})();`; // tslint:disable-line:max-line-length
 //# sourceMappingURL=worker.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/index.js"
 /*!***********************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/index.js ***!
   \***********************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -24551,13 +24622,13 @@ WebSocket.WebSocketServer = WebSocket.Server;
 module.exports = WebSocket;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/buffer-util.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/buffer-util.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/buffer-util.js ***!
   \*********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -24676,7 +24747,7 @@ module.exports = {
 /* istanbul ignore else  */
 if (!process.env.WS_NO_BUFFER_UTIL) {
   try {
-    const bufferUtil = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module 'bufferutil'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+    const bufferUtil = __webpack_require__(Object(function webpackMissingModule() { const e = new Error("Cannot find module 'bufferutil'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
     module.exports.mask = function (source, mask, output, offset, length) {
       if (length < 48) _mask(source, mask, output, offset, length);
@@ -24693,13 +24764,13 @@ if (!process.env.WS_NO_BUFFER_UTIL) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/constants.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/constants.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/constants.js ***!
   \*******************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -24722,13 +24793,13 @@ module.exports = {
 };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/event-target.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/event-target.js"
 /*!**********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/event-target.js ***!
   \**********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -25025,13 +25096,13 @@ function callListener(listener, thisArg, event) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/extension.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/extension.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/extension.js ***!
   \*******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -25239,13 +25310,13 @@ function format(extensions) {
 module.exports = { format, parse };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/limiter.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/limiter.js"
 /*!*****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/limiter.js ***!
   \*****************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 
@@ -25305,13 +25376,13 @@ class Limiter {
 module.exports = Limiter;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/permessage-deflate.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/permessage-deflate.js"
 /*!****************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/permessage-deflate.js ***!
   \****************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -25830,13 +25901,13 @@ function inflateOnError(err) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/receiver.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/receiver.js"
 /*!******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/receiver.js ***!
   \******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -26547,13 +26618,13 @@ class Receiver extends Writable {
 module.exports = Receiver;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/sender.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/sender.js"
 /*!****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/sender.js ***!
   \****************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "^Duplex" }] */
@@ -27160,13 +27231,13 @@ function onError(sender, err, cb) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/stream.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/stream.js"
 /*!****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/stream.js ***!
   \****************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -27330,13 +27401,13 @@ function createWebSocketStream(ws, options) {
 module.exports = createWebSocketStream;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/subprotocol.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/subprotocol.js"
 /*!*********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/subprotocol.js ***!
   \*********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -27403,13 +27474,13 @@ function parse(header) {
 module.exports = { parse };
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/validation.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/validation.js"
 /*!********************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/validation.js ***!
   \********************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 
@@ -27555,7 +27626,7 @@ if (isUtf8) {
   };
 } /* istanbul ignore else  */ else if (!process.env.WS_NO_UTF_8_VALIDATE) {
   try {
-    const isValidUTF8 = __webpack_require__(Object(function webpackMissingModule() { var e = new Error("Cannot find module 'utf-8-validate'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+    const isValidUTF8 = __webpack_require__(Object(function webpackMissingModule() { const e = new Error("Cannot find module 'utf-8-validate'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 
     module.exports.isValidUTF8 = function (buf) {
       return buf.length < 32 ? _isValidUTF8(buf) : isValidUTF8(buf);
@@ -27566,13 +27637,13 @@ if (isUtf8) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/websocket-server.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/websocket-server.js"
 /*!**************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/websocket-server.js ***!
   \**************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "^Duplex$", "caughtErrors": "none" }] */
@@ -28117,13 +28188,13 @@ function abortHandshakeOrEmitwsClientError(server, req, socket, code, message) {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/websocket.js":
+/***/ "../scrypted-apocaliss-base/node_modules/ws/lib/websocket.js"
 /*!*******************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/ws/lib/websocket.js ***!
   \*******************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "^Duplex|Readable$", "caughtErrors": "none" }] */
@@ -29516,15 +29587,16 @@ function socketOnError() {
 }
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/@scrypted/sdk/dist/src/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/@scrypted/sdk/dist/src/index.js ***!
-  \******************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js"
+/*!***********************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js ***!
+  \***********************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -29540,10 +29612,14 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sdk = exports.MixinDeviceBase = exports.ScryptedDeviceBase = void 0;
-__exportStar(__webpack_require__(/*! ../types/gen/index */ "./node_modules/@scrypted/sdk/dist/types/gen/index.js"), exports);
-const index_1 = __webpack_require__(/*! ../types/gen/index */ "./node_modules/@scrypted/sdk/dist/types/gen/index.js");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(__webpack_exports__, "__esModule", ({ value: true }));
+__webpack_exports__.sdk = __webpack_exports__.MixinDeviceBase = __webpack_exports__.ScryptedDeviceBase = void 0;
+__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js"), __webpack_exports__);
+const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
+const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js");
 const module_1 = __webpack_require__(/*! module */ "module");
 /**
  * @category Core Reference
@@ -29555,39 +29631,39 @@ class ScryptedDeviceBase extends index_1.DeviceBase {
     }
     get storage() {
         if (!this._storage) {
-            this._storage = exports.sdk.deviceManager.getDeviceStorage(this.nativeId);
+            this._storage = __webpack_exports__.sdk.deviceManager.getDeviceStorage(this.nativeId);
         }
         return this._storage;
     }
     get log() {
         if (!this._log) {
-            this._log = exports.sdk.deviceManager.getDeviceLogger(this.nativeId);
+            this._log = __webpack_exports__.sdk.deviceManager.getDeviceLogger(this.nativeId);
         }
         return this._log;
     }
     get console() {
         if (!this._console) {
-            this._console = exports.sdk.deviceManager.getDeviceConsole(this.nativeId);
+            this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.nativeId);
         }
         return this._console;
     }
     async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
             sourceId: this.id,
         });
     }
     getMediaObjectConsole(mediaObject) {
         if (typeof mediaObject.sourceId !== 'string')
             return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
     }
     _lazyLoadDeviceState() {
         if (!this._deviceState) {
             if (this.nativeId) {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState(this.nativeId);
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState(this.nativeId);
             }
             else {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState();
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState();
             }
         }
     }
@@ -29595,10 +29671,10 @@ class ScryptedDeviceBase extends index_1.DeviceBase {
      * Fire an event for this device.
      */
     onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
+        return __webpack_exports__.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
     }
 }
-exports.ScryptedDeviceBase = ScryptedDeviceBase;
+__webpack_exports__.ScryptedDeviceBase = ScryptedDeviceBase;
 /**
  * @category Mixin Reference
  */
@@ -29610,47 +29686,47 @@ class MixinDeviceBase extends index_1.DeviceBase {
         this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
         this.mixinStorageSuffix = options.mixinStorageSuffix;
         this._deviceState = options.mixinDeviceState;
-        this.nativeId = exports.sdk.systemManager.getDeviceById(this.id).nativeId;
+        this.nativeId = __webpack_exports__.sdk.systemManager.getDeviceById(this.id).nativeId;
         this.mixinProviderNativeId = options.mixinProviderNativeId;
         // RpcProxy will trap all properties, and the following check/hack will determine
         // if the device state came from another node worker thread.
         // This should ultimately be discouraged and warned at some point in the future.
         if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
-            this._deviceState = exports.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
+            this._deviceState = __webpack_exports__.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
         }
     }
     get storage() {
         if (!this._storage) {
             const mixinStorageSuffix = this.mixinStorageSuffix;
             const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
-            this._storage = exports.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
+            this._storage = __webpack_exports__.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
         }
         return this._storage;
     }
     get console() {
         if (!this._console) {
-            if (exports.sdk.deviceManager.getMixinConsole)
-                this._console = exports.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
+            if (__webpack_exports__.sdk.deviceManager.getMixinConsole)
+                this._console = __webpack_exports__.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
             else
-                this._console = exports.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
+                this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
         }
         return this._console;
     }
     async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
             sourceId: this.id,
         });
     }
     getMediaObjectConsole(mediaObject) {
         if (typeof mediaObject.sourceId !== 'string')
             return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
     }
     /**
      * Fire an event for this device.
      */
     onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
+        return __webpack_exports__.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
     }
     _lazyLoadDeviceState() {
     }
@@ -29663,7 +29739,7 @@ class MixinDeviceBase extends index_1.DeviceBase {
         }
     }
 }
-exports.MixinDeviceBase = MixinDeviceBase;
+__webpack_exports__.MixinDeviceBase = MixinDeviceBase;
 (function () {
     function _createGetState(state) {
         return function () {
@@ -29698,7 +29774,7 @@ exports.MixinDeviceBase = MixinDeviceBase;
         });
     }
 })();
-exports.sdk = {};
+__webpack_exports__.sdk = {};
 try {
     let loaded = false;
     try {
@@ -29708,7 +29784,8 @@ try {
         const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
         const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
         // @ts-expect-error
-        if (esModule && "undefined" !== 'undefined') {}
+        if (esModule && "undefined" !== 'undefined') // removed by dead control flow
+{}
         else if (cjsModule) {
             // @ts-expect-error
             if (typeof require !== 'undefined') {
@@ -29718,7 +29795,7 @@ try {
                 loaded = true;
             }
             else {
-                const sdkModule = __webpack_require__("./node_modules/@scrypted/sdk/dist/src sync recursive")(cjsModule);
+                const sdkModule = __webpack_require__("../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive")(cjsModule);
                 Object.assign(exports.sdk, sdkModule.getScryptedStatic());
                 loaded = true;
             }
@@ -29746,7 +29823,23 @@ try {
         });
     }
     try {
-        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, index_1.ScryptedInterfaceDescriptors)?.catch(() => { });
+        let descriptors = {
+            ...index_1.ScryptedInterfaceDescriptors,
+        };
+        try {
+            const sdkJson = JSON.parse(fs_1.default.readFileSync('../sdk.json').toString());
+            const customDescriptors = sdkJson.interfaceDescriptors;
+            if (customDescriptors) {
+                descriptors = {
+                    ...descriptors,
+                    ...customDescriptors,
+                };
+            }
+        }
+        catch (e) {
+            console.warn('failed to load custom interface descriptors', e);
+        }
+        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, descriptors)?.catch(() => { });
     }
     catch (e) {
     }
@@ -29754,234 +29847,40 @@ try {
 catch (e) {
     console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
 }
-exports["default"] = exports.sdk;
+exports.default = exports.sdk;
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/@scrypted/sdk/dist/src/storage-settings.js":
-/*!*****************************************************************!*\
-  !*** ./node_modules/@scrypted/sdk/dist/src/storage-settings.js ***!
-  \*****************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.StorageSettings = void 0;
-const _1 = __importStar(__webpack_require__(/*! . */ "./node_modules/@scrypted/sdk/dist/src/index.js"));
-const { systemManager } = _1.default;
-function parseValue(value, setting, readDefaultValue, rawDevice) {
-    if (value === null || value === undefined) {
-        return readDefaultValue();
-    }
-    const type = setting.multiple ? 'array' : setting.type;
-    if (type === 'boolean') {
-        if (value === 'true')
-            return true;
-        if (value === 'false')
-            return false;
-        return readDefaultValue() || false;
-    }
-    if (type === 'number') {
-        const n = parseFloat(value);
-        if (!isNaN(n))
-            return n;
-        return readDefaultValue() || 0;
-    }
-    if (type === 'integer') {
-        const n = parseInt(value);
-        if (!isNaN(n))
-            return n;
-        return readDefaultValue() || 0;
-    }
-    if (type === 'array') {
-        if (!value)
-            return readDefaultValue() || [];
-        try {
-            return JSON.parse(value);
-        }
-        catch (e) {
-            return readDefaultValue() || [];
-        }
-    }
-    if (type === 'device') {
-        if (rawDevice)
-            return value;
-        return systemManager.getDeviceById(value) || systemManager.getDeviceById(readDefaultValue());
-    }
-    // string type, so check if it is json.
-    if (value && setting.json) {
-        try {
-            return JSON.parse(value);
-        }
-        catch (e) {
-            return readDefaultValue();
-        }
-    }
-    return value || readDefaultValue();
-}
-class StorageSettings {
-    constructor(device, settings) {
-        this.device = device;
-        this.settings = settings;
-        this.values = {};
-        this.hasValue = {};
-        for (const key of Object.keys(settings)) {
-            const setting = settings[key];
-            const rawGet = () => this.getItem(key);
-            let get;
-            if (setting.type !== 'clippath') {
-                get = rawGet;
-            }
-            else {
-                // maybe need a mapPut. clippath is the only complex type at the moment.
-                get = () => {
-                    try {
-                        return JSON.parse(rawGet());
-                    }
-                    catch (e) {
-                    }
-                };
-            }
-            Object.defineProperty(this.values, key, {
-                get,
-                set: value => this.putSetting(key, value),
-                enumerable: true,
-            });
-            Object.defineProperty(this.hasValue, key, {
-                get: () => this.device.storage.getItem(key) != null,
-                enumerable: true,
-            });
-        }
-    }
-    get keys() {
-        const ret = {};
-        for (const key of Object.keys(this.settings)) {
-            ret[key] = key;
-        }
-        return ret;
-    }
-    async getSettings() {
-        const onGet = await this.options?.onGet?.();
-        const ret = [];
-        for (const [key, setting] of Object.entries(this.settings)) {
-            let s = Object.assign({}, setting);
-            if (onGet?.[key])
-                s = Object.assign(s, onGet[key]);
-            if (s.onGet)
-                s = Object.assign(s, await s.onGet());
-            if (s.hide || await this.options?.hide?.[key]?.())
-                continue;
-            s.key = key;
-            s.value = this.getItemInternal(key, s, true);
-            if (typeof s.deviceFilter === 'function')
-                s.deviceFilter = s.deviceFilter.toString();
-            ret.push(s);
-            delete s.onPut;
-            delete s.onGet;
-            delete s.mapPut;
-            delete s.mapGet;
-        }
-        return ret;
-    }
-    async putSetting(key, value) {
-        const setting = this.settings[key];
-        let oldValue;
-        if (setting)
-            oldValue = this.getItemInternal(key, setting);
-        return this.putSettingInternal(setting, oldValue, key, value);
-    }
-    putSettingInternal(setting, oldValue, key, value) {
-        if (!setting?.noStore) {
-            if (setting?.mapPut)
-                value = setting.mapPut(oldValue, value);
-            // nullish values should be removed, since Storage can't persist them correctly.
-            if (value == null)
-                this.device.storage.removeItem(key);
-            else if (typeof value === 'object')
-                this.device.storage.setItem(key, JSON.stringify(value));
-            else
-                this.device.storage.setItem(key, value?.toString());
-        }
-        setting?.onPut?.(oldValue, value);
-        if (!setting?.hide)
-            this.device.onDeviceEvent(_1.ScryptedInterface.Settings, undefined);
-    }
-    getItemInternal(key, setting, rawDevice) {
-        if (!setting)
-            return this.device.storage.getItem(key);
-        const readDefaultValue = () => {
-            if (setting.persistedDefaultValue != null) {
-                this.putSettingInternal(setting, undefined, key, setting.persistedDefaultValue);
-                return setting.persistedDefaultValue;
-            }
-            return setting.defaultValue;
-        };
-        const ret = parseValue(this.device.storage.getItem(key), setting, readDefaultValue, rawDevice);
-        return setting.mapGet ? setting.mapGet(ret) : ret;
-    }
-    getItem(key) {
-        return this.getItemInternal(key, this.settings[key]);
-    }
-}
-exports.StorageSettings = StorageSettings;
-//# sourceMappingURL=storage-settings.js.map
-
-/***/ }),
-
-/***/ "./node_modules/@scrypted/sdk/dist/src sync recursive":
-/*!***************************************************!*\
-  !*** ./node_modules/@scrypted/sdk/dist/src/ sync ***!
-  \***************************************************/
-/***/ ((module) => {
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive"
+/*!********************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/ sync ***!
+  \********************************************************************/
+(module) {
 
 function webpackEmptyContext(req) {
-	var e = new Error("Cannot find module '" + req + "'");
+	const e = new Error("Cannot find module '" + req + "'");
 	e.code = 'MODULE_NOT_FOUND';
 	throw e;
 }
 webpackEmptyContext.keys = () => ([]);
 webpackEmptyContext.resolve = webpackEmptyContext;
-webpackEmptyContext.id = "./node_modules/@scrypted/sdk/dist/src sync recursive";
+webpackEmptyContext.id = "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive";
 module.exports = webpackEmptyContext;
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/@scrypted/sdk/dist/types/gen/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
-  \************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js"
+/*!*****************************************************************************!*\
+  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
+  \*****************************************************************************/
+(__unused_webpack_module, exports) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.113";
+exports.TYPES_VERSION = "0.5.51";
 class DeviceBase {
 }
 exports.DeviceBase = DeviceBase;
@@ -30016,6 +29915,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["temperature"] = "temperature";
     ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
     ScryptedInterfaceProperty["humidity"] = "humidity";
+    ScryptedInterfaceProperty["resolution"] = "resolution";
     ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
     ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
     ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
@@ -30052,6 +29952,7 @@ var ScryptedInterfaceProperty;
     ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
     ScryptedInterfaceProperty["fan"] = "fan";
     ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
+    ScryptedInterfaceProperty["chatCompletionCapabilities"] = "chatCompletionCapabilities";
     ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
 })(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
 var ScryptedInterfaceMethod;
@@ -30152,7 +30053,6 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
     ScryptedInterfaceMethod["saveScript"] = "saveScript";
     ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
-    ScryptedInterfaceMethod["trackObjects"] = "trackObjects";
     ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
     ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
     ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
@@ -30166,6 +30066,12 @@ var ScryptedInterfaceMethod;
     ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
     ScryptedInterfaceMethod["connectStream"] = "connectStream";
     ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
+    ScryptedInterfaceMethod["getChatCompletion"] = "getChatCompletion";
+    ScryptedInterfaceMethod["streamChatCompletion"] = "streamChatCompletion";
+    ScryptedInterfaceMethod["getTextEmbedding"] = "getTextEmbedding";
+    ScryptedInterfaceMethod["getImageEmbedding"] = "getImageEmbedding";
+    ScryptedInterfaceMethod["callLLMTool"] = "callLLMTool";
+    ScryptedInterfaceMethod["getLLMTools"] = "getLLMTools";
 })(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
 exports.ScryptedInterfaceDescriptors = {
     "ScryptedDevice": {
@@ -30347,6 +30253,13 @@ exports.ScryptedInterfaceDescriptors = {
             "takePicture"
         ],
         "properties": []
+    },
+    "Resolution": {
+        "name": "Resolution",
+        "methods": [],
+        "properties": [
+            "resolution"
+        ]
     },
     "Microphone": {
         "name": "Microphone",
@@ -30819,13 +30732,6 @@ exports.ScryptedInterfaceDescriptors = {
         ],
         "properties": []
     },
-    "ObjectTracker": {
-        "name": "ObjectTracker",
-        "methods": [
-            "trackObjects"
-        ],
-        "properties": []
-    },
     "ObjectDetector": {
         "name": "ObjectDetector",
         "methods": [
@@ -30925,6 +30831,38 @@ exports.ScryptedInterfaceDescriptors = {
         ],
         "properties": []
     },
+    "ChatCompletion": {
+        "name": "ChatCompletion",
+        "methods": [
+            "getChatCompletion",
+            "streamChatCompletion"
+        ],
+        "properties": [
+            "chatCompletionCapabilities"
+        ]
+    },
+    "TextEmbedding": {
+        "name": "TextEmbedding",
+        "methods": [
+            "getTextEmbedding"
+        ],
+        "properties": []
+    },
+    "ImageEmbedding": {
+        "name": "ImageEmbedding",
+        "methods": [
+            "getImageEmbedding"
+        ],
+        "properties": []
+    },
+    "LLMTools": {
+        "name": "LLMTools",
+        "methods": [
+            "callLLMTool",
+            "getLLMTools"
+        ],
+        "properties": []
+    },
     "ScryptedSystemDevice": {
         "name": "ScryptedSystemDevice",
         "methods": [],
@@ -30983,12 +30921,14 @@ var ScryptedDeviceType;
      * Smart Speakers have two way audio.
      */
     ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
+    ScryptedDeviceType["RemoteDesktop"] = "RemoteDesktop";
     ScryptedDeviceType["Event"] = "Event";
     ScryptedDeviceType["Entry"] = "Entry";
     ScryptedDeviceType["Garage"] = "Garage";
     ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
     ScryptedDeviceType["DataSource"] = "DataSource";
     ScryptedDeviceType["API"] = "API";
+    ScryptedDeviceType["Buttons"] = "Buttons";
     ScryptedDeviceType["Doorbell"] = "Doorbell";
     ScryptedDeviceType["Irrigation"] = "Irrigation";
     ScryptedDeviceType["Valve"] = "Valve";
@@ -30997,6 +30937,10 @@ var ScryptedDeviceType;
     ScryptedDeviceType["WindowCovering"] = "WindowCovering";
     ScryptedDeviceType["Siren"] = "Siren";
     ScryptedDeviceType["AirPurifier"] = "AirPurifier";
+    ScryptedDeviceType["Internet"] = "Internet";
+    ScryptedDeviceType["Network"] = "Network";
+    ScryptedDeviceType["Bridge"] = "Bridge";
+    ScryptedDeviceType["LLM"] = "LLM";
     ScryptedDeviceType["Unknown"] = "Unknown";
 })(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
 var HumidityMode;
@@ -31112,6 +31056,7 @@ var ScryptedInterface;
     ScryptedInterface["Thermometer"] = "Thermometer";
     ScryptedInterface["HumiditySensor"] = "HumiditySensor";
     ScryptedInterface["Camera"] = "Camera";
+    ScryptedInterface["Resolution"] = "Resolution";
     ScryptedInterface["Microphone"] = "Microphone";
     ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
     ScryptedInterface["Display"] = "Display";
@@ -31172,7 +31117,6 @@ var ScryptedInterface;
     ScryptedInterface["Program"] = "Program";
     ScryptedInterface["Scriptable"] = "Scriptable";
     ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
-    ScryptedInterface["ObjectTracker"] = "ObjectTracker";
     ScryptedInterface["ObjectDetector"] = "ObjectDetector";
     ScryptedInterface["ObjectDetection"] = "ObjectDetection";
     ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
@@ -31187,6 +31131,10 @@ var ScryptedInterface;
     ScryptedInterface["StreamService"] = "StreamService";
     ScryptedInterface["TTY"] = "TTY";
     ScryptedInterface["TTYSettings"] = "TTYSettings";
+    ScryptedInterface["ChatCompletion"] = "ChatCompletion";
+    ScryptedInterface["TextEmbedding"] = "TextEmbedding";
+    ScryptedInterface["ImageEmbedding"] = "ImageEmbedding";
+    ScryptedInterface["LLMTools"] = "LLMTools";
     ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
     ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
     ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
@@ -31213,13 +31161,3381 @@ var ScryptedMimeTypes;
 })(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/lodash/lodash.js":
+/***/ "../scrypted/sdk/dist/src/index.js"
+/*!*****************************************!*\
+  !*** ../scrypted/sdk/dist/src/index.js ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(__webpack_exports__, "__esModule", ({ value: true }));
+__webpack_exports__.sdk = __webpack_exports__.MixinDeviceBase = __webpack_exports__.ScryptedDeviceBase = void 0;
+__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted/sdk/dist/types/gen/index.js"), __webpack_exports__);
+const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
+const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted/sdk/dist/types/gen/index.js");
+const module_1 = __webpack_require__(/*! module */ "module");
+/**
+ * @category Core Reference
+ */
+class ScryptedDeviceBase extends index_1.DeviceBase {
+    constructor(nativeId) {
+        super();
+        this.nativeId = nativeId;
+    }
+    get storage() {
+        if (!this._storage) {
+            this._storage = __webpack_exports__.sdk.deviceManager.getDeviceStorage(this.nativeId);
+        }
+        return this._storage;
+    }
+    get log() {
+        if (!this._log) {
+            this._log = __webpack_exports__.sdk.deviceManager.getDeviceLogger(this.nativeId);
+        }
+        return this._log;
+    }
+    get console() {
+        if (!this._console) {
+            this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.nativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
+    }
+    _lazyLoadDeviceState() {
+        if (!this._deviceState) {
+            if (this.nativeId) {
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState(this.nativeId);
+            }
+            else {
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState();
+            }
+        }
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return __webpack_exports__.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
+    }
+}
+__webpack_exports__.ScryptedDeviceBase = ScryptedDeviceBase;
+/**
+ * @category Mixin Reference
+ */
+class MixinDeviceBase extends index_1.DeviceBase {
+    constructor(options) {
+        super();
+        this._listeners = new Set();
+        this.mixinDevice = options.mixinDevice;
+        this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
+        this.mixinStorageSuffix = options.mixinStorageSuffix;
+        this._deviceState = options.mixinDeviceState;
+        this.nativeId = __webpack_exports__.sdk.systemManager.getDeviceById(this.id).nativeId;
+        this.mixinProviderNativeId = options.mixinProviderNativeId;
+        // RpcProxy will trap all properties, and the following check/hack will determine
+        // if the device state came from another node worker thread.
+        // This should ultimately be discouraged and warned at some point in the future.
+        if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
+            this._deviceState = __webpack_exports__.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
+        }
+    }
+    get storage() {
+        if (!this._storage) {
+            const mixinStorageSuffix = this.mixinStorageSuffix;
+            const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
+            this._storage = __webpack_exports__.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
+        }
+        return this._storage;
+    }
+    get console() {
+        if (!this._console) {
+            if (__webpack_exports__.sdk.deviceManager.getMixinConsole)
+                this._console = __webpack_exports__.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
+            else
+                this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return __webpack_exports__.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
+    }
+    _lazyLoadDeviceState() {
+    }
+    manageListener(listener) {
+        this._listeners.add(listener);
+    }
+    release() {
+        for (const l of this._listeners) {
+            l.removeListener();
+        }
+    }
+}
+__webpack_exports__.MixinDeviceBase = MixinDeviceBase;
+(function () {
+    function _createGetState(state) {
+        return function () {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            return this._deviceState?.[state];
+        };
+    }
+    function _createSetState(state) {
+        return function (value) {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            if (!this._deviceState) {
+                console.warn('device state is unavailable. the device must be discovered with deviceManager.onDeviceDiscovered or deviceManager.onDevicesChanged before the state can be set.');
+            }
+            else {
+                // @ts-ignore: accessing private property
+                this._deviceState[state] = value;
+            }
+        };
+    }
+    for (const field of Object.values(index_1.ScryptedInterfaceProperty)) {
+        if (field === index_1.ScryptedInterfaceProperty.nativeId)
+            continue;
+        Object.defineProperty(ScryptedDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+        Object.defineProperty(MixinDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+    }
+})();
+__webpack_exports__.sdk = {};
+try {
+    let loaded = false;
+    try {
+        // todo: remove usage of process.env.SCRYPTED_SDK_MODULE, only existed in prerelease builds.
+        // import.meta is not a reliable way to detect es module support in webpack since webpack
+        // evaluates that to true at runtime.
+        const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        // @ts-expect-error
+        if (esModule && "undefined" !== 'undefined') // removed by dead control flow
+{}
+        else if (cjsModule) {
+            // @ts-expect-error
+            if (typeof require !== 'undefined') {
+                // @ts-expect-error
+                const sdkModule = require(process.env.SCRYPTED_SDK_MODULE);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+            else {
+                const sdkModule = __webpack_require__("../scrypted/sdk/dist/src sync recursive")(cjsModule);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+        }
+    }
+    catch (e) {
+        console.warn("failed to load sdk module", e);
+        throw e;
+    }
+    if (!loaded) {
+        let runtimeAPI;
+        try {
+            runtimeAPI = pluginRuntimeAPI;
+        }
+        catch (e) {
+        }
+        Object.assign(exports.sdk, {
+            log: deviceManager.getDeviceLogger(undefined),
+            deviceManager,
+            endpointManager,
+            mediaManager,
+            systemManager,
+            pluginHostAPI,
+            ...runtimeAPI,
+        });
+    }
+    try {
+        let descriptors = {
+            ...index_1.ScryptedInterfaceDescriptors,
+        };
+        try {
+            const sdkJson = JSON.parse(fs_1.default.readFileSync('../sdk.json').toString());
+            const customDescriptors = sdkJson.interfaceDescriptors;
+            if (customDescriptors) {
+                descriptors = {
+                    ...descriptors,
+                    ...customDescriptors,
+                };
+            }
+        }
+        catch (e) {
+            console.warn('failed to load custom interface descriptors', e);
+        }
+        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, descriptors)?.catch(() => { });
+    }
+    catch (e) {
+    }
+}
+catch (e) {
+    console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
+}
+exports.default = exports.sdk;
+//# sourceMappingURL=index.js.map
+
+/***/ },
+
+/***/ "../scrypted/sdk/dist/src sync recursive"
+/*!**************************************!*\
+  !*** ../scrypted/sdk/dist/src/ sync ***!
+  \**************************************/
+(module) {
+
+function webpackEmptyContext(req) {
+	const e = new Error("Cannot find module '" + req + "'");
+	e.code = 'MODULE_NOT_FOUND';
+	throw e;
+}
+webpackEmptyContext.keys = () => ([]);
+webpackEmptyContext.resolve = webpackEmptyContext;
+webpackEmptyContext.id = "../scrypted/sdk/dist/src sync recursive";
+module.exports = webpackEmptyContext;
+
+/***/ },
+
+/***/ "../scrypted/sdk/dist/types/gen/index.js"
+/*!***********************************************!*\
+  !*** ../scrypted/sdk/dist/types/gen/index.js ***!
+  \***********************************************/
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
+exports.TYPES_VERSION = "0.5.54";
+class DeviceBase {
+}
+exports.DeviceBase = DeviceBase;
+var ScryptedInterfaceProperty;
+(function (ScryptedInterfaceProperty) {
+    ScryptedInterfaceProperty["id"] = "id";
+    ScryptedInterfaceProperty["info"] = "info";
+    ScryptedInterfaceProperty["interfaces"] = "interfaces";
+    ScryptedInterfaceProperty["mixins"] = "mixins";
+    ScryptedInterfaceProperty["name"] = "name";
+    ScryptedInterfaceProperty["nativeId"] = "nativeId";
+    ScryptedInterfaceProperty["pluginId"] = "pluginId";
+    ScryptedInterfaceProperty["providedInterfaces"] = "providedInterfaces";
+    ScryptedInterfaceProperty["providedName"] = "providedName";
+    ScryptedInterfaceProperty["providedRoom"] = "providedRoom";
+    ScryptedInterfaceProperty["providedType"] = "providedType";
+    ScryptedInterfaceProperty["providerId"] = "providerId";
+    ScryptedInterfaceProperty["room"] = "room";
+    ScryptedInterfaceProperty["type"] = "type";
+    ScryptedInterfaceProperty["scryptedRuntimeArguments"] = "scryptedRuntimeArguments";
+    ScryptedInterfaceProperty["on"] = "on";
+    ScryptedInterfaceProperty["brightness"] = "brightness";
+    ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
+    ScryptedInterfaceProperty["rgb"] = "rgb";
+    ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
+    ScryptedInterfaceProperty["running"] = "running";
+    ScryptedInterfaceProperty["paused"] = "paused";
+    ScryptedInterfaceProperty["docked"] = "docked";
+    ScryptedInterfaceProperty["temperatureSetting"] = "temperatureSetting";
+    ScryptedInterfaceProperty["temperature"] = "temperature";
+    ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
+    ScryptedInterfaceProperty["humidity"] = "humidity";
+    ScryptedInterfaceProperty["resolution"] = "resolution";
+    ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
+    ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
+    ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
+    ScryptedInterfaceProperty["lockState"] = "lockState";
+    ScryptedInterfaceProperty["entryOpen"] = "entryOpen";
+    ScryptedInterfaceProperty["windowLevel"] = "windowLevel";
+    ScryptedInterfaceProperty["batteryLevel"] = "batteryLevel";
+    ScryptedInterfaceProperty["chargeState"] = "chargeState";
+    ScryptedInterfaceProperty["online"] = "online";
+    ScryptedInterfaceProperty["fromMimeType"] = "fromMimeType";
+    ScryptedInterfaceProperty["toMimeType"] = "toMimeType";
+    ScryptedInterfaceProperty["converters"] = "converters";
+    ScryptedInterfaceProperty["binaryState"] = "binaryState";
+    ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
+    ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
+    ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
+    ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
+    ScryptedInterfaceProperty["ambientLight"] = "ambientLight";
+    ScryptedInterfaceProperty["occupied"] = "occupied";
+    ScryptedInterfaceProperty["flooded"] = "flooded";
+    ScryptedInterfaceProperty["ultraviolet"] = "ultraviolet";
+    ScryptedInterfaceProperty["luminance"] = "luminance";
+    ScryptedInterfaceProperty["position"] = "position";
+    ScryptedInterfaceProperty["securitySystemState"] = "securitySystemState";
+    ScryptedInterfaceProperty["pm10Density"] = "pm10Density";
+    ScryptedInterfaceProperty["pm25Density"] = "pm25Density";
+    ScryptedInterfaceProperty["vocDensity"] = "vocDensity";
+    ScryptedInterfaceProperty["noxDensity"] = "noxDensity";
+    ScryptedInterfaceProperty["co2ppm"] = "co2ppm";
+    ScryptedInterfaceProperty["airQuality"] = "airQuality";
+    ScryptedInterfaceProperty["airPurifierState"] = "airPurifierState";
+    ScryptedInterfaceProperty["filterChangeIndication"] = "filterChangeIndication";
+    ScryptedInterfaceProperty["filterLifeLevel"] = "filterLifeLevel";
+    ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
+    ScryptedInterfaceProperty["fan"] = "fan";
+    ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
+    ScryptedInterfaceProperty["chatCompletionCapabilities"] = "chatCompletionCapabilities";
+    ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
+})(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
+var ScryptedInterfaceMethod;
+(function (ScryptedInterfaceMethod) {
+    ScryptedInterfaceMethod["listen"] = "listen";
+    ScryptedInterfaceMethod["probe"] = "probe";
+    ScryptedInterfaceMethod["setMixins"] = "setMixins";
+    ScryptedInterfaceMethod["setName"] = "setName";
+    ScryptedInterfaceMethod["setRoom"] = "setRoom";
+    ScryptedInterfaceMethod["setType"] = "setType";
+    ScryptedInterfaceMethod["getPluginJson"] = "getPluginJson";
+    ScryptedInterfaceMethod["turnOff"] = "turnOff";
+    ScryptedInterfaceMethod["turnOn"] = "turnOn";
+    ScryptedInterfaceMethod["setBrightness"] = "setBrightness";
+    ScryptedInterfaceMethod["getTemperatureMaxK"] = "getTemperatureMaxK";
+    ScryptedInterfaceMethod["getTemperatureMinK"] = "getTemperatureMinK";
+    ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
+    ScryptedInterfaceMethod["setRgb"] = "setRgb";
+    ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
+    ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
+    ScryptedInterfaceMethod["start"] = "start";
+    ScryptedInterfaceMethod["stop"] = "stop";
+    ScryptedInterfaceMethod["pause"] = "pause";
+    ScryptedInterfaceMethod["resume"] = "resume";
+    ScryptedInterfaceMethod["dock"] = "dock";
+    ScryptedInterfaceMethod["setTemperature"] = "setTemperature";
+    ScryptedInterfaceMethod["setTemperatureUnit"] = "setTemperatureUnit";
+    ScryptedInterfaceMethod["getPictureOptions"] = "getPictureOptions";
+    ScryptedInterfaceMethod["takePicture"] = "takePicture";
+    ScryptedInterfaceMethod["getAudioStream"] = "getAudioStream";
+    ScryptedInterfaceMethod["setAudioVolumes"] = "setAudioVolumes";
+    ScryptedInterfaceMethod["startDisplay"] = "startDisplay";
+    ScryptedInterfaceMethod["stopDisplay"] = "stopDisplay";
+    ScryptedInterfaceMethod["getVideoStream"] = "getVideoStream";
+    ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
+    ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
+    ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
+    ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
+    ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
+    ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
+    ScryptedInterfaceMethod["getRecordingStreamThumbnail"] = "getRecordingStreamThumbnail";
+    ScryptedInterfaceMethod["deleteRecordingStream"] = "deleteRecordingStream";
+    ScryptedInterfaceMethod["setRecordingActive"] = "setRecordingActive";
+    ScryptedInterfaceMethod["ptzCommand"] = "ptzCommand";
+    ScryptedInterfaceMethod["getRecordedEvents"] = "getRecordedEvents";
+    ScryptedInterfaceMethod["getVideoClip"] = "getVideoClip";
+    ScryptedInterfaceMethod["getVideoClips"] = "getVideoClips";
+    ScryptedInterfaceMethod["getVideoClipThumbnail"] = "getVideoClipThumbnail";
+    ScryptedInterfaceMethod["removeVideoClips"] = "removeVideoClips";
+    ScryptedInterfaceMethod["setVideoStreamOptions"] = "setVideoStreamOptions";
+    ScryptedInterfaceMethod["startIntercom"] = "startIntercom";
+    ScryptedInterfaceMethod["stopIntercom"] = "stopIntercom";
+    ScryptedInterfaceMethod["lock"] = "lock";
+    ScryptedInterfaceMethod["unlock"] = "unlock";
+    ScryptedInterfaceMethod["addPassword"] = "addPassword";
+    ScryptedInterfaceMethod["getPasswords"] = "getPasswords";
+    ScryptedInterfaceMethod["removePassword"] = "removePassword";
+    ScryptedInterfaceMethod["activate"] = "activate";
+    ScryptedInterfaceMethod["deactivate"] = "deactivate";
+    ScryptedInterfaceMethod["isReversible"] = "isReversible";
+    ScryptedInterfaceMethod["closeEntry"] = "closeEntry";
+    ScryptedInterfaceMethod["openEntry"] = "openEntry";
+    ScryptedInterfaceMethod["closeWindow"] = "closeWindow";
+    ScryptedInterfaceMethod["openWindow"] = "openWindow";
+    ScryptedInterfaceMethod["stopWindow"] = "stopWindow";
+    ScryptedInterfaceMethod["getDevice"] = "getDevice";
+    ScryptedInterfaceMethod["releaseDevice"] = "releaseDevice";
+    ScryptedInterfaceMethod["adoptDevice"] = "adoptDevice";
+    ScryptedInterfaceMethod["discoverDevices"] = "discoverDevices";
+    ScryptedInterfaceMethod["createDevice"] = "createDevice";
+    ScryptedInterfaceMethod["getCreateDeviceSettings"] = "getCreateDeviceSettings";
+    ScryptedInterfaceMethod["reboot"] = "reboot";
+    ScryptedInterfaceMethod["getRefreshFrequency"] = "getRefreshFrequency";
+    ScryptedInterfaceMethod["refresh"] = "refresh";
+    ScryptedInterfaceMethod["getMediaStatus"] = "getMediaStatus";
+    ScryptedInterfaceMethod["load"] = "load";
+    ScryptedInterfaceMethod["seek"] = "seek";
+    ScryptedInterfaceMethod["skipNext"] = "skipNext";
+    ScryptedInterfaceMethod["skipPrevious"] = "skipPrevious";
+    ScryptedInterfaceMethod["convert"] = "convert";
+    ScryptedInterfaceMethod["convertMedia"] = "convertMedia";
+    ScryptedInterfaceMethod["getSettings"] = "getSettings";
+    ScryptedInterfaceMethod["putSetting"] = "putSetting";
+    ScryptedInterfaceMethod["armSecuritySystem"] = "armSecuritySystem";
+    ScryptedInterfaceMethod["disarmSecuritySystem"] = "disarmSecuritySystem";
+    ScryptedInterfaceMethod["setAirPurifierState"] = "setAirPurifierState";
+    ScryptedInterfaceMethod["getReadmeMarkdown"] = "getReadmeMarkdown";
+    ScryptedInterfaceMethod["getOauthUrl"] = "getOauthUrl";
+    ScryptedInterfaceMethod["onOauthCallback"] = "onOauthCallback";
+    ScryptedInterfaceMethod["canMixin"] = "canMixin";
+    ScryptedInterfaceMethod["getMixin"] = "getMixin";
+    ScryptedInterfaceMethod["releaseMixin"] = "releaseMixin";
+    ScryptedInterfaceMethod["onRequest"] = "onRequest";
+    ScryptedInterfaceMethod["onConnection"] = "onConnection";
+    ScryptedInterfaceMethod["onPush"] = "onPush";
+    ScryptedInterfaceMethod["run"] = "run";
+    ScryptedInterfaceMethod["eval"] = "eval";
+    ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
+    ScryptedInterfaceMethod["saveScript"] = "saveScript";
+    ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
+    ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
+    ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
+    ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
+    ScryptedInterfaceMethod["generateObjectDetections"] = "generateObjectDetections";
+    ScryptedInterfaceMethod["getDetectionModel"] = "getDetectionModel";
+    ScryptedInterfaceMethod["setHumidity"] = "setHumidity";
+    ScryptedInterfaceMethod["setFan"] = "setFan";
+    ScryptedInterfaceMethod["startRTCSignalingSession"] = "startRTCSignalingSession";
+    ScryptedInterfaceMethod["createRTCSignalingSession"] = "createRTCSignalingSession";
+    ScryptedInterfaceMethod["getScryptedUserAccessControl"] = "getScryptedUserAccessControl";
+    ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
+    ScryptedInterfaceMethod["connectStream"] = "connectStream";
+    ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
+    ScryptedInterfaceMethod["getChatCompletion"] = "getChatCompletion";
+    ScryptedInterfaceMethod["streamChatCompletion"] = "streamChatCompletion";
+    ScryptedInterfaceMethod["getTextEmbedding"] = "getTextEmbedding";
+    ScryptedInterfaceMethod["getImageEmbedding"] = "getImageEmbedding";
+    ScryptedInterfaceMethod["callLLMTool"] = "callLLMTool";
+    ScryptedInterfaceMethod["getLLMTools"] = "getLLMTools";
+})(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
+exports.ScryptedInterfaceDescriptors = {
+    "ScryptedDevice": {
+        "name": "ScryptedDevice",
+        "methods": [
+            "listen",
+            "probe",
+            "setMixins",
+            "setName",
+            "setRoom",
+            "setType"
+        ],
+        "properties": [
+            "id",
+            "info",
+            "interfaces",
+            "mixins",
+            "name",
+            "nativeId",
+            "pluginId",
+            "providedInterfaces",
+            "providedName",
+            "providedRoom",
+            "providedType",
+            "providerId",
+            "room",
+            "type"
+        ]
+    },
+    "ScryptedPlugin": {
+        "name": "ScryptedPlugin",
+        "methods": [
+            "getPluginJson"
+        ],
+        "properties": []
+    },
+    "ScryptedPluginRuntime": {
+        "name": "ScryptedPluginRuntime",
+        "methods": [],
+        "properties": [
+            "scryptedRuntimeArguments"
+        ]
+    },
+    "OnOff": {
+        "name": "OnOff",
+        "methods": [
+            "turnOff",
+            "turnOn"
+        ],
+        "properties": [
+            "on"
+        ]
+    },
+    "Brightness": {
+        "name": "Brightness",
+        "methods": [
+            "setBrightness"
+        ],
+        "properties": [
+            "brightness"
+        ]
+    },
+    "ColorSettingTemperature": {
+        "name": "ColorSettingTemperature",
+        "methods": [
+            "getTemperatureMaxK",
+            "getTemperatureMinK",
+            "setColorTemperature"
+        ],
+        "properties": [
+            "colorTemperature"
+        ]
+    },
+    "ColorSettingRgb": {
+        "name": "ColorSettingRgb",
+        "methods": [
+            "setRgb"
+        ],
+        "properties": [
+            "rgb"
+        ]
+    },
+    "ColorSettingHsv": {
+        "name": "ColorSettingHsv",
+        "methods": [
+            "setHsv"
+        ],
+        "properties": [
+            "hsv"
+        ]
+    },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
+    },
+    "Notifier": {
+        "name": "Notifier",
+        "methods": [
+            "sendNotification"
+        ],
+        "properties": []
+    },
+    "StartStop": {
+        "name": "StartStop",
+        "methods": [
+            "start",
+            "stop"
+        ],
+        "properties": [
+            "running"
+        ]
+    },
+    "Pause": {
+        "name": "Pause",
+        "methods": [
+            "pause",
+            "resume"
+        ],
+        "properties": [
+            "paused"
+        ]
+    },
+    "Dock": {
+        "name": "Dock",
+        "methods": [
+            "dock"
+        ],
+        "properties": [
+            "docked"
+        ]
+    },
+    "TemperatureSetting": {
+        "name": "TemperatureSetting",
+        "methods": [
+            "setTemperature"
+        ],
+        "properties": [
+            "temperatureSetting"
+        ]
+    },
+    "Thermometer": {
+        "name": "Thermometer",
+        "methods": [
+            "setTemperatureUnit"
+        ],
+        "properties": [
+            "temperature",
+            "temperatureUnit"
+        ]
+    },
+    "HumiditySensor": {
+        "name": "HumiditySensor",
+        "methods": [],
+        "properties": [
+            "humidity"
+        ]
+    },
+    "Camera": {
+        "name": "Camera",
+        "methods": [
+            "getPictureOptions",
+            "takePicture"
+        ],
+        "properties": []
+    },
+    "Resolution": {
+        "name": "Resolution",
+        "methods": [],
+        "properties": [
+            "resolution"
+        ]
+    },
+    "Microphone": {
+        "name": "Microphone",
+        "methods": [
+            "getAudioStream"
+        ],
+        "properties": []
+    },
+    "AudioVolumeControl": {
+        "name": "AudioVolumeControl",
+        "methods": [
+            "setAudioVolumes"
+        ],
+        "properties": [
+            "audioVolumes"
+        ]
+    },
+    "Display": {
+        "name": "Display",
+        "methods": [
+            "startDisplay",
+            "stopDisplay"
+        ],
+        "properties": []
+    },
+    "VideoCamera": {
+        "name": "VideoCamera",
+        "methods": [
+            "getVideoStream",
+            "getVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "VideoCameraMask": {
+        "name": "VideoCameraMask",
+        "methods": [
+            "getPrivacyMasks",
+            "setPrivacyMasks"
+        ],
+        "properties": []
+    },
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
+        ],
+        "properties": []
+    },
+    "VideoRecorder": {
+        "name": "VideoRecorder",
+        "methods": [
+            "getRecordingStream",
+            "getRecordingStreamCurrentTime",
+            "getRecordingStreamOptions",
+            "getRecordingStreamThumbnail"
+        ],
+        "properties": [
+            "recordingActive"
+        ]
+    },
+    "VideoRecorderManagement": {
+        "name": "VideoRecorderManagement",
+        "methods": [
+            "deleteRecordingStream",
+            "setRecordingActive"
+        ],
+        "properties": []
+    },
+    "PanTiltZoom": {
+        "name": "PanTiltZoom",
+        "methods": [
+            "ptzCommand"
+        ],
+        "properties": [
+            "ptzCapabilities"
+        ]
+    },
+    "EventRecorder": {
+        "name": "EventRecorder",
+        "methods": [
+            "getRecordedEvents"
+        ],
+        "properties": []
+    },
+    "VideoClips": {
+        "name": "VideoClips",
+        "methods": [
+            "getVideoClip",
+            "getVideoClips",
+            "getVideoClipThumbnail",
+            "removeVideoClips"
+        ],
+        "properties": []
+    },
+    "VideoCameraConfiguration": {
+        "name": "VideoCameraConfiguration",
+        "methods": [
+            "setVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "Intercom": {
+        "name": "Intercom",
+        "methods": [
+            "startIntercom",
+            "stopIntercom"
+        ],
+        "properties": []
+    },
+    "Lock": {
+        "name": "Lock",
+        "methods": [
+            "lock",
+            "unlock"
+        ],
+        "properties": [
+            "lockState"
+        ]
+    },
+    "PasswordStore": {
+        "name": "PasswordStore",
+        "methods": [
+            "addPassword",
+            "getPasswords",
+            "removePassword"
+        ],
+        "properties": []
+    },
+    "Scene": {
+        "name": "Scene",
+        "methods": [
+            "activate",
+            "deactivate",
+            "isReversible"
+        ],
+        "properties": []
+    },
+    "Entry": {
+        "name": "Entry",
+        "methods": [
+            "closeEntry",
+            "openEntry"
+        ],
+        "properties": []
+    },
+    "EntrySensor": {
+        "name": "EntrySensor",
+        "methods": [],
+        "properties": [
+            "entryOpen"
+        ]
+    },
+    "WindowCovering": {
+        "name": "WindowCovering",
+        "methods": [
+            "closeWindow",
+            "openWindow",
+            "stopWindow"
+        ],
+        "properties": [
+            "windowLevel"
+        ]
+    },
+    "DeviceProvider": {
+        "name": "DeviceProvider",
+        "methods": [
+            "getDevice",
+            "releaseDevice"
+        ],
+        "properties": []
+    },
+    "DeviceDiscovery": {
+        "name": "DeviceDiscovery",
+        "methods": [
+            "adoptDevice",
+            "discoverDevices"
+        ],
+        "properties": []
+    },
+    "DeviceCreator": {
+        "name": "DeviceCreator",
+        "methods": [
+            "createDevice",
+            "getCreateDeviceSettings"
+        ],
+        "properties": []
+    },
+    "Battery": {
+        "name": "Battery",
+        "methods": [],
+        "properties": [
+            "batteryLevel"
+        ]
+    },
+    "Charger": {
+        "name": "Charger",
+        "methods": [],
+        "properties": [
+            "chargeState"
+        ]
+    },
+    "Reboot": {
+        "name": "Reboot",
+        "methods": [
+            "reboot"
+        ],
+        "properties": []
+    },
+    "Refresh": {
+        "name": "Refresh",
+        "methods": [
+            "getRefreshFrequency",
+            "refresh"
+        ],
+        "properties": []
+    },
+    "MediaPlayer": {
+        "name": "MediaPlayer",
+        "methods": [
+            "getMediaStatus",
+            "load",
+            "seek",
+            "skipNext",
+            "skipPrevious"
+        ],
+        "properties": []
+    },
+    "Online": {
+        "name": "Online",
+        "methods": [],
+        "properties": [
+            "online"
+        ]
+    },
+    "BufferConverter": {
+        "name": "BufferConverter",
+        "methods": [
+            "convert"
+        ],
+        "properties": [
+            "fromMimeType",
+            "toMimeType"
+        ]
+    },
+    "MediaConverter": {
+        "name": "MediaConverter",
+        "methods": [
+            "convertMedia"
+        ],
+        "properties": [
+            "converters"
+        ]
+    },
+    "Settings": {
+        "name": "Settings",
+        "methods": [
+            "getSettings",
+            "putSetting"
+        ],
+        "properties": []
+    },
+    "BinarySensor": {
+        "name": "BinarySensor",
+        "methods": [],
+        "properties": [
+            "binaryState"
+        ]
+    },
+    "TamperSensor": {
+        "name": "TamperSensor",
+        "methods": [],
+        "properties": [
+            "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
+        ]
+    },
+    "PowerSensor": {
+        "name": "PowerSensor",
+        "methods": [],
+        "properties": [
+            "powerDetected"
+        ]
+    },
+    "AudioSensor": {
+        "name": "AudioSensor",
+        "methods": [],
+        "properties": [
+            "audioDetected"
+        ]
+    },
+    "MotionSensor": {
+        "name": "MotionSensor",
+        "methods": [],
+        "properties": [
+            "motionDetected"
+        ]
+    },
+    "AmbientLightSensor": {
+        "name": "AmbientLightSensor",
+        "methods": [],
+        "properties": [
+            "ambientLight"
+        ]
+    },
+    "OccupancySensor": {
+        "name": "OccupancySensor",
+        "methods": [],
+        "properties": [
+            "occupied"
+        ]
+    },
+    "FloodSensor": {
+        "name": "FloodSensor",
+        "methods": [],
+        "properties": [
+            "flooded"
+        ]
+    },
+    "UltravioletSensor": {
+        "name": "UltravioletSensor",
+        "methods": [],
+        "properties": [
+            "ultraviolet"
+        ]
+    },
+    "LuminanceSensor": {
+        "name": "LuminanceSensor",
+        "methods": [],
+        "properties": [
+            "luminance"
+        ]
+    },
+    "PositionSensor": {
+        "name": "PositionSensor",
+        "methods": [],
+        "properties": [
+            "position"
+        ]
+    },
+    "SecuritySystem": {
+        "name": "SecuritySystem",
+        "methods": [
+            "armSecuritySystem",
+            "disarmSecuritySystem"
+        ],
+        "properties": [
+            "securitySystemState"
+        ]
+    },
+    "PM10Sensor": {
+        "name": "PM10Sensor",
+        "methods": [],
+        "properties": [
+            "pm10Density"
+        ]
+    },
+    "PM25Sensor": {
+        "name": "PM25Sensor",
+        "methods": [],
+        "properties": [
+            "pm25Density"
+        ]
+    },
+    "VOCSensor": {
+        "name": "VOCSensor",
+        "methods": [],
+        "properties": [
+            "vocDensity"
+        ]
+    },
+    "NOXSensor": {
+        "name": "NOXSensor",
+        "methods": [],
+        "properties": [
+            "noxDensity"
+        ]
+    },
+    "CO2Sensor": {
+        "name": "CO2Sensor",
+        "methods": [],
+        "properties": [
+            "co2ppm"
+        ]
+    },
+    "AirQualitySensor": {
+        "name": "AirQualitySensor",
+        "methods": [],
+        "properties": [
+            "airQuality"
+        ]
+    },
+    "AirPurifier": {
+        "name": "AirPurifier",
+        "methods": [
+            "setAirPurifierState"
+        ],
+        "properties": [
+            "airPurifierState"
+        ]
+    },
+    "FilterMaintenance": {
+        "name": "FilterMaintenance",
+        "methods": [],
+        "properties": [
+            "filterChangeIndication",
+            "filterLifeLevel"
+        ]
+    },
+    "Readme": {
+        "name": "Readme",
+        "methods": [
+            "getReadmeMarkdown"
+        ],
+        "properties": []
+    },
+    "OauthClient": {
+        "name": "OauthClient",
+        "methods": [
+            "getOauthUrl",
+            "onOauthCallback"
+        ],
+        "properties": []
+    },
+    "MixinProvider": {
+        "name": "MixinProvider",
+        "methods": [
+            "canMixin",
+            "getMixin",
+            "releaseMixin"
+        ],
+        "properties": []
+    },
+    "HttpRequestHandler": {
+        "name": "HttpRequestHandler",
+        "methods": [
+            "onRequest"
+        ],
+        "properties": []
+    },
+    "EngineIOHandler": {
+        "name": "EngineIOHandler",
+        "methods": [
+            "onConnection"
+        ],
+        "properties": []
+    },
+    "PushHandler": {
+        "name": "PushHandler",
+        "methods": [
+            "onPush"
+        ],
+        "properties": []
+    },
+    "Program": {
+        "name": "Program",
+        "methods": [
+            "run"
+        ],
+        "properties": []
+    },
+    "Scriptable": {
+        "name": "Scriptable",
+        "methods": [
+            "eval",
+            "loadScripts",
+            "saveScript"
+        ],
+        "properties": []
+    },
+    "ClusterForkInterface": {
+        "name": "ClusterForkInterface",
+        "methods": [
+            "forkInterface"
+        ],
+        "properties": []
+    },
+    "ObjectDetector": {
+        "name": "ObjectDetector",
+        "methods": [
+            "getDetectionInput",
+            "getObjectTypes"
+        ],
+        "properties": []
+    },
+    "ObjectDetection": {
+        "name": "ObjectDetection",
+        "methods": [
+            "detectObjects",
+            "generateObjectDetections",
+            "getDetectionModel"
+        ],
+        "properties": []
+    },
+    "ObjectDetectionPreview": {
+        "name": "ObjectDetectionPreview",
+        "methods": [],
+        "properties": []
+    },
+    "ObjectDetectionGenerator": {
+        "name": "ObjectDetectionGenerator",
+        "methods": [],
+        "properties": []
+    },
+    "HumiditySetting": {
+        "name": "HumiditySetting",
+        "methods": [
+            "setHumidity"
+        ],
+        "properties": [
+            "humiditySetting"
+        ]
+    },
+    "Fan": {
+        "name": "Fan",
+        "methods": [
+            "setFan"
+        ],
+        "properties": [
+            "fan"
+        ]
+    },
+    "RTCSignalingChannel": {
+        "name": "RTCSignalingChannel",
+        "methods": [
+            "startRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "RTCSignalingClient": {
+        "name": "RTCSignalingClient",
+        "methods": [
+            "createRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "LauncherApplication": {
+        "name": "LauncherApplication",
+        "methods": [],
+        "properties": [
+            "applicationInfo"
+        ]
+    },
+    "ScryptedUser": {
+        "name": "ScryptedUser",
+        "methods": [
+            "getScryptedUserAccessControl"
+        ],
+        "properties": []
+    },
+    "VideoFrameGenerator": {
+        "name": "VideoFrameGenerator",
+        "methods": [
+            "generateVideoFrames"
+        ],
+        "properties": []
+    },
+    "StreamService": {
+        "name": "StreamService",
+        "methods": [
+            "connectStream"
+        ],
+        "properties": []
+    },
+    "TTY": {
+        "name": "TTY",
+        "methods": [],
+        "properties": []
+    },
+    "TTYSettings": {
+        "name": "TTYSettings",
+        "methods": [
+            "getTTYSettings"
+        ],
+        "properties": []
+    },
+    "ChatCompletion": {
+        "name": "ChatCompletion",
+        "methods": [
+            "getChatCompletion",
+            "streamChatCompletion"
+        ],
+        "properties": [
+            "chatCompletionCapabilities"
+        ]
+    },
+    "TextEmbedding": {
+        "name": "TextEmbedding",
+        "methods": [
+            "getTextEmbedding"
+        ],
+        "properties": []
+    },
+    "ImageEmbedding": {
+        "name": "ImageEmbedding",
+        "methods": [
+            "getImageEmbedding"
+        ],
+        "properties": []
+    },
+    "LLMTools": {
+        "name": "LLMTools",
+        "methods": [
+            "callLLMTool",
+            "getLLMTools"
+        ],
+        "properties": []
+    },
+    "ScryptedSystemDevice": {
+        "name": "ScryptedSystemDevice",
+        "methods": [],
+        "properties": [
+            "systemDevice"
+        ]
+    },
+    "ScryptedDeviceCreator": {
+        "name": "ScryptedDeviceCreator",
+        "methods": [],
+        "properties": []
+    },
+    "ScryptedSettings": {
+        "name": "ScryptedSettings",
+        "methods": [],
+        "properties": []
+    }
+};
+/**
+ * @category Core Reference
+ */
+var ScryptedDeviceType;
+(function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
+    ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
+    ScryptedDeviceType["Camera"] = "Camera";
+    ScryptedDeviceType["Fan"] = "Fan";
+    ScryptedDeviceType["Light"] = "Light";
+    ScryptedDeviceType["Switch"] = "Switch";
+    ScryptedDeviceType["Outlet"] = "Outlet";
+    ScryptedDeviceType["Sensor"] = "Sensor";
+    ScryptedDeviceType["Scene"] = "Scene";
+    ScryptedDeviceType["Program"] = "Program";
+    ScryptedDeviceType["Automation"] = "Automation";
+    ScryptedDeviceType["Vacuum"] = "Vacuum";
+    ScryptedDeviceType["Notifier"] = "Notifier";
+    ScryptedDeviceType["Thermostat"] = "Thermostat";
+    ScryptedDeviceType["Lock"] = "Lock";
+    ScryptedDeviceType["PasswordControl"] = "PasswordControl";
+    /**
+     * Displays have audio and video output.
+     */
+    ScryptedDeviceType["Display"] = "Display";
+    /**
+     * Smart Displays have two way audio and video.
+     */
+    ScryptedDeviceType["SmartDisplay"] = "SmartDisplay";
+    ScryptedDeviceType["Speaker"] = "Speaker";
+    /**
+     * Smart Speakers have two way audio.
+     */
+    ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
+    ScryptedDeviceType["RemoteDesktop"] = "RemoteDesktop";
+    ScryptedDeviceType["Event"] = "Event";
+    ScryptedDeviceType["Entry"] = "Entry";
+    ScryptedDeviceType["Garage"] = "Garage";
+    ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
+    ScryptedDeviceType["DataSource"] = "DataSource";
+    ScryptedDeviceType["API"] = "API";
+    ScryptedDeviceType["Buttons"] = "Buttons";
+    ScryptedDeviceType["Doorbell"] = "Doorbell";
+    ScryptedDeviceType["Irrigation"] = "Irrigation";
+    ScryptedDeviceType["Valve"] = "Valve";
+    ScryptedDeviceType["Person"] = "Person";
+    ScryptedDeviceType["SecuritySystem"] = "SecuritySystem";
+    ScryptedDeviceType["WindowCovering"] = "WindowCovering";
+    ScryptedDeviceType["Siren"] = "Siren";
+    ScryptedDeviceType["AirPurifier"] = "AirPurifier";
+    ScryptedDeviceType["Internet"] = "Internet";
+    ScryptedDeviceType["Network"] = "Network";
+    ScryptedDeviceType["Bridge"] = "Bridge";
+    ScryptedDeviceType["LLM"] = "LLM";
+    ScryptedDeviceType["Unknown"] = "Unknown";
+})(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
+var HumidityMode;
+(function (HumidityMode) {
+    HumidityMode["Humidify"] = "Humidify";
+    HumidityMode["Dehumidify"] = "Dehumidify";
+    HumidityMode["Auto"] = "Auto";
+    HumidityMode["Off"] = "Off";
+})(HumidityMode || (exports.HumidityMode = HumidityMode = {}));
+var FanMode;
+(function (FanMode) {
+    FanMode["Auto"] = "Auto";
+    FanMode["Manual"] = "Manual";
+})(FanMode || (exports.FanMode = FanMode = {}));
+var TemperatureUnit;
+(function (TemperatureUnit) {
+    TemperatureUnit["C"] = "C";
+    TemperatureUnit["F"] = "F";
+})(TemperatureUnit || (exports.TemperatureUnit = TemperatureUnit = {}));
+var ThermostatMode;
+(function (ThermostatMode) {
+    ThermostatMode["Off"] = "Off";
+    ThermostatMode["Cool"] = "Cool";
+    ThermostatMode["Heat"] = "Heat";
+    ThermostatMode["HeatCool"] = "HeatCool";
+    ThermostatMode["Auto"] = "Auto";
+    ThermostatMode["FanOnly"] = "FanOnly";
+    ThermostatMode["Purifier"] = "Purifier";
+    ThermostatMode["Eco"] = "Eco";
+    ThermostatMode["Dry"] = "Dry";
+    ThermostatMode["On"] = "On";
+})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
+var PanTiltZoomMovement;
+(function (PanTiltZoomMovement) {
+    PanTiltZoomMovement["Absolute"] = "Absolute";
+    PanTiltZoomMovement["Relative"] = "Relative";
+    PanTiltZoomMovement["Continuous"] = "Continuous";
+    PanTiltZoomMovement["Preset"] = "Preset";
+    PanTiltZoomMovement["Home"] = "Home";
+})(PanTiltZoomMovement || (exports.PanTiltZoomMovement = PanTiltZoomMovement = {}));
+var LockState;
+(function (LockState) {
+    LockState["Locked"] = "Locked";
+    LockState["Unlocked"] = "Unlocked";
+    LockState["Jammed"] = "Jammed";
+})(LockState || (exports.LockState = LockState = {}));
+var ChargeState;
+(function (ChargeState) {
+    ChargeState["Trickle"] = "trickle";
+    ChargeState["Charging"] = "charging";
+    ChargeState["NotCharging"] = "not-charging";
+})(ChargeState || (exports.ChargeState = ChargeState = {}));
+var AirPurifierStatus;
+(function (AirPurifierStatus) {
+    AirPurifierStatus["Inactive"] = "Inactive";
+    AirPurifierStatus["Idle"] = "Idle";
+    AirPurifierStatus["Active"] = "Active";
+    AirPurifierStatus["ActiveNightMode"] = "ActiveNightMode";
+})(AirPurifierStatus || (exports.AirPurifierStatus = AirPurifierStatus = {}));
+var AirPurifierMode;
+(function (AirPurifierMode) {
+    AirPurifierMode["Manual"] = "Manual";
+    AirPurifierMode["Automatic"] = "Automatic";
+})(AirPurifierMode || (exports.AirPurifierMode = AirPurifierMode = {}));
+var AirQuality;
+(function (AirQuality) {
+    AirQuality["Unknown"] = "Unknown";
+    AirQuality["Excellent"] = "Excellent";
+    AirQuality["Good"] = "Good";
+    AirQuality["Fair"] = "Fair";
+    AirQuality["Inferior"] = "Inferior";
+    AirQuality["Poor"] = "Poor";
+})(AirQuality || (exports.AirQuality = AirQuality = {}));
+var SecuritySystemMode;
+(function (SecuritySystemMode) {
+    SecuritySystemMode["Disarmed"] = "Disarmed";
+    SecuritySystemMode["HomeArmed"] = "HomeArmed";
+    SecuritySystemMode["AwayArmed"] = "AwayArmed";
+    SecuritySystemMode["NightArmed"] = "NightArmed";
+})(SecuritySystemMode || (exports.SecuritySystemMode = SecuritySystemMode = {}));
+var SecuritySystemObstruction;
+(function (SecuritySystemObstruction) {
+    SecuritySystemObstruction["Sensor"] = "Sensor";
+    SecuritySystemObstruction["Occupied"] = "Occupied";
+    SecuritySystemObstruction["Time"] = "Time";
+    SecuritySystemObstruction["Error"] = "Error";
+})(SecuritySystemObstruction || (exports.SecuritySystemObstruction = SecuritySystemObstruction = {}));
+var MediaPlayerState;
+(function (MediaPlayerState) {
+    MediaPlayerState["Idle"] = "Idle";
+    MediaPlayerState["Playing"] = "Playing";
+    MediaPlayerState["Paused"] = "Paused";
+    MediaPlayerState["Buffering"] = "Buffering";
+})(MediaPlayerState || (exports.MediaPlayerState = MediaPlayerState = {}));
+var ScryptedInterface;
+(function (ScryptedInterface) {
+    ScryptedInterface["ScryptedDevice"] = "ScryptedDevice";
+    ScryptedInterface["ScryptedPlugin"] = "ScryptedPlugin";
+    ScryptedInterface["ScryptedPluginRuntime"] = "ScryptedPluginRuntime";
+    ScryptedInterface["OnOff"] = "OnOff";
+    ScryptedInterface["Brightness"] = "Brightness";
+    ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
+    ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
+    ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
+    ScryptedInterface["Notifier"] = "Notifier";
+    ScryptedInterface["StartStop"] = "StartStop";
+    ScryptedInterface["Pause"] = "Pause";
+    ScryptedInterface["Dock"] = "Dock";
+    ScryptedInterface["TemperatureSetting"] = "TemperatureSetting";
+    ScryptedInterface["Thermometer"] = "Thermometer";
+    ScryptedInterface["HumiditySensor"] = "HumiditySensor";
+    ScryptedInterface["Camera"] = "Camera";
+    ScryptedInterface["Resolution"] = "Resolution";
+    ScryptedInterface["Microphone"] = "Microphone";
+    ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
+    ScryptedInterface["Display"] = "Display";
+    ScryptedInterface["VideoCamera"] = "VideoCamera";
+    ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
+    ScryptedInterface["VideoRecorder"] = "VideoRecorder";
+    ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
+    ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
+    ScryptedInterface["EventRecorder"] = "EventRecorder";
+    ScryptedInterface["VideoClips"] = "VideoClips";
+    ScryptedInterface["VideoCameraConfiguration"] = "VideoCameraConfiguration";
+    ScryptedInterface["Intercom"] = "Intercom";
+    ScryptedInterface["Lock"] = "Lock";
+    ScryptedInterface["PasswordStore"] = "PasswordStore";
+    ScryptedInterface["Scene"] = "Scene";
+    ScryptedInterface["Entry"] = "Entry";
+    ScryptedInterface["EntrySensor"] = "EntrySensor";
+    ScryptedInterface["WindowCovering"] = "WindowCovering";
+    ScryptedInterface["DeviceProvider"] = "DeviceProvider";
+    ScryptedInterface["DeviceDiscovery"] = "DeviceDiscovery";
+    ScryptedInterface["DeviceCreator"] = "DeviceCreator";
+    ScryptedInterface["Battery"] = "Battery";
+    ScryptedInterface["Charger"] = "Charger";
+    ScryptedInterface["Reboot"] = "Reboot";
+    ScryptedInterface["Refresh"] = "Refresh";
+    ScryptedInterface["MediaPlayer"] = "MediaPlayer";
+    ScryptedInterface["Online"] = "Online";
+    ScryptedInterface["BufferConverter"] = "BufferConverter";
+    ScryptedInterface["MediaConverter"] = "MediaConverter";
+    ScryptedInterface["Settings"] = "Settings";
+    ScryptedInterface["BinarySensor"] = "BinarySensor";
+    ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
+    ScryptedInterface["PowerSensor"] = "PowerSensor";
+    ScryptedInterface["AudioSensor"] = "AudioSensor";
+    ScryptedInterface["MotionSensor"] = "MotionSensor";
+    ScryptedInterface["AmbientLightSensor"] = "AmbientLightSensor";
+    ScryptedInterface["OccupancySensor"] = "OccupancySensor";
+    ScryptedInterface["FloodSensor"] = "FloodSensor";
+    ScryptedInterface["UltravioletSensor"] = "UltravioletSensor";
+    ScryptedInterface["LuminanceSensor"] = "LuminanceSensor";
+    ScryptedInterface["PositionSensor"] = "PositionSensor";
+    ScryptedInterface["SecuritySystem"] = "SecuritySystem";
+    ScryptedInterface["PM10Sensor"] = "PM10Sensor";
+    ScryptedInterface["PM25Sensor"] = "PM25Sensor";
+    ScryptedInterface["VOCSensor"] = "VOCSensor";
+    ScryptedInterface["NOXSensor"] = "NOXSensor";
+    ScryptedInterface["CO2Sensor"] = "CO2Sensor";
+    ScryptedInterface["AirQualitySensor"] = "AirQualitySensor";
+    ScryptedInterface["AirPurifier"] = "AirPurifier";
+    ScryptedInterface["FilterMaintenance"] = "FilterMaintenance";
+    ScryptedInterface["Readme"] = "Readme";
+    ScryptedInterface["OauthClient"] = "OauthClient";
+    ScryptedInterface["MixinProvider"] = "MixinProvider";
+    ScryptedInterface["HttpRequestHandler"] = "HttpRequestHandler";
+    ScryptedInterface["EngineIOHandler"] = "EngineIOHandler";
+    ScryptedInterface["PushHandler"] = "PushHandler";
+    ScryptedInterface["Program"] = "Program";
+    ScryptedInterface["Scriptable"] = "Scriptable";
+    ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
+    ScryptedInterface["ObjectDetector"] = "ObjectDetector";
+    ScryptedInterface["ObjectDetection"] = "ObjectDetection";
+    ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
+    ScryptedInterface["ObjectDetectionGenerator"] = "ObjectDetectionGenerator";
+    ScryptedInterface["HumiditySetting"] = "HumiditySetting";
+    ScryptedInterface["Fan"] = "Fan";
+    ScryptedInterface["RTCSignalingChannel"] = "RTCSignalingChannel";
+    ScryptedInterface["RTCSignalingClient"] = "RTCSignalingClient";
+    ScryptedInterface["LauncherApplication"] = "LauncherApplication";
+    ScryptedInterface["ScryptedUser"] = "ScryptedUser";
+    ScryptedInterface["VideoFrameGenerator"] = "VideoFrameGenerator";
+    ScryptedInterface["StreamService"] = "StreamService";
+    ScryptedInterface["TTY"] = "TTY";
+    ScryptedInterface["TTYSettings"] = "TTYSettings";
+    ScryptedInterface["ChatCompletion"] = "ChatCompletion";
+    ScryptedInterface["TextEmbedding"] = "TextEmbedding";
+    ScryptedInterface["ImageEmbedding"] = "ImageEmbedding";
+    ScryptedInterface["LLMTools"] = "LLMTools";
+    ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
+    ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
+    ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
+})(ScryptedInterface || (exports.ScryptedInterface = ScryptedInterface = {}));
+var ScryptedMimeTypes;
+(function (ScryptedMimeTypes) {
+    ScryptedMimeTypes["Url"] = "text/x-uri";
+    ScryptedMimeTypes["InsecureLocalUrl"] = "text/x-insecure-local-uri";
+    ScryptedMimeTypes["LocalUrl"] = "text/x-local-uri";
+    ScryptedMimeTypes["ServerId"] = "text/x-server-id";
+    ScryptedMimeTypes["PushEndpoint"] = "text/x-push-endpoint";
+    ScryptedMimeTypes["SchemePrefix"] = "x-scrypted/x-scrypted-scheme-";
+    ScryptedMimeTypes["MediaStreamUrl"] = "text/x-media-url";
+    ScryptedMimeTypes["MediaObject"] = "x-scrypted/x-scrypted-media-object";
+    ScryptedMimeTypes["RequestMediaObject"] = "x-scrypted/x-scrypted-request-media-object";
+    ScryptedMimeTypes["RequestMediaStream"] = "x-scrypted/x-scrypted-request-stream";
+    ScryptedMimeTypes["MediaStreamFeedback"] = "x-scrypted/x-media-stream-feedback";
+    ScryptedMimeTypes["FFmpegInput"] = "x-scrypted/x-ffmpeg-input";
+    ScryptedMimeTypes["FFmpegTranscodeStream"] = "x-scrypted/x-ffmpeg-transcode-stream";
+    ScryptedMimeTypes["RTCSignalingChannel"] = "x-scrypted/x-scrypted-rtc-signaling-channel";
+    ScryptedMimeTypes["RTCSignalingSession"] = "x-scrypted/x-scrypted-rtc-signaling-session";
+    ScryptedMimeTypes["RTCConnectionManagement"] = "x-scrypted/x-scrypted-rtc-connection-management";
+    ScryptedMimeTypes["Image"] = "x-scrypted/x-scrypted-image";
+})(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
+//# sourceMappingURL=index.js.map
+
+/***/ },
+
+/***/ "./node_modules/@scrypted/sdk/dist/src/index.js"
+/*!******************************************************!*\
+  !*** ./node_modules/@scrypted/sdk/dist/src/index.js ***!
+  \******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(__webpack_exports__, "__esModule", ({ value: true }));
+__webpack_exports__.sdk = __webpack_exports__.MixinDeviceBase = __webpack_exports__.ScryptedDeviceBase = void 0;
+__exportStar(__webpack_require__(/*! ../types/gen/index */ "./node_modules/@scrypted/sdk/dist/types/gen/index.js"), __webpack_exports__);
+const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
+const index_1 = __webpack_require__(/*! ../types/gen/index */ "./node_modules/@scrypted/sdk/dist/types/gen/index.js");
+const module_1 = __webpack_require__(/*! module */ "module");
+/**
+ * @category Core Reference
+ */
+class ScryptedDeviceBase extends index_1.DeviceBase {
+    constructor(nativeId) {
+        super();
+        this.nativeId = nativeId;
+    }
+    get storage() {
+        if (!this._storage) {
+            this._storage = __webpack_exports__.sdk.deviceManager.getDeviceStorage(this.nativeId);
+        }
+        return this._storage;
+    }
+    get log() {
+        if (!this._log) {
+            this._log = __webpack_exports__.sdk.deviceManager.getDeviceLogger(this.nativeId);
+        }
+        return this._log;
+    }
+    get console() {
+        if (!this._console) {
+            this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.nativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
+    }
+    _lazyLoadDeviceState() {
+        if (!this._deviceState) {
+            if (this.nativeId) {
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState(this.nativeId);
+            }
+            else {
+                this._deviceState = __webpack_exports__.sdk.deviceManager.getDeviceState();
+            }
+        }
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return __webpack_exports__.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
+    }
+}
+__webpack_exports__.ScryptedDeviceBase = ScryptedDeviceBase;
+/**
+ * @category Mixin Reference
+ */
+class MixinDeviceBase extends index_1.DeviceBase {
+    constructor(options) {
+        super();
+        this._listeners = new Set();
+        this.mixinDevice = options.mixinDevice;
+        this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
+        this.mixinStorageSuffix = options.mixinStorageSuffix;
+        this._deviceState = options.mixinDeviceState;
+        this.nativeId = __webpack_exports__.sdk.systemManager.getDeviceById(this.id).nativeId;
+        this.mixinProviderNativeId = options.mixinProviderNativeId;
+        // RpcProxy will trap all properties, and the following check/hack will determine
+        // if the device state came from another node worker thread.
+        // This should ultimately be discouraged and warned at some point in the future.
+        if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
+            this._deviceState = __webpack_exports__.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
+        }
+    }
+    get storage() {
+        if (!this._storage) {
+            const mixinStorageSuffix = this.mixinStorageSuffix;
+            const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
+            this._storage = __webpack_exports__.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
+        }
+        return this._storage;
+    }
+    get console() {
+        if (!this._console) {
+            if (__webpack_exports__.sdk.deviceManager.getMixinConsole)
+                this._console = __webpack_exports__.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
+            else
+                this._console = __webpack_exports__.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
+        }
+        return this._console;
+    }
+    async createMediaObject(data, mimeType) {
+        return __webpack_exports__.sdk.mediaManager.createMediaObject(data, mimeType, {
+            sourceId: this.id,
+        });
+    }
+    getMediaObjectConsole(mediaObject) {
+        if (typeof mediaObject.sourceId !== 'string')
+            return this.console;
+        return __webpack_exports__.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
+    }
+    /**
+     * Fire an event for this device.
+     */
+    onDeviceEvent(eventInterface, eventData) {
+        return __webpack_exports__.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
+    }
+    _lazyLoadDeviceState() {
+    }
+    manageListener(listener) {
+        this._listeners.add(listener);
+    }
+    release() {
+        for (const l of this._listeners) {
+            l.removeListener();
+        }
+    }
+}
+__webpack_exports__.MixinDeviceBase = MixinDeviceBase;
+(function () {
+    function _createGetState(state) {
+        return function () {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            return this._deviceState?.[state];
+        };
+    }
+    function _createSetState(state) {
+        return function (value) {
+            this._lazyLoadDeviceState();
+            // @ts-ignore: accessing private property
+            if (!this._deviceState) {
+                console.warn('device state is unavailable. the device must be discovered with deviceManager.onDeviceDiscovered or deviceManager.onDevicesChanged before the state can be set.');
+            }
+            else {
+                // @ts-ignore: accessing private property
+                this._deviceState[state] = value;
+            }
+        };
+    }
+    for (const field of Object.values(index_1.ScryptedInterfaceProperty)) {
+        if (field === index_1.ScryptedInterfaceProperty.nativeId)
+            continue;
+        Object.defineProperty(ScryptedDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+        Object.defineProperty(MixinDeviceBase.prototype, field, {
+            set: _createSetState(field),
+            get: _createGetState(field),
+        });
+    }
+})();
+__webpack_exports__.sdk = {};
+try {
+    let loaded = false;
+    try {
+        // todo: remove usage of process.env.SCRYPTED_SDK_MODULE, only existed in prerelease builds.
+        // import.meta is not a reliable way to detect es module support in webpack since webpack
+        // evaluates that to true at runtime.
+        const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
+        // @ts-expect-error
+        if (esModule && "undefined" !== 'undefined') // removed by dead control flow
+{}
+        else if (cjsModule) {
+            // @ts-expect-error
+            if (typeof require !== 'undefined') {
+                // @ts-expect-error
+                const sdkModule = require(process.env.SCRYPTED_SDK_MODULE);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+            else {
+                const sdkModule = __webpack_require__("./node_modules/@scrypted/sdk/dist/src sync recursive")(cjsModule);
+                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
+                loaded = true;
+            }
+        }
+    }
+    catch (e) {
+        console.warn("failed to load sdk module", e);
+        throw e;
+    }
+    if (!loaded) {
+        let runtimeAPI;
+        try {
+            runtimeAPI = pluginRuntimeAPI;
+        }
+        catch (e) {
+        }
+        Object.assign(exports.sdk, {
+            log: deviceManager.getDeviceLogger(undefined),
+            deviceManager,
+            endpointManager,
+            mediaManager,
+            systemManager,
+            pluginHostAPI,
+            ...runtimeAPI,
+        });
+    }
+    try {
+        let descriptors = {
+            ...index_1.ScryptedInterfaceDescriptors,
+        };
+        try {
+            const sdkJson = JSON.parse(fs_1.default.readFileSync('../sdk.json').toString());
+            const customDescriptors = sdkJson.interfaceDescriptors;
+            if (customDescriptors) {
+                descriptors = {
+                    ...descriptors,
+                    ...customDescriptors,
+                };
+            }
+        }
+        catch (e) {
+            console.warn('failed to load custom interface descriptors', e);
+        }
+        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, descriptors)?.catch(() => { });
+    }
+    catch (e) {
+    }
+}
+catch (e) {
+    console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
+}
+exports.default = exports.sdk;
+//# sourceMappingURL=index.js.map
+
+/***/ },
+
+/***/ "./node_modules/@scrypted/sdk/dist/src/storage-settings.js"
+/*!*****************************************************************!*\
+  !*** ./node_modules/@scrypted/sdk/dist/src/storage-settings.js ***!
+  \*****************************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StorageSettings = void 0;
+const _1 = __importStar(__webpack_require__(/*! . */ "./node_modules/@scrypted/sdk/dist/src/index.js"));
+const { systemManager } = _1.default;
+function parseValue(value, setting, readDefaultValue, rawDevice) {
+    if (value === null || value === undefined) {
+        return readDefaultValue();
+    }
+    const type = setting.multiple ? 'array' : setting.type;
+    if (type === 'boolean') {
+        if (value === 'true')
+            return true;
+        if (value === 'false')
+            return false;
+        return readDefaultValue() || false;
+    }
+    if (type === 'number') {
+        const n = parseFloat(value);
+        if (!isNaN(n))
+            return n;
+        return readDefaultValue() || 0;
+    }
+    if (type === 'integer') {
+        const n = parseInt(value);
+        if (!isNaN(n))
+            return n;
+        return readDefaultValue() || 0;
+    }
+    if (type === 'array') {
+        if (!value)
+            return readDefaultValue() || [];
+        try {
+            return JSON.parse(value);
+        }
+        catch (e) {
+            return readDefaultValue() || [];
+        }
+    }
+    if (type === 'device') {
+        if (rawDevice)
+            return value;
+        return systemManager.getDeviceById(value) || systemManager.getDeviceById(readDefaultValue());
+    }
+    // string type, so check if it is json.
+    if (value && setting.json) {
+        try {
+            return JSON.parse(value);
+        }
+        catch (e) {
+            return readDefaultValue();
+        }
+    }
+    return value || readDefaultValue();
+}
+class StorageSettings {
+    constructor(device, settings) {
+        this.device = device;
+        this.settings = settings;
+        this.values = {};
+        this.hasValue = {};
+        for (const key of Object.keys(settings)) {
+            const setting = settings[key];
+            const rawGet = () => this.getItem(key);
+            let get;
+            if (setting.type !== 'clippath') {
+                get = rawGet;
+            }
+            else {
+                // maybe need a mapPut. clippath is the only complex type at the moment.
+                get = () => {
+                    try {
+                        return JSON.parse(rawGet());
+                    }
+                    catch (e) {
+                    }
+                };
+            }
+            Object.defineProperty(this.values, key, {
+                get,
+                set: value => this.putSetting(key, value),
+                enumerable: true,
+            });
+            Object.defineProperty(this.hasValue, key, {
+                get: () => this.device.storage.getItem(key) != null,
+                enumerable: true,
+            });
+        }
+    }
+    get keys() {
+        const ret = {};
+        for (const key of Object.keys(this.settings)) {
+            ret[key] = key;
+        }
+        return ret;
+    }
+    async getSettings() {
+        const onGet = await this.options?.onGet?.();
+        const ret = [];
+        for (const [key, setting] of Object.entries(this.settings)) {
+            let s = Object.assign({}, setting);
+            if (onGet?.[key])
+                s = Object.assign(s, onGet[key]);
+            if (s.onGet)
+                s = Object.assign(s, await s.onGet());
+            if (s.hide || await this.options?.hide?.[key]?.())
+                continue;
+            s.key = key;
+            s.value = this.getItemInternal(key, s, true);
+            if (typeof s.deviceFilter === 'function')
+                s.deviceFilter = s.deviceFilter.toString();
+            ret.push(s);
+            delete s.onPut;
+            delete s.onGet;
+            delete s.mapPut;
+            delete s.mapGet;
+        }
+        return ret;
+    }
+    async putSetting(key, value) {
+        const setting = this.settings[key];
+        let oldValue;
+        if (setting)
+            oldValue = this.getItemInternal(key, setting);
+        return this.putSettingInternal(setting, oldValue, key, value);
+    }
+    putSettingInternal(setting, oldValue, key, value) {
+        if (!setting?.noStore) {
+            if (setting?.mapPut)
+                value = setting.mapPut(oldValue, value);
+            // nullish values should be removed, since Storage can't persist them correctly.
+            if (value == null)
+                this.device.storage.removeItem(key);
+            else if (typeof value === 'object')
+                this.device.storage.setItem(key, JSON.stringify(value));
+            else
+                this.device.storage.setItem(key, value?.toString());
+        }
+        setting?.onPut?.(oldValue, value);
+        if (!setting?.hide)
+            this.device.onDeviceEvent(_1.ScryptedInterface.Settings, undefined);
+    }
+    getItemInternal(key, setting, rawDevice) {
+        if (!setting)
+            return this.device.storage.getItem(key);
+        const readDefaultValue = () => {
+            if (setting.persistedDefaultValue != null) {
+                this.putSettingInternal(setting, undefined, key, setting.persistedDefaultValue);
+                return setting.persistedDefaultValue;
+            }
+            return setting.defaultValue;
+        };
+        const ret = parseValue(this.device.storage.getItem(key), setting, readDefaultValue, rawDevice);
+        return setting.mapGet ? setting.mapGet(ret) : ret;
+    }
+    getItem(key) {
+        return this.getItemInternal(key, this.settings[key]);
+    }
+}
+exports.StorageSettings = StorageSettings;
+//# sourceMappingURL=storage-settings.js.map
+
+/***/ },
+
+/***/ "./node_modules/@scrypted/sdk/dist/src sync recursive"
+/*!***************************************************!*\
+  !*** ./node_modules/@scrypted/sdk/dist/src/ sync ***!
+  \***************************************************/
+(module) {
+
+function webpackEmptyContext(req) {
+	const e = new Error("Cannot find module '" + req + "'");
+	e.code = 'MODULE_NOT_FOUND';
+	throw e;
+}
+webpackEmptyContext.keys = () => ([]);
+webpackEmptyContext.resolve = webpackEmptyContext;
+webpackEmptyContext.id = "./node_modules/@scrypted/sdk/dist/src sync recursive";
+module.exports = webpackEmptyContext;
+
+/***/ },
+
+/***/ "./node_modules/@scrypted/sdk/dist/types/gen/index.js"
+/*!************************************************************!*\
+  !*** ./node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
+  \************************************************************/
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
+exports.TYPES_VERSION = "0.5.51";
+class DeviceBase {
+}
+exports.DeviceBase = DeviceBase;
+var ScryptedInterfaceProperty;
+(function (ScryptedInterfaceProperty) {
+    ScryptedInterfaceProperty["id"] = "id";
+    ScryptedInterfaceProperty["info"] = "info";
+    ScryptedInterfaceProperty["interfaces"] = "interfaces";
+    ScryptedInterfaceProperty["mixins"] = "mixins";
+    ScryptedInterfaceProperty["name"] = "name";
+    ScryptedInterfaceProperty["nativeId"] = "nativeId";
+    ScryptedInterfaceProperty["pluginId"] = "pluginId";
+    ScryptedInterfaceProperty["providedInterfaces"] = "providedInterfaces";
+    ScryptedInterfaceProperty["providedName"] = "providedName";
+    ScryptedInterfaceProperty["providedRoom"] = "providedRoom";
+    ScryptedInterfaceProperty["providedType"] = "providedType";
+    ScryptedInterfaceProperty["providerId"] = "providerId";
+    ScryptedInterfaceProperty["room"] = "room";
+    ScryptedInterfaceProperty["type"] = "type";
+    ScryptedInterfaceProperty["scryptedRuntimeArguments"] = "scryptedRuntimeArguments";
+    ScryptedInterfaceProperty["on"] = "on";
+    ScryptedInterfaceProperty["brightness"] = "brightness";
+    ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
+    ScryptedInterfaceProperty["rgb"] = "rgb";
+    ScryptedInterfaceProperty["hsv"] = "hsv";
+    ScryptedInterfaceProperty["buttons"] = "buttons";
+    ScryptedInterfaceProperty["sensors"] = "sensors";
+    ScryptedInterfaceProperty["running"] = "running";
+    ScryptedInterfaceProperty["paused"] = "paused";
+    ScryptedInterfaceProperty["docked"] = "docked";
+    ScryptedInterfaceProperty["temperatureSetting"] = "temperatureSetting";
+    ScryptedInterfaceProperty["temperature"] = "temperature";
+    ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
+    ScryptedInterfaceProperty["humidity"] = "humidity";
+    ScryptedInterfaceProperty["resolution"] = "resolution";
+    ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
+    ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
+    ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
+    ScryptedInterfaceProperty["lockState"] = "lockState";
+    ScryptedInterfaceProperty["entryOpen"] = "entryOpen";
+    ScryptedInterfaceProperty["batteryLevel"] = "batteryLevel";
+    ScryptedInterfaceProperty["chargeState"] = "chargeState";
+    ScryptedInterfaceProperty["online"] = "online";
+    ScryptedInterfaceProperty["fromMimeType"] = "fromMimeType";
+    ScryptedInterfaceProperty["toMimeType"] = "toMimeType";
+    ScryptedInterfaceProperty["converters"] = "converters";
+    ScryptedInterfaceProperty["binaryState"] = "binaryState";
+    ScryptedInterfaceProperty["tampered"] = "tampered";
+    ScryptedInterfaceProperty["sleeping"] = "sleeping";
+    ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
+    ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
+    ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
+    ScryptedInterfaceProperty["ambientLight"] = "ambientLight";
+    ScryptedInterfaceProperty["occupied"] = "occupied";
+    ScryptedInterfaceProperty["flooded"] = "flooded";
+    ScryptedInterfaceProperty["ultraviolet"] = "ultraviolet";
+    ScryptedInterfaceProperty["luminance"] = "luminance";
+    ScryptedInterfaceProperty["position"] = "position";
+    ScryptedInterfaceProperty["securitySystemState"] = "securitySystemState";
+    ScryptedInterfaceProperty["pm10Density"] = "pm10Density";
+    ScryptedInterfaceProperty["pm25Density"] = "pm25Density";
+    ScryptedInterfaceProperty["vocDensity"] = "vocDensity";
+    ScryptedInterfaceProperty["noxDensity"] = "noxDensity";
+    ScryptedInterfaceProperty["co2ppm"] = "co2ppm";
+    ScryptedInterfaceProperty["airQuality"] = "airQuality";
+    ScryptedInterfaceProperty["airPurifierState"] = "airPurifierState";
+    ScryptedInterfaceProperty["filterChangeIndication"] = "filterChangeIndication";
+    ScryptedInterfaceProperty["filterLifeLevel"] = "filterLifeLevel";
+    ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
+    ScryptedInterfaceProperty["fan"] = "fan";
+    ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
+    ScryptedInterfaceProperty["chatCompletionCapabilities"] = "chatCompletionCapabilities";
+    ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
+})(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
+var ScryptedInterfaceMethod;
+(function (ScryptedInterfaceMethod) {
+    ScryptedInterfaceMethod["listen"] = "listen";
+    ScryptedInterfaceMethod["probe"] = "probe";
+    ScryptedInterfaceMethod["setMixins"] = "setMixins";
+    ScryptedInterfaceMethod["setName"] = "setName";
+    ScryptedInterfaceMethod["setRoom"] = "setRoom";
+    ScryptedInterfaceMethod["setType"] = "setType";
+    ScryptedInterfaceMethod["getPluginJson"] = "getPluginJson";
+    ScryptedInterfaceMethod["turnOff"] = "turnOff";
+    ScryptedInterfaceMethod["turnOn"] = "turnOn";
+    ScryptedInterfaceMethod["setBrightness"] = "setBrightness";
+    ScryptedInterfaceMethod["getTemperatureMaxK"] = "getTemperatureMaxK";
+    ScryptedInterfaceMethod["getTemperatureMinK"] = "getTemperatureMinK";
+    ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
+    ScryptedInterfaceMethod["setRgb"] = "setRgb";
+    ScryptedInterfaceMethod["setHsv"] = "setHsv";
+    ScryptedInterfaceMethod["pressButton"] = "pressButton";
+    ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
+    ScryptedInterfaceMethod["start"] = "start";
+    ScryptedInterfaceMethod["stop"] = "stop";
+    ScryptedInterfaceMethod["pause"] = "pause";
+    ScryptedInterfaceMethod["resume"] = "resume";
+    ScryptedInterfaceMethod["dock"] = "dock";
+    ScryptedInterfaceMethod["setTemperature"] = "setTemperature";
+    ScryptedInterfaceMethod["setTemperatureUnit"] = "setTemperatureUnit";
+    ScryptedInterfaceMethod["getPictureOptions"] = "getPictureOptions";
+    ScryptedInterfaceMethod["takePicture"] = "takePicture";
+    ScryptedInterfaceMethod["getAudioStream"] = "getAudioStream";
+    ScryptedInterfaceMethod["setAudioVolumes"] = "setAudioVolumes";
+    ScryptedInterfaceMethod["startDisplay"] = "startDisplay";
+    ScryptedInterfaceMethod["stopDisplay"] = "stopDisplay";
+    ScryptedInterfaceMethod["getVideoStream"] = "getVideoStream";
+    ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
+    ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
+    ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
+    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
+    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
+    ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
+    ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
+    ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
+    ScryptedInterfaceMethod["getRecordingStreamThumbnail"] = "getRecordingStreamThumbnail";
+    ScryptedInterfaceMethod["deleteRecordingStream"] = "deleteRecordingStream";
+    ScryptedInterfaceMethod["setRecordingActive"] = "setRecordingActive";
+    ScryptedInterfaceMethod["ptzCommand"] = "ptzCommand";
+    ScryptedInterfaceMethod["getRecordedEvents"] = "getRecordedEvents";
+    ScryptedInterfaceMethod["getVideoClip"] = "getVideoClip";
+    ScryptedInterfaceMethod["getVideoClips"] = "getVideoClips";
+    ScryptedInterfaceMethod["getVideoClipThumbnail"] = "getVideoClipThumbnail";
+    ScryptedInterfaceMethod["removeVideoClips"] = "removeVideoClips";
+    ScryptedInterfaceMethod["setVideoStreamOptions"] = "setVideoStreamOptions";
+    ScryptedInterfaceMethod["startIntercom"] = "startIntercom";
+    ScryptedInterfaceMethod["stopIntercom"] = "stopIntercom";
+    ScryptedInterfaceMethod["lock"] = "lock";
+    ScryptedInterfaceMethod["unlock"] = "unlock";
+    ScryptedInterfaceMethod["addPassword"] = "addPassword";
+    ScryptedInterfaceMethod["getPasswords"] = "getPasswords";
+    ScryptedInterfaceMethod["removePassword"] = "removePassword";
+    ScryptedInterfaceMethod["activate"] = "activate";
+    ScryptedInterfaceMethod["deactivate"] = "deactivate";
+    ScryptedInterfaceMethod["isReversible"] = "isReversible";
+    ScryptedInterfaceMethod["closeEntry"] = "closeEntry";
+    ScryptedInterfaceMethod["openEntry"] = "openEntry";
+    ScryptedInterfaceMethod["getDevice"] = "getDevice";
+    ScryptedInterfaceMethod["releaseDevice"] = "releaseDevice";
+    ScryptedInterfaceMethod["adoptDevice"] = "adoptDevice";
+    ScryptedInterfaceMethod["discoverDevices"] = "discoverDevices";
+    ScryptedInterfaceMethod["createDevice"] = "createDevice";
+    ScryptedInterfaceMethod["getCreateDeviceSettings"] = "getCreateDeviceSettings";
+    ScryptedInterfaceMethod["reboot"] = "reboot";
+    ScryptedInterfaceMethod["getRefreshFrequency"] = "getRefreshFrequency";
+    ScryptedInterfaceMethod["refresh"] = "refresh";
+    ScryptedInterfaceMethod["getMediaStatus"] = "getMediaStatus";
+    ScryptedInterfaceMethod["load"] = "load";
+    ScryptedInterfaceMethod["seek"] = "seek";
+    ScryptedInterfaceMethod["skipNext"] = "skipNext";
+    ScryptedInterfaceMethod["skipPrevious"] = "skipPrevious";
+    ScryptedInterfaceMethod["convert"] = "convert";
+    ScryptedInterfaceMethod["convertMedia"] = "convertMedia";
+    ScryptedInterfaceMethod["getSettings"] = "getSettings";
+    ScryptedInterfaceMethod["putSetting"] = "putSetting";
+    ScryptedInterfaceMethod["armSecuritySystem"] = "armSecuritySystem";
+    ScryptedInterfaceMethod["disarmSecuritySystem"] = "disarmSecuritySystem";
+    ScryptedInterfaceMethod["setAirPurifierState"] = "setAirPurifierState";
+    ScryptedInterfaceMethod["getReadmeMarkdown"] = "getReadmeMarkdown";
+    ScryptedInterfaceMethod["getOauthUrl"] = "getOauthUrl";
+    ScryptedInterfaceMethod["onOauthCallback"] = "onOauthCallback";
+    ScryptedInterfaceMethod["canMixin"] = "canMixin";
+    ScryptedInterfaceMethod["getMixin"] = "getMixin";
+    ScryptedInterfaceMethod["releaseMixin"] = "releaseMixin";
+    ScryptedInterfaceMethod["onRequest"] = "onRequest";
+    ScryptedInterfaceMethod["onConnection"] = "onConnection";
+    ScryptedInterfaceMethod["onPush"] = "onPush";
+    ScryptedInterfaceMethod["run"] = "run";
+    ScryptedInterfaceMethod["eval"] = "eval";
+    ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
+    ScryptedInterfaceMethod["saveScript"] = "saveScript";
+    ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
+    ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
+    ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
+    ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
+    ScryptedInterfaceMethod["generateObjectDetections"] = "generateObjectDetections";
+    ScryptedInterfaceMethod["getDetectionModel"] = "getDetectionModel";
+    ScryptedInterfaceMethod["setHumidity"] = "setHumidity";
+    ScryptedInterfaceMethod["setFan"] = "setFan";
+    ScryptedInterfaceMethod["startRTCSignalingSession"] = "startRTCSignalingSession";
+    ScryptedInterfaceMethod["createRTCSignalingSession"] = "createRTCSignalingSession";
+    ScryptedInterfaceMethod["getScryptedUserAccessControl"] = "getScryptedUserAccessControl";
+    ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
+    ScryptedInterfaceMethod["connectStream"] = "connectStream";
+    ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
+    ScryptedInterfaceMethod["getChatCompletion"] = "getChatCompletion";
+    ScryptedInterfaceMethod["streamChatCompletion"] = "streamChatCompletion";
+    ScryptedInterfaceMethod["getTextEmbedding"] = "getTextEmbedding";
+    ScryptedInterfaceMethod["getImageEmbedding"] = "getImageEmbedding";
+    ScryptedInterfaceMethod["callLLMTool"] = "callLLMTool";
+    ScryptedInterfaceMethod["getLLMTools"] = "getLLMTools";
+})(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
+exports.ScryptedInterfaceDescriptors = {
+    "ScryptedDevice": {
+        "name": "ScryptedDevice",
+        "methods": [
+            "listen",
+            "probe",
+            "setMixins",
+            "setName",
+            "setRoom",
+            "setType"
+        ],
+        "properties": [
+            "id",
+            "info",
+            "interfaces",
+            "mixins",
+            "name",
+            "nativeId",
+            "pluginId",
+            "providedInterfaces",
+            "providedName",
+            "providedRoom",
+            "providedType",
+            "providerId",
+            "room",
+            "type"
+        ]
+    },
+    "ScryptedPlugin": {
+        "name": "ScryptedPlugin",
+        "methods": [
+            "getPluginJson"
+        ],
+        "properties": []
+    },
+    "ScryptedPluginRuntime": {
+        "name": "ScryptedPluginRuntime",
+        "methods": [],
+        "properties": [
+            "scryptedRuntimeArguments"
+        ]
+    },
+    "OnOff": {
+        "name": "OnOff",
+        "methods": [
+            "turnOff",
+            "turnOn"
+        ],
+        "properties": [
+            "on"
+        ]
+    },
+    "Brightness": {
+        "name": "Brightness",
+        "methods": [
+            "setBrightness"
+        ],
+        "properties": [
+            "brightness"
+        ]
+    },
+    "ColorSettingTemperature": {
+        "name": "ColorSettingTemperature",
+        "methods": [
+            "getTemperatureMaxK",
+            "getTemperatureMinK",
+            "setColorTemperature"
+        ],
+        "properties": [
+            "colorTemperature"
+        ]
+    },
+    "ColorSettingRgb": {
+        "name": "ColorSettingRgb",
+        "methods": [
+            "setRgb"
+        ],
+        "properties": [
+            "rgb"
+        ]
+    },
+    "ColorSettingHsv": {
+        "name": "ColorSettingHsv",
+        "methods": [
+            "setHsv"
+        ],
+        "properties": [
+            "hsv"
+        ]
+    },
+    "Buttons": {
+        "name": "Buttons",
+        "methods": [],
+        "properties": [
+            "buttons"
+        ]
+    },
+    "PressButtons": {
+        "name": "PressButtons",
+        "methods": [
+            "pressButton"
+        ],
+        "properties": []
+    },
+    "Sensors": {
+        "name": "Sensors",
+        "methods": [],
+        "properties": [
+            "sensors"
+        ]
+    },
+    "Notifier": {
+        "name": "Notifier",
+        "methods": [
+            "sendNotification"
+        ],
+        "properties": []
+    },
+    "StartStop": {
+        "name": "StartStop",
+        "methods": [
+            "start",
+            "stop"
+        ],
+        "properties": [
+            "running"
+        ]
+    },
+    "Pause": {
+        "name": "Pause",
+        "methods": [
+            "pause",
+            "resume"
+        ],
+        "properties": [
+            "paused"
+        ]
+    },
+    "Dock": {
+        "name": "Dock",
+        "methods": [
+            "dock"
+        ],
+        "properties": [
+            "docked"
+        ]
+    },
+    "TemperatureSetting": {
+        "name": "TemperatureSetting",
+        "methods": [
+            "setTemperature"
+        ],
+        "properties": [
+            "temperatureSetting"
+        ]
+    },
+    "Thermometer": {
+        "name": "Thermometer",
+        "methods": [
+            "setTemperatureUnit"
+        ],
+        "properties": [
+            "temperature",
+            "temperatureUnit"
+        ]
+    },
+    "HumiditySensor": {
+        "name": "HumiditySensor",
+        "methods": [],
+        "properties": [
+            "humidity"
+        ]
+    },
+    "Camera": {
+        "name": "Camera",
+        "methods": [
+            "getPictureOptions",
+            "takePicture"
+        ],
+        "properties": []
+    },
+    "Resolution": {
+        "name": "Resolution",
+        "methods": [],
+        "properties": [
+            "resolution"
+        ]
+    },
+    "Microphone": {
+        "name": "Microphone",
+        "methods": [
+            "getAudioStream"
+        ],
+        "properties": []
+    },
+    "AudioVolumeControl": {
+        "name": "AudioVolumeControl",
+        "methods": [
+            "setAudioVolumes"
+        ],
+        "properties": [
+            "audioVolumes"
+        ]
+    },
+    "Display": {
+        "name": "Display",
+        "methods": [
+            "startDisplay",
+            "stopDisplay"
+        ],
+        "properties": []
+    },
+    "VideoCamera": {
+        "name": "VideoCamera",
+        "methods": [
+            "getVideoStream",
+            "getVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "VideoCameraMask": {
+        "name": "VideoCameraMask",
+        "methods": [
+            "getPrivacyMasks",
+            "setPrivacyMasks"
+        ],
+        "properties": []
+    },
+    "VideoTextOverlays": {
+        "name": "VideoTextOverlays",
+        "methods": [
+            "getVideoTextOverlays",
+            "setVideoTextOverlay"
+        ],
+        "properties": []
+    },
+    "VideoRecorder": {
+        "name": "VideoRecorder",
+        "methods": [
+            "getRecordingStream",
+            "getRecordingStreamCurrentTime",
+            "getRecordingStreamOptions",
+            "getRecordingStreamThumbnail"
+        ],
+        "properties": [
+            "recordingActive"
+        ]
+    },
+    "VideoRecorderManagement": {
+        "name": "VideoRecorderManagement",
+        "methods": [
+            "deleteRecordingStream",
+            "setRecordingActive"
+        ],
+        "properties": []
+    },
+    "PanTiltZoom": {
+        "name": "PanTiltZoom",
+        "methods": [
+            "ptzCommand"
+        ],
+        "properties": [
+            "ptzCapabilities"
+        ]
+    },
+    "EventRecorder": {
+        "name": "EventRecorder",
+        "methods": [
+            "getRecordedEvents"
+        ],
+        "properties": []
+    },
+    "VideoClips": {
+        "name": "VideoClips",
+        "methods": [
+            "getVideoClip",
+            "getVideoClips",
+            "getVideoClipThumbnail",
+            "removeVideoClips"
+        ],
+        "properties": []
+    },
+    "VideoCameraConfiguration": {
+        "name": "VideoCameraConfiguration",
+        "methods": [
+            "setVideoStreamOptions"
+        ],
+        "properties": []
+    },
+    "Intercom": {
+        "name": "Intercom",
+        "methods": [
+            "startIntercom",
+            "stopIntercom"
+        ],
+        "properties": []
+    },
+    "Lock": {
+        "name": "Lock",
+        "methods": [
+            "lock",
+            "unlock"
+        ],
+        "properties": [
+            "lockState"
+        ]
+    },
+    "PasswordStore": {
+        "name": "PasswordStore",
+        "methods": [
+            "addPassword",
+            "getPasswords",
+            "removePassword"
+        ],
+        "properties": []
+    },
+    "Scene": {
+        "name": "Scene",
+        "methods": [
+            "activate",
+            "deactivate",
+            "isReversible"
+        ],
+        "properties": []
+    },
+    "Entry": {
+        "name": "Entry",
+        "methods": [
+            "closeEntry",
+            "openEntry"
+        ],
+        "properties": []
+    },
+    "EntrySensor": {
+        "name": "EntrySensor",
+        "methods": [],
+        "properties": [
+            "entryOpen"
+        ]
+    },
+    "DeviceProvider": {
+        "name": "DeviceProvider",
+        "methods": [
+            "getDevice",
+            "releaseDevice"
+        ],
+        "properties": []
+    },
+    "DeviceDiscovery": {
+        "name": "DeviceDiscovery",
+        "methods": [
+            "adoptDevice",
+            "discoverDevices"
+        ],
+        "properties": []
+    },
+    "DeviceCreator": {
+        "name": "DeviceCreator",
+        "methods": [
+            "createDevice",
+            "getCreateDeviceSettings"
+        ],
+        "properties": []
+    },
+    "Battery": {
+        "name": "Battery",
+        "methods": [],
+        "properties": [
+            "batteryLevel"
+        ]
+    },
+    "Charger": {
+        "name": "Charger",
+        "methods": [],
+        "properties": [
+            "chargeState"
+        ]
+    },
+    "Reboot": {
+        "name": "Reboot",
+        "methods": [
+            "reboot"
+        ],
+        "properties": []
+    },
+    "Refresh": {
+        "name": "Refresh",
+        "methods": [
+            "getRefreshFrequency",
+            "refresh"
+        ],
+        "properties": []
+    },
+    "MediaPlayer": {
+        "name": "MediaPlayer",
+        "methods": [
+            "getMediaStatus",
+            "load",
+            "seek",
+            "skipNext",
+            "skipPrevious"
+        ],
+        "properties": []
+    },
+    "Online": {
+        "name": "Online",
+        "methods": [],
+        "properties": [
+            "online"
+        ]
+    },
+    "BufferConverter": {
+        "name": "BufferConverter",
+        "methods": [
+            "convert"
+        ],
+        "properties": [
+            "fromMimeType",
+            "toMimeType"
+        ]
+    },
+    "MediaConverter": {
+        "name": "MediaConverter",
+        "methods": [
+            "convertMedia"
+        ],
+        "properties": [
+            "converters"
+        ]
+    },
+    "Settings": {
+        "name": "Settings",
+        "methods": [
+            "getSettings",
+            "putSetting"
+        ],
+        "properties": []
+    },
+    "BinarySensor": {
+        "name": "BinarySensor",
+        "methods": [],
+        "properties": [
+            "binaryState"
+        ]
+    },
+    "TamperSensor": {
+        "name": "TamperSensor",
+        "methods": [],
+        "properties": [
+            "tampered"
+        ]
+    },
+    "Sleep": {
+        "name": "Sleep",
+        "methods": [],
+        "properties": [
+            "sleeping"
+        ]
+    },
+    "PowerSensor": {
+        "name": "PowerSensor",
+        "methods": [],
+        "properties": [
+            "powerDetected"
+        ]
+    },
+    "AudioSensor": {
+        "name": "AudioSensor",
+        "methods": [],
+        "properties": [
+            "audioDetected"
+        ]
+    },
+    "MotionSensor": {
+        "name": "MotionSensor",
+        "methods": [],
+        "properties": [
+            "motionDetected"
+        ]
+    },
+    "AmbientLightSensor": {
+        "name": "AmbientLightSensor",
+        "methods": [],
+        "properties": [
+            "ambientLight"
+        ]
+    },
+    "OccupancySensor": {
+        "name": "OccupancySensor",
+        "methods": [],
+        "properties": [
+            "occupied"
+        ]
+    },
+    "FloodSensor": {
+        "name": "FloodSensor",
+        "methods": [],
+        "properties": [
+            "flooded"
+        ]
+    },
+    "UltravioletSensor": {
+        "name": "UltravioletSensor",
+        "methods": [],
+        "properties": [
+            "ultraviolet"
+        ]
+    },
+    "LuminanceSensor": {
+        "name": "LuminanceSensor",
+        "methods": [],
+        "properties": [
+            "luminance"
+        ]
+    },
+    "PositionSensor": {
+        "name": "PositionSensor",
+        "methods": [],
+        "properties": [
+            "position"
+        ]
+    },
+    "SecuritySystem": {
+        "name": "SecuritySystem",
+        "methods": [
+            "armSecuritySystem",
+            "disarmSecuritySystem"
+        ],
+        "properties": [
+            "securitySystemState"
+        ]
+    },
+    "PM10Sensor": {
+        "name": "PM10Sensor",
+        "methods": [],
+        "properties": [
+            "pm10Density"
+        ]
+    },
+    "PM25Sensor": {
+        "name": "PM25Sensor",
+        "methods": [],
+        "properties": [
+            "pm25Density"
+        ]
+    },
+    "VOCSensor": {
+        "name": "VOCSensor",
+        "methods": [],
+        "properties": [
+            "vocDensity"
+        ]
+    },
+    "NOXSensor": {
+        "name": "NOXSensor",
+        "methods": [],
+        "properties": [
+            "noxDensity"
+        ]
+    },
+    "CO2Sensor": {
+        "name": "CO2Sensor",
+        "methods": [],
+        "properties": [
+            "co2ppm"
+        ]
+    },
+    "AirQualitySensor": {
+        "name": "AirQualitySensor",
+        "methods": [],
+        "properties": [
+            "airQuality"
+        ]
+    },
+    "AirPurifier": {
+        "name": "AirPurifier",
+        "methods": [
+            "setAirPurifierState"
+        ],
+        "properties": [
+            "airPurifierState"
+        ]
+    },
+    "FilterMaintenance": {
+        "name": "FilterMaintenance",
+        "methods": [],
+        "properties": [
+            "filterChangeIndication",
+            "filterLifeLevel"
+        ]
+    },
+    "Readme": {
+        "name": "Readme",
+        "methods": [
+            "getReadmeMarkdown"
+        ],
+        "properties": []
+    },
+    "OauthClient": {
+        "name": "OauthClient",
+        "methods": [
+            "getOauthUrl",
+            "onOauthCallback"
+        ],
+        "properties": []
+    },
+    "MixinProvider": {
+        "name": "MixinProvider",
+        "methods": [
+            "canMixin",
+            "getMixin",
+            "releaseMixin"
+        ],
+        "properties": []
+    },
+    "HttpRequestHandler": {
+        "name": "HttpRequestHandler",
+        "methods": [
+            "onRequest"
+        ],
+        "properties": []
+    },
+    "EngineIOHandler": {
+        "name": "EngineIOHandler",
+        "methods": [
+            "onConnection"
+        ],
+        "properties": []
+    },
+    "PushHandler": {
+        "name": "PushHandler",
+        "methods": [
+            "onPush"
+        ],
+        "properties": []
+    },
+    "Program": {
+        "name": "Program",
+        "methods": [
+            "run"
+        ],
+        "properties": []
+    },
+    "Scriptable": {
+        "name": "Scriptable",
+        "methods": [
+            "eval",
+            "loadScripts",
+            "saveScript"
+        ],
+        "properties": []
+    },
+    "ClusterForkInterface": {
+        "name": "ClusterForkInterface",
+        "methods": [
+            "forkInterface"
+        ],
+        "properties": []
+    },
+    "ObjectDetector": {
+        "name": "ObjectDetector",
+        "methods": [
+            "getDetectionInput",
+            "getObjectTypes"
+        ],
+        "properties": []
+    },
+    "ObjectDetection": {
+        "name": "ObjectDetection",
+        "methods": [
+            "detectObjects",
+            "generateObjectDetections",
+            "getDetectionModel"
+        ],
+        "properties": []
+    },
+    "ObjectDetectionPreview": {
+        "name": "ObjectDetectionPreview",
+        "methods": [],
+        "properties": []
+    },
+    "ObjectDetectionGenerator": {
+        "name": "ObjectDetectionGenerator",
+        "methods": [],
+        "properties": []
+    },
+    "HumiditySetting": {
+        "name": "HumiditySetting",
+        "methods": [
+            "setHumidity"
+        ],
+        "properties": [
+            "humiditySetting"
+        ]
+    },
+    "Fan": {
+        "name": "Fan",
+        "methods": [
+            "setFan"
+        ],
+        "properties": [
+            "fan"
+        ]
+    },
+    "RTCSignalingChannel": {
+        "name": "RTCSignalingChannel",
+        "methods": [
+            "startRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "RTCSignalingClient": {
+        "name": "RTCSignalingClient",
+        "methods": [
+            "createRTCSignalingSession"
+        ],
+        "properties": []
+    },
+    "LauncherApplication": {
+        "name": "LauncherApplication",
+        "methods": [],
+        "properties": [
+            "applicationInfo"
+        ]
+    },
+    "ScryptedUser": {
+        "name": "ScryptedUser",
+        "methods": [
+            "getScryptedUserAccessControl"
+        ],
+        "properties": []
+    },
+    "VideoFrameGenerator": {
+        "name": "VideoFrameGenerator",
+        "methods": [
+            "generateVideoFrames"
+        ],
+        "properties": []
+    },
+    "StreamService": {
+        "name": "StreamService",
+        "methods": [
+            "connectStream"
+        ],
+        "properties": []
+    },
+    "TTY": {
+        "name": "TTY",
+        "methods": [],
+        "properties": []
+    },
+    "TTYSettings": {
+        "name": "TTYSettings",
+        "methods": [
+            "getTTYSettings"
+        ],
+        "properties": []
+    },
+    "ChatCompletion": {
+        "name": "ChatCompletion",
+        "methods": [
+            "getChatCompletion",
+            "streamChatCompletion"
+        ],
+        "properties": [
+            "chatCompletionCapabilities"
+        ]
+    },
+    "TextEmbedding": {
+        "name": "TextEmbedding",
+        "methods": [
+            "getTextEmbedding"
+        ],
+        "properties": []
+    },
+    "ImageEmbedding": {
+        "name": "ImageEmbedding",
+        "methods": [
+            "getImageEmbedding"
+        ],
+        "properties": []
+    },
+    "LLMTools": {
+        "name": "LLMTools",
+        "methods": [
+            "callLLMTool",
+            "getLLMTools"
+        ],
+        "properties": []
+    },
+    "ScryptedSystemDevice": {
+        "name": "ScryptedSystemDevice",
+        "methods": [],
+        "properties": [
+            "systemDevice"
+        ]
+    },
+    "ScryptedDeviceCreator": {
+        "name": "ScryptedDeviceCreator",
+        "methods": [],
+        "properties": []
+    },
+    "ScryptedSettings": {
+        "name": "ScryptedSettings",
+        "methods": [],
+        "properties": []
+    }
+};
+/**
+ * @category Core Reference
+ */
+var ScryptedDeviceType;
+(function (ScryptedDeviceType) {
+    /**
+     * @deprecated
+     */
+    ScryptedDeviceType["Builtin"] = "Builtin";
+    /**
+     * Internal devices will not show up in device lists unless explicitly searched.
+     */
+    ScryptedDeviceType["Internal"] = "Internal";
+    ScryptedDeviceType["Camera"] = "Camera";
+    ScryptedDeviceType["Fan"] = "Fan";
+    ScryptedDeviceType["Light"] = "Light";
+    ScryptedDeviceType["Switch"] = "Switch";
+    ScryptedDeviceType["Outlet"] = "Outlet";
+    ScryptedDeviceType["Sensor"] = "Sensor";
+    ScryptedDeviceType["Scene"] = "Scene";
+    ScryptedDeviceType["Program"] = "Program";
+    ScryptedDeviceType["Automation"] = "Automation";
+    ScryptedDeviceType["Vacuum"] = "Vacuum";
+    ScryptedDeviceType["Notifier"] = "Notifier";
+    ScryptedDeviceType["Thermostat"] = "Thermostat";
+    ScryptedDeviceType["Lock"] = "Lock";
+    ScryptedDeviceType["PasswordControl"] = "PasswordControl";
+    /**
+     * Displays have audio and video output.
+     */
+    ScryptedDeviceType["Display"] = "Display";
+    /**
+     * Smart Displays have two way audio and video.
+     */
+    ScryptedDeviceType["SmartDisplay"] = "SmartDisplay";
+    ScryptedDeviceType["Speaker"] = "Speaker";
+    /**
+     * Smart Speakers have two way audio.
+     */
+    ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
+    ScryptedDeviceType["RemoteDesktop"] = "RemoteDesktop";
+    ScryptedDeviceType["Event"] = "Event";
+    ScryptedDeviceType["Entry"] = "Entry";
+    ScryptedDeviceType["Garage"] = "Garage";
+    ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
+    ScryptedDeviceType["DataSource"] = "DataSource";
+    ScryptedDeviceType["API"] = "API";
+    ScryptedDeviceType["Buttons"] = "Buttons";
+    ScryptedDeviceType["Doorbell"] = "Doorbell";
+    ScryptedDeviceType["Irrigation"] = "Irrigation";
+    ScryptedDeviceType["Valve"] = "Valve";
+    ScryptedDeviceType["Person"] = "Person";
+    ScryptedDeviceType["SecuritySystem"] = "SecuritySystem";
+    ScryptedDeviceType["WindowCovering"] = "WindowCovering";
+    ScryptedDeviceType["Siren"] = "Siren";
+    ScryptedDeviceType["AirPurifier"] = "AirPurifier";
+    ScryptedDeviceType["Internet"] = "Internet";
+    ScryptedDeviceType["Network"] = "Network";
+    ScryptedDeviceType["Bridge"] = "Bridge";
+    ScryptedDeviceType["LLM"] = "LLM";
+    ScryptedDeviceType["Unknown"] = "Unknown";
+})(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
+var HumidityMode;
+(function (HumidityMode) {
+    HumidityMode["Humidify"] = "Humidify";
+    HumidityMode["Dehumidify"] = "Dehumidify";
+    HumidityMode["Auto"] = "Auto";
+    HumidityMode["Off"] = "Off";
+})(HumidityMode || (exports.HumidityMode = HumidityMode = {}));
+var FanMode;
+(function (FanMode) {
+    FanMode["Auto"] = "Auto";
+    FanMode["Manual"] = "Manual";
+})(FanMode || (exports.FanMode = FanMode = {}));
+var TemperatureUnit;
+(function (TemperatureUnit) {
+    TemperatureUnit["C"] = "C";
+    TemperatureUnit["F"] = "F";
+})(TemperatureUnit || (exports.TemperatureUnit = TemperatureUnit = {}));
+var ThermostatMode;
+(function (ThermostatMode) {
+    ThermostatMode["Off"] = "Off";
+    ThermostatMode["Cool"] = "Cool";
+    ThermostatMode["Heat"] = "Heat";
+    ThermostatMode["HeatCool"] = "HeatCool";
+    ThermostatMode["Auto"] = "Auto";
+    ThermostatMode["FanOnly"] = "FanOnly";
+    ThermostatMode["Purifier"] = "Purifier";
+    ThermostatMode["Eco"] = "Eco";
+    ThermostatMode["Dry"] = "Dry";
+    ThermostatMode["On"] = "On";
+})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
+var PanTiltZoomMovement;
+(function (PanTiltZoomMovement) {
+    PanTiltZoomMovement["Absolute"] = "Absolute";
+    PanTiltZoomMovement["Relative"] = "Relative";
+    PanTiltZoomMovement["Continuous"] = "Continuous";
+    PanTiltZoomMovement["Preset"] = "Preset";
+    PanTiltZoomMovement["Home"] = "Home";
+})(PanTiltZoomMovement || (exports.PanTiltZoomMovement = PanTiltZoomMovement = {}));
+var LockState;
+(function (LockState) {
+    LockState["Locked"] = "Locked";
+    LockState["Unlocked"] = "Unlocked";
+    LockState["Jammed"] = "Jammed";
+})(LockState || (exports.LockState = LockState = {}));
+var ChargeState;
+(function (ChargeState) {
+    ChargeState["Trickle"] = "trickle";
+    ChargeState["Charging"] = "charging";
+    ChargeState["NotCharging"] = "not-charging";
+})(ChargeState || (exports.ChargeState = ChargeState = {}));
+var AirPurifierStatus;
+(function (AirPurifierStatus) {
+    AirPurifierStatus["Inactive"] = "Inactive";
+    AirPurifierStatus["Idle"] = "Idle";
+    AirPurifierStatus["Active"] = "Active";
+    AirPurifierStatus["ActiveNightMode"] = "ActiveNightMode";
+})(AirPurifierStatus || (exports.AirPurifierStatus = AirPurifierStatus = {}));
+var AirPurifierMode;
+(function (AirPurifierMode) {
+    AirPurifierMode["Manual"] = "Manual";
+    AirPurifierMode["Automatic"] = "Automatic";
+})(AirPurifierMode || (exports.AirPurifierMode = AirPurifierMode = {}));
+var AirQuality;
+(function (AirQuality) {
+    AirQuality["Unknown"] = "Unknown";
+    AirQuality["Excellent"] = "Excellent";
+    AirQuality["Good"] = "Good";
+    AirQuality["Fair"] = "Fair";
+    AirQuality["Inferior"] = "Inferior";
+    AirQuality["Poor"] = "Poor";
+})(AirQuality || (exports.AirQuality = AirQuality = {}));
+var SecuritySystemMode;
+(function (SecuritySystemMode) {
+    SecuritySystemMode["Disarmed"] = "Disarmed";
+    SecuritySystemMode["HomeArmed"] = "HomeArmed";
+    SecuritySystemMode["AwayArmed"] = "AwayArmed";
+    SecuritySystemMode["NightArmed"] = "NightArmed";
+})(SecuritySystemMode || (exports.SecuritySystemMode = SecuritySystemMode = {}));
+var SecuritySystemObstruction;
+(function (SecuritySystemObstruction) {
+    SecuritySystemObstruction["Sensor"] = "Sensor";
+    SecuritySystemObstruction["Occupied"] = "Occupied";
+    SecuritySystemObstruction["Time"] = "Time";
+    SecuritySystemObstruction["Error"] = "Error";
+})(SecuritySystemObstruction || (exports.SecuritySystemObstruction = SecuritySystemObstruction = {}));
+var MediaPlayerState;
+(function (MediaPlayerState) {
+    MediaPlayerState["Idle"] = "Idle";
+    MediaPlayerState["Playing"] = "Playing";
+    MediaPlayerState["Paused"] = "Paused";
+    MediaPlayerState["Buffering"] = "Buffering";
+})(MediaPlayerState || (exports.MediaPlayerState = MediaPlayerState = {}));
+var ScryptedInterface;
+(function (ScryptedInterface) {
+    ScryptedInterface["ScryptedDevice"] = "ScryptedDevice";
+    ScryptedInterface["ScryptedPlugin"] = "ScryptedPlugin";
+    ScryptedInterface["ScryptedPluginRuntime"] = "ScryptedPluginRuntime";
+    ScryptedInterface["OnOff"] = "OnOff";
+    ScryptedInterface["Brightness"] = "Brightness";
+    ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
+    ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
+    ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
+    ScryptedInterface["Buttons"] = "Buttons";
+    ScryptedInterface["PressButtons"] = "PressButtons";
+    ScryptedInterface["Sensors"] = "Sensors";
+    ScryptedInterface["Notifier"] = "Notifier";
+    ScryptedInterface["StartStop"] = "StartStop";
+    ScryptedInterface["Pause"] = "Pause";
+    ScryptedInterface["Dock"] = "Dock";
+    ScryptedInterface["TemperatureSetting"] = "TemperatureSetting";
+    ScryptedInterface["Thermometer"] = "Thermometer";
+    ScryptedInterface["HumiditySensor"] = "HumiditySensor";
+    ScryptedInterface["Camera"] = "Camera";
+    ScryptedInterface["Resolution"] = "Resolution";
+    ScryptedInterface["Microphone"] = "Microphone";
+    ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
+    ScryptedInterface["Display"] = "Display";
+    ScryptedInterface["VideoCamera"] = "VideoCamera";
+    ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
+    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
+    ScryptedInterface["VideoRecorder"] = "VideoRecorder";
+    ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
+    ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
+    ScryptedInterface["EventRecorder"] = "EventRecorder";
+    ScryptedInterface["VideoClips"] = "VideoClips";
+    ScryptedInterface["VideoCameraConfiguration"] = "VideoCameraConfiguration";
+    ScryptedInterface["Intercom"] = "Intercom";
+    ScryptedInterface["Lock"] = "Lock";
+    ScryptedInterface["PasswordStore"] = "PasswordStore";
+    ScryptedInterface["Scene"] = "Scene";
+    ScryptedInterface["Entry"] = "Entry";
+    ScryptedInterface["EntrySensor"] = "EntrySensor";
+    ScryptedInterface["DeviceProvider"] = "DeviceProvider";
+    ScryptedInterface["DeviceDiscovery"] = "DeviceDiscovery";
+    ScryptedInterface["DeviceCreator"] = "DeviceCreator";
+    ScryptedInterface["Battery"] = "Battery";
+    ScryptedInterface["Charger"] = "Charger";
+    ScryptedInterface["Reboot"] = "Reboot";
+    ScryptedInterface["Refresh"] = "Refresh";
+    ScryptedInterface["MediaPlayer"] = "MediaPlayer";
+    ScryptedInterface["Online"] = "Online";
+    ScryptedInterface["BufferConverter"] = "BufferConverter";
+    ScryptedInterface["MediaConverter"] = "MediaConverter";
+    ScryptedInterface["Settings"] = "Settings";
+    ScryptedInterface["BinarySensor"] = "BinarySensor";
+    ScryptedInterface["TamperSensor"] = "TamperSensor";
+    ScryptedInterface["Sleep"] = "Sleep";
+    ScryptedInterface["PowerSensor"] = "PowerSensor";
+    ScryptedInterface["AudioSensor"] = "AudioSensor";
+    ScryptedInterface["MotionSensor"] = "MotionSensor";
+    ScryptedInterface["AmbientLightSensor"] = "AmbientLightSensor";
+    ScryptedInterface["OccupancySensor"] = "OccupancySensor";
+    ScryptedInterface["FloodSensor"] = "FloodSensor";
+    ScryptedInterface["UltravioletSensor"] = "UltravioletSensor";
+    ScryptedInterface["LuminanceSensor"] = "LuminanceSensor";
+    ScryptedInterface["PositionSensor"] = "PositionSensor";
+    ScryptedInterface["SecuritySystem"] = "SecuritySystem";
+    ScryptedInterface["PM10Sensor"] = "PM10Sensor";
+    ScryptedInterface["PM25Sensor"] = "PM25Sensor";
+    ScryptedInterface["VOCSensor"] = "VOCSensor";
+    ScryptedInterface["NOXSensor"] = "NOXSensor";
+    ScryptedInterface["CO2Sensor"] = "CO2Sensor";
+    ScryptedInterface["AirQualitySensor"] = "AirQualitySensor";
+    ScryptedInterface["AirPurifier"] = "AirPurifier";
+    ScryptedInterface["FilterMaintenance"] = "FilterMaintenance";
+    ScryptedInterface["Readme"] = "Readme";
+    ScryptedInterface["OauthClient"] = "OauthClient";
+    ScryptedInterface["MixinProvider"] = "MixinProvider";
+    ScryptedInterface["HttpRequestHandler"] = "HttpRequestHandler";
+    ScryptedInterface["EngineIOHandler"] = "EngineIOHandler";
+    ScryptedInterface["PushHandler"] = "PushHandler";
+    ScryptedInterface["Program"] = "Program";
+    ScryptedInterface["Scriptable"] = "Scriptable";
+    ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
+    ScryptedInterface["ObjectDetector"] = "ObjectDetector";
+    ScryptedInterface["ObjectDetection"] = "ObjectDetection";
+    ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
+    ScryptedInterface["ObjectDetectionGenerator"] = "ObjectDetectionGenerator";
+    ScryptedInterface["HumiditySetting"] = "HumiditySetting";
+    ScryptedInterface["Fan"] = "Fan";
+    ScryptedInterface["RTCSignalingChannel"] = "RTCSignalingChannel";
+    ScryptedInterface["RTCSignalingClient"] = "RTCSignalingClient";
+    ScryptedInterface["LauncherApplication"] = "LauncherApplication";
+    ScryptedInterface["ScryptedUser"] = "ScryptedUser";
+    ScryptedInterface["VideoFrameGenerator"] = "VideoFrameGenerator";
+    ScryptedInterface["StreamService"] = "StreamService";
+    ScryptedInterface["TTY"] = "TTY";
+    ScryptedInterface["TTYSettings"] = "TTYSettings";
+    ScryptedInterface["ChatCompletion"] = "ChatCompletion";
+    ScryptedInterface["TextEmbedding"] = "TextEmbedding";
+    ScryptedInterface["ImageEmbedding"] = "ImageEmbedding";
+    ScryptedInterface["LLMTools"] = "LLMTools";
+    ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
+    ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
+    ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
+})(ScryptedInterface || (exports.ScryptedInterface = ScryptedInterface = {}));
+var ScryptedMimeTypes;
+(function (ScryptedMimeTypes) {
+    ScryptedMimeTypes["Url"] = "text/x-uri";
+    ScryptedMimeTypes["InsecureLocalUrl"] = "text/x-insecure-local-uri";
+    ScryptedMimeTypes["LocalUrl"] = "text/x-local-uri";
+    ScryptedMimeTypes["ServerId"] = "text/x-server-id";
+    ScryptedMimeTypes["PushEndpoint"] = "text/x-push-endpoint";
+    ScryptedMimeTypes["SchemePrefix"] = "x-scrypted/x-scrypted-scheme-";
+    ScryptedMimeTypes["MediaStreamUrl"] = "text/x-media-url";
+    ScryptedMimeTypes["MediaObject"] = "x-scrypted/x-scrypted-media-object";
+    ScryptedMimeTypes["RequestMediaObject"] = "x-scrypted/x-scrypted-request-media-object";
+    ScryptedMimeTypes["RequestMediaStream"] = "x-scrypted/x-scrypted-request-stream";
+    ScryptedMimeTypes["MediaStreamFeedback"] = "x-scrypted/x-media-stream-feedback";
+    ScryptedMimeTypes["FFmpegInput"] = "x-scrypted/x-ffmpeg-input";
+    ScryptedMimeTypes["FFmpegTranscodeStream"] = "x-scrypted/x-ffmpeg-transcode-stream";
+    ScryptedMimeTypes["RTCSignalingChannel"] = "x-scrypted/x-scrypted-rtc-signaling-channel";
+    ScryptedMimeTypes["RTCSignalingSession"] = "x-scrypted/x-scrypted-rtc-signaling-session";
+    ScryptedMimeTypes["RTCConnectionManagement"] = "x-scrypted/x-scrypted-rtc-connection-management";
+    ScryptedMimeTypes["Image"] = "x-scrypted/x-scrypted-image";
+})(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
+//# sourceMappingURL=index.js.map
+
+/***/ },
+
+/***/ "./node_modules/lodash/lodash.js"
 /*!***************************************!*\
   !*** ./node_modules/lodash/lodash.js ***!
   \***************************************/
-/***/ (function(module, exports, __webpack_require__) {
+(module, exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
 var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -48421,17 +51737,18 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   }
   // Check for `exports` after `define` in case a build optimizer adds it.
-  else {}
+  else // removed by dead control flow
+{}
 }.call(this));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/af.js":
+/***/ "./node_modules/moment/locale/af.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/af.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Afrikaans [af]
@@ -48515,13 +51832,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-dz.js":
+/***/ "./node_modules/moment/locale/ar-dz.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-dz.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Algeria) [ar-dz]
@@ -48690,13 +52007,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-kw.js":
+/***/ "./node_modules/moment/locale/ar-kw.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-kw.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Kuwait) [ar-kw]
@@ -48764,13 +52081,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-ly.js":
+/***/ "./node_modules/moment/locale/ar-ly.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-ly.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Libya) [ar-ly]
@@ -48954,13 +52271,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-ma.js":
+/***/ "./node_modules/moment/locale/ar-ma.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-ma.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Morocco) [ar-ma]
@@ -49029,13 +52346,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-ps.js":
+/***/ "./node_modules/moment/locale/ar-ps.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-ps.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Palestine) [ar-ps]
@@ -49160,13 +52477,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-sa.js":
+/***/ "./node_modules/moment/locale/ar-sa.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-sa.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic (Saudi Arabia) [ar-sa]
@@ -49284,13 +52601,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar-tn.js":
+/***/ "./node_modules/moment/locale/ar-tn.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ar-tn.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale  :  Arabic (Tunisia) [ar-tn]
@@ -49358,13 +52675,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ar.js":
+/***/ "./node_modules/moment/locale/ar.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ar.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Arabic [ar]
@@ -49566,13 +52883,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/az.js":
+/***/ "./node_modules/moment/locale/az.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/az.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Azerbaijani [az]
@@ -49687,13 +53004,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/be.js":
+/***/ "./node_modules/moment/locale/be.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/be.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Belarusian [be]
@@ -49848,13 +53165,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bg.js":
+/***/ "./node_modules/moment/locale/bg.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/bg.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Bulgarian [bg]
@@ -49954,13 +53271,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bm.js":
+/***/ "./node_modules/moment/locale/bm.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/bm.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Bambara [bm]
@@ -50024,13 +53341,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bn-bd.js":
+/***/ "./node_modules/moment/locale/bn-bd.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/bn-bd.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Bengali (Bangladesh) [bn-bd]
@@ -50172,13 +53489,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bn.js":
+/***/ "./node_modules/moment/locale/bn.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/bn.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Bengali [bn]
@@ -50310,13 +53627,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bo.js":
+/***/ "./node_modules/moment/locale/bo.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/bo.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Tibetan [bo]
@@ -50453,13 +53770,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/br.js":
+/***/ "./node_modules/moment/locale/br.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/br.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Breton [br]
@@ -50640,13 +53957,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/bs.js":
+/***/ "./node_modules/moment/locale/bs.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/bs.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Bosnian [bs]
@@ -50819,13 +54136,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ca.js":
+/***/ "./node_modules/moment/locale/ca.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ca.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Catalan [ca]
@@ -50938,13 +54255,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/cs.js":
+/***/ "./node_modules/moment/locale/cs.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/cs.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Czech [cs]
@@ -51138,13 +54455,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/cv.js":
+/***/ "./node_modules/moment/locale/cv.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/cv.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Chuvash [cv]
@@ -51220,13 +54537,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/cy.js":
+/***/ "./node_modules/moment/locale/cy.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/cy.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Welsh [cy]
@@ -51337,13 +54654,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/da.js":
+/***/ "./node_modules/moment/locale/da.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/da.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Danish [da]
@@ -51409,13 +54726,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/de-at.js":
+/***/ "./node_modules/moment/locale/de-at.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/de-at.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : German (Austria) [de-at]
@@ -51507,13 +54824,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/de-ch.js":
+/***/ "./node_modules/moment/locale/de-ch.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/de-ch.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : German (Switzerland) [de-ch]
@@ -51602,13 +54919,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/de.js":
+/***/ "./node_modules/moment/locale/de.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/de.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : German [de]
@@ -51699,13 +55016,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/dv.js":
+/***/ "./node_modules/moment/locale/dv.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/dv.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Maldivian [dv]
@@ -51808,13 +55125,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/el.js":
+/***/ "./node_modules/moment/locale/el.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/el.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Greek [el]
@@ -51933,13 +55250,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-au.js":
+/***/ "./node_modules/moment/locale/en-au.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-au.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (Australia) [en-au]
@@ -52020,13 +55337,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-ca.js":
+/***/ "./node_modules/moment/locale/en-ca.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-ca.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (Canada) [en-ca]
@@ -52103,13 +55420,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-gb.js":
+/***/ "./node_modules/moment/locale/en-gb.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-gb.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (United Kingdom) [en-gb]
@@ -52190,13 +55507,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-ie.js":
+/***/ "./node_modules/moment/locale/en-ie.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-ie.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (Ireland) [en-ie]
@@ -52277,13 +55594,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-il.js":
+/***/ "./node_modules/moment/locale/en-il.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-il.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (Israel) [en-il]
@@ -52360,13 +55677,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-in.js":
+/***/ "./node_modules/moment/locale/en-in.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-in.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (India) [en-in]
@@ -52447,13 +55764,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-nz.js":
+/***/ "./node_modules/moment/locale/en-nz.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-nz.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (New Zealand) [en-nz]
@@ -52534,13 +55851,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/en-sg.js":
+/***/ "./node_modules/moment/locale/en-sg.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/en-sg.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : English (Singapore) [en-sg]
@@ -52621,13 +55938,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/eo.js":
+/***/ "./node_modules/moment/locale/eo.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/eo.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Esperanto [eo]
@@ -52708,13 +56025,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/es-do.js":
+/***/ "./node_modules/moment/locale/es-do.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/es-do.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Spanish (Dominican Republic) [es-do]
@@ -52835,13 +56152,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/es-mx.js":
+/***/ "./node_modules/moment/locale/es-mx.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/es-mx.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Spanish (Mexico) [es-mx]
@@ -52964,13 +56281,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/es-us.js":
+/***/ "./node_modules/moment/locale/es-us.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/es-us.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Spanish (United States) [es-us]
@@ -53093,13 +56410,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/es.js":
+/***/ "./node_modules/moment/locale/es.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/es.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Spanish [es]
@@ -53222,13 +56539,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/et.js":
+/***/ "./node_modules/moment/locale/et.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/et.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Estonian [et]
@@ -53319,13 +56636,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/eu.js":
+/***/ "./node_modules/moment/locale/eu.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/eu.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Basque [eu]
@@ -53403,13 +56720,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fa.js":
+/***/ "./node_modules/moment/locale/fa.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/fa.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Persian [fa]
@@ -53535,13 +56852,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fi.js":
+/***/ "./node_modules/moment/locale/fi.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/fi.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Finnish [fi]
@@ -53678,13 +56995,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fil.js":
+/***/ "./node_modules/moment/locale/fil.js"
 /*!*******************************************!*\
   !*** ./node_modules/moment/locale/fil.js ***!
   \*******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Filipino [fil]
@@ -53755,13 +57072,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fo.js":
+/***/ "./node_modules/moment/locale/fo.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/fo.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Faroese [fo]
@@ -53831,13 +57148,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fr-ca.js":
+/***/ "./node_modules/moment/locale/fr-ca.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/fr-ca.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : French (Canada) [fr-ca]
@@ -53920,13 +57237,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fr-ch.js":
+/***/ "./node_modules/moment/locale/fr-ch.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/fr-ch.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : French (Switzerland) [fr-ch]
@@ -54013,13 +57330,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fr.js":
+/***/ "./node_modules/moment/locale/fr.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/fr.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : French [fr]
@@ -54140,13 +57457,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/fy.js":
+/***/ "./node_modules/moment/locale/fy.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/fy.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Frisian [fy]
@@ -54234,13 +57551,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ga.js":
+/***/ "./node_modules/moment/locale/ga.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ga.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Irish or Irish Gaelic [ga]
@@ -54348,13 +57665,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/gd.js":
+/***/ "./node_modules/moment/locale/gd.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/gd.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Scottish Gaelic [gd]
@@ -54462,13 +57779,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/gl.js":
+/***/ "./node_modules/moment/locale/gl.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/gl.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Galician [gl]
@@ -54556,13 +57873,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/gom-deva.js":
+/***/ "./node_modules/moment/locale/gom-deva.js"
 /*!************************************************!*\
   !*** ./node_modules/moment/locale/gom-deva.js ***!
   \************************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Konkani Devanagari script [gom-deva]
@@ -54701,13 +58018,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/gom-latn.js":
+/***/ "./node_modules/moment/locale/gom-latn.js"
 /*!************************************************!*\
   !*** ./node_modules/moment/locale/gom-latn.js ***!
   \************************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Konkani Latin script [gom-latn]
@@ -54844,13 +58161,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/gu.js":
+/***/ "./node_modules/moment/locale/gu.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/gu.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Gujarati [gu]
@@ -54985,13 +58302,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/he.js":
+/***/ "./node_modules/moment/locale/he.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/he.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Hebrew [he]
@@ -55098,13 +58415,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/hi.js":
+/***/ "./node_modules/moment/locale/hi.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/hi.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Hindi [hi]
@@ -55285,13 +58602,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/hr.js":
+/***/ "./node_modules/moment/locale/hr.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/hr.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Croatian [hr]
@@ -55460,13 +58777,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/hu.js":
+/***/ "./node_modules/moment/locale/hu.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/hu.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Hungarian [hu]
@@ -55597,13 +58914,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/hy-am.js":
+/***/ "./node_modules/moment/locale/hy-am.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/hy-am.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Armenian [hy-am]
@@ -55710,13 +59027,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/id.js":
+/***/ "./node_modules/moment/locale/id.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/id.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Indonesian [id]
@@ -55805,13 +59122,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/is.js":
+/***/ "./node_modules/moment/locale/is.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/is.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Icelandic [is]
@@ -55964,13 +59281,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/it-ch.js":
+/***/ "./node_modules/moment/locale/it-ch.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/it-ch.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Italian (Switzerland) [it-ch]
@@ -56047,13 +59364,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/it.js":
+/***/ "./node_modules/moment/locale/it.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/it.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Italian [it]
@@ -56172,13 +59489,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ja.js":
+/***/ "./node_modules/moment/locale/ja.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ja.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Japanese [ja]
@@ -56339,13 +59656,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/jv.js":
+/***/ "./node_modules/moment/locale/jv.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/jv.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Javanese [jv]
@@ -56434,13 +59751,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ka.js":
+/***/ "./node_modules/moment/locale/ka.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ka.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Georgian [ka]
@@ -56545,13 +59862,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/kk.js":
+/***/ "./node_modules/moment/locale/kk.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/kk.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Kazakh [kk]
@@ -56646,13 +59963,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/km.js":
+/***/ "./node_modules/moment/locale/km.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/km.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Cambodian [km]
@@ -56768,13 +60085,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/kn.js":
+/***/ "./node_modules/moment/locale/kn.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/kn.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Kannada [kn]
@@ -56911,13 +60228,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ko.js":
+/***/ "./node_modules/moment/locale/ko.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ko.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Korean [ko]
@@ -57005,13 +60322,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ku-kmr.js":
+/***/ "./node_modules/moment/locale/ku-kmr.js"
 /*!**********************************************!*\
   !*** ./node_modules/moment/locale/ku-kmr.js ***!
   \**********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Northern Kurdish [ku-kmr]
@@ -57138,13 +60455,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ku.js":
+/***/ "./node_modules/moment/locale/ku.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ku.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Kurdish [ku]
@@ -57275,13 +60592,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ky.js":
+/***/ "./node_modules/moment/locale/ky.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ky.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Kyrgyz [ky]
@@ -57378,13 +60695,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/lb.js":
+/***/ "./node_modules/moment/locale/lb.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/lb.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Luxembourgish [lb]
@@ -57534,13 +60851,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/lo.js":
+/***/ "./node_modules/moment/locale/lo.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/lo.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Lao [lo]
@@ -57619,13 +60936,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/lt.js":
+/***/ "./node_modules/moment/locale/lt.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/lt.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Lithuanian [lt]
@@ -57763,13 +61080,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/lv.js":
+/***/ "./node_modules/moment/locale/lv.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/lv.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Latvian [lv]
@@ -57876,13 +61193,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/me.js":
+/***/ "./node_modules/moment/locale/me.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/me.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Montenegrin [me]
@@ -58012,13 +61329,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/mi.js":
+/***/ "./node_modules/moment/locale/mi.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/mi.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Maori [mi]
@@ -58091,13 +61408,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/mk.js":
+/***/ "./node_modules/moment/locale/mk.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/mk.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Macedonian [mk]
@@ -58196,13 +61513,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ml.js":
+/***/ "./node_modules/moment/locale/ml.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ml.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Malayalam [ml]
@@ -58297,13 +61614,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/mn.js":
+/***/ "./node_modules/moment/locale/mn.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/mn.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Mongolian [mn]
@@ -58416,13 +61733,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/mr.js":
+/***/ "./node_modules/moment/locale/mr.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/mr.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Marathi [mr]
@@ -58638,13 +61955,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ms-my.js":
+/***/ "./node_modules/moment/locale/ms-my.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ms-my.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Malay [ms-my]
@@ -58733,13 +62050,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ms.js":
+/***/ "./node_modules/moment/locale/ms.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ms.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Malay [ms]
@@ -58827,13 +62144,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/mt.js":
+/***/ "./node_modules/moment/locale/mt.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/mt.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Maltese (Malta) [mt]
@@ -58902,13 +62219,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/my.js":
+/***/ "./node_modules/moment/locale/my.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/my.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Burmese [my]
@@ -59012,13 +62329,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/nb.js":
+/***/ "./node_modules/moment/locale/nb.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/nb.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Norwegian Bokmål [nb]
@@ -59091,13 +62408,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ne.js":
+/***/ "./node_modules/moment/locale/ne.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ne.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Nepalese [ne]
@@ -59231,13 +62548,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/nl-be.js":
+/***/ "./node_modules/moment/locale/nl-be.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/nl-be.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Dutch (Belgium) [nl-be]
@@ -59352,13 +62669,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/nl.js":
+/***/ "./node_modules/moment/locale/nl.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/nl.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Dutch [nl]
@@ -59475,13 +62792,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/nn.js":
+/***/ "./node_modules/moment/locale/nn.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/nn.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Nynorsk [nn]
@@ -59553,13 +62870,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/oc-lnc.js":
+/***/ "./node_modules/moment/locale/oc-lnc.js"
 /*!**********************************************!*\
   !*** ./node_modules/moment/locale/oc-lnc.js ***!
   \**********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Occitan, lengadocian dialecte [oc-lnc]
@@ -59657,13 +62974,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/pa-in.js":
+/***/ "./node_modules/moment/locale/pa-in.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/pa-in.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Punjabi (India) [pa-in]
@@ -59798,13 +63115,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/pl.js":
+/***/ "./node_modules/moment/locale/pl.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/pl.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Polish [pl]
@@ -59957,13 +63274,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/pt-br.js":
+/***/ "./node_modules/moment/locale/pt-br.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/pt-br.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Portuguese (Brazil) [pt-br]
@@ -60034,13 +63351,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/pt.js":
+/***/ "./node_modules/moment/locale/pt.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/pt.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Portuguese [pt]
@@ -60116,13 +63433,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ro.js":
+/***/ "./node_modules/moment/locale/ro.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ro.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Romanian [ro]
@@ -60211,13 +63528,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ru.js":
+/***/ "./node_modules/moment/locale/ru.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ru.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Russian [ru]
@@ -60443,13 +63760,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sd.js":
+/***/ "./node_modules/moment/locale/sd.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sd.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Sindhi [sd]
@@ -60543,13 +63860,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/se.js":
+/***/ "./node_modules/moment/locale/se.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/se.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Northern Sami [se]
@@ -60619,13 +63936,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/si.js":
+/***/ "./node_modules/moment/locale/si.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/si.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Sinhalese [si]
@@ -60707,13 +64024,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sk.js":
+/***/ "./node_modules/moment/locale/sk.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sk.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Slovak [sk]
@@ -60871,13 +64188,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sl.js":
+/***/ "./node_modules/moment/locale/sl.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sl.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Slovenian [sl]
@@ -61061,13 +64378,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sq.js":
+/***/ "./node_modules/moment/locale/sq.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sq.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Albanian [sq]
@@ -61145,13 +64462,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sr-cyrl.js":
+/***/ "./node_modules/moment/locale/sr-cyrl.js"
 /*!***********************************************!*\
   !*** ./node_modules/moment/locale/sr-cyrl.js ***!
   \***********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Serbian Cyrillic [sr-cyrl]
@@ -61291,13 +64608,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sr.js":
+/***/ "./node_modules/moment/locale/sr.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sr.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Serbian [sr]
@@ -61439,13 +64756,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ss.js":
+/***/ "./node_modules/moment/locale/ss.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ss.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : siSwati [ss]
@@ -61542,13 +64859,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sv.js":
+/***/ "./node_modules/moment/locale/sv.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sv.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Swedish [sv]
@@ -61629,13 +64946,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/sw.js":
+/***/ "./node_modules/moment/locale/sw.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/sw.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Swahili [sw]
@@ -61703,13 +65020,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ta.js":
+/***/ "./node_modules/moment/locale/ta.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ta.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Tamil [ta]
@@ -61853,13 +65170,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/te.js":
+/***/ "./node_modules/moment/locale/te.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/te.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Telugu [te]
@@ -61960,13 +65277,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tet.js":
+/***/ "./node_modules/moment/locale/tet.js"
 /*!*******************************************!*\
   !*** ./node_modules/moment/locale/tet.js ***!
   \*******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Tetun Dili (East Timor) [tet]
@@ -62047,13 +65364,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tg.js":
+/***/ "./node_modules/moment/locale/tg.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/tg.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Tajik [tg]
@@ -62183,13 +65500,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/th.js":
+/***/ "./node_modules/moment/locale/th.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/th.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Thai [th]
@@ -62267,13 +65584,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tk.js":
+/***/ "./node_modules/moment/locale/tk.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/tk.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Turkmen [tk]
@@ -62377,13 +65694,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tl-ph.js":
+/***/ "./node_modules/moment/locale/tl-ph.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/tl-ph.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Tagalog (Philippines) [tl-ph]
@@ -62453,13 +65770,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tlh.js":
+/***/ "./node_modules/moment/locale/tlh.js"
 /*!*******************************************!*\
   !*** ./node_modules/moment/locale/tlh.js ***!
   \*******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Klingon [tlh]
@@ -62596,13 +65913,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tr.js":
+/***/ "./node_modules/moment/locale/tr.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/tr.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Turkish [tr]
@@ -62721,13 +66038,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tzl.js":
+/***/ "./node_modules/moment/locale/tzl.js"
 /*!*******************************************!*\
   !*** ./node_modules/moment/locale/tzl.js ***!
   \*******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Talossan [tzl]
@@ -62829,13 +66146,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tzm-latn.js":
+/***/ "./node_modules/moment/locale/tzm-latn.js"
 /*!************************************************!*\
   !*** ./node_modules/moment/locale/tzm-latn.js ***!
   \************************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Central Atlas Tamazight Latin [tzm-latn]
@@ -62902,13 +66219,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/tzm.js":
+/***/ "./node_modules/moment/locale/tzm.js"
 /*!*******************************************!*\
   !*** ./node_modules/moment/locale/tzm.js ***!
   \*******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Central Atlas Tamazight [tzm]
@@ -62975,13 +66292,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ug-cn.js":
+/***/ "./node_modules/moment/locale/ug-cn.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/ug-cn.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Uyghur (China) [ug-cn]
@@ -63105,13 +66422,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/uk.js":
+/***/ "./node_modules/moment/locale/uk.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/uk.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Ukrainian [uk]
@@ -63291,13 +66608,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/ur.js":
+/***/ "./node_modules/moment/locale/ur.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/ur.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Urdu [ur]
@@ -63392,13 +66709,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/uz-latn.js":
+/***/ "./node_modules/moment/locale/uz-latn.js"
 /*!***********************************************!*\
   !*** ./node_modules/moment/locale/uz-latn.js ***!
   \***********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Uzbek Latin [uz-latn]
@@ -63465,13 +66782,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/uz.js":
+/***/ "./node_modules/moment/locale/uz.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/uz.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Uzbek [uz]
@@ -63535,13 +66852,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/vi.js":
+/***/ "./node_modules/moment/locale/vi.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/vi.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Vietnamese [vi]
@@ -63634,13 +66951,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/x-pseudo.js":
+/***/ "./node_modules/moment/locale/x-pseudo.js"
 /*!************************************************!*\
   !*** ./node_modules/moment/locale/x-pseudo.js ***!
   \************************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Pseudo [x-pseudo]
@@ -63726,13 +67043,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/yo.js":
+/***/ "./node_modules/moment/locale/yo.js"
 /*!******************************************!*\
   !*** ./node_modules/moment/locale/yo.js ***!
   \******************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Yoruba Nigeria [yo]
@@ -63798,13 +67115,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/zh-cn.js":
+/***/ "./node_modules/moment/locale/zh-cn.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/zh-cn.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Chinese (China) [zh-cn]
@@ -63937,13 +67254,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/zh-hk.js":
+/***/ "./node_modules/moment/locale/zh-hk.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/zh-hk.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Chinese (Hong Kong) [zh-hk]
@@ -64057,13 +67374,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/zh-mo.js":
+/***/ "./node_modules/moment/locale/zh-mo.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/zh-mo.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Chinese (Macau) [zh-mo]
@@ -64176,13 +67493,13 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale/zh-tw.js":
+/***/ "./node_modules/moment/locale/zh-tw.js"
 /*!*********************************************!*\
   !*** ./node_modules/moment/locale/zh-tw.js ***!
   \*********************************************/
-/***/ (function(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
+(__unused_webpack_module, __unused_webpack_exports, __webpack_require__) {
 
 //! moment.js locale configuration
 //! locale : Chinese (Taiwan) [zh-tw]
@@ -64294,15 +67611,15 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/**
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/locale sync recursive ^\\.\\/.*$":
+/***/ "./node_modules/moment/locale sync recursive ^\\.\\/.*$"
 /*!***************************************************!*\
   !*** ./node_modules/moment/locale/ sync ^\.\/.*$ ***!
   \***************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
-var map = {
+const map = {
 	"./af": "./node_modules/moment/locale/af.js",
 	"./af.js": "./node_modules/moment/locale/af.js",
 	"./ar": "./node_modules/moment/locale/ar.js",
@@ -64581,12 +67898,12 @@ var map = {
 
 
 function webpackContext(req) {
-	var id = webpackContextResolve(req);
+	const id = webpackContextResolve(req);
 	return __webpack_require__(id);
 }
 function webpackContextResolve(req) {
 	if(!__webpack_require__.o(map, req)) {
-		var e = new Error("Cannot find module '" + req + "'");
+		const e = new Error("Cannot find module '" + req + "'");
 		e.code = 'MODULE_NOT_FOUND';
 		throw e;
 	}
@@ -64599,13 +67916,13 @@ webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
 webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
-/***/ }),
+/***/ },
 
-/***/ "./node_modules/moment/moment.js":
+/***/ "./node_modules/moment/moment.js"
 /*!***************************************!*\
   !*** ./node_modules/moment/moment.js ***!
   \***************************************/
-/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
 //! moment.js
@@ -70297,18 +73614,18 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 })));
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-advanced-notifier/src/detectionClasses.ts":
+/***/ "../scrypted-advanced-notifier/src/detectionClasses.ts"
 /*!*************************************************************!*\
   !*** ../scrypted-advanced-notifier/src/detectionClasses.ts ***!
   \*************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.levenshteinDistance = exports.getParentDetectionClass = exports.detectionClassesDefaultMap = exports.isObjectClassname = exports.isLabelDetection = exports.isAudioClassname = exports.isPackageClassname = exports.isDoorbellClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.doorbellClasses = exports.audioClasses = exports.objectClasses = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.basicDetectionClasses = exports.classnamePrio = exports.DetectionClass = void 0;
+exports.levenshteinDistance = exports.getParentDetectionClass = exports.detectionClassesDefaultMap = exports.isObjectClassname = exports.isLabelDetection = exports.isThingClassname = exports.isAudioClassname = exports.isObjectLabel = exports.isAudioLabel = exports.isPackageClassname = exports.isDoorbellClassname = exports.isMotionClassname = exports.isVehicleClassname = exports.isPersonClassname = exports.isAnimalClassname = exports.isPlateClassname = exports.isFaceClassname = exports.doorbellClasses = exports.audioClasses = exports.thingsClasses = exports.audioLabels = exports.objectClasses = exports.packageClasses = exports.motionClasses = exports.licensePlateClasses = exports.faceClasses = exports.vehicleClasses = exports.personClasses = exports.animalClasses = exports.defaultDetectionClasses = exports.basicDetectionClasses = exports.classnamePrio = exports.DetectionClass = void 0;
 var DetectionClass;
 (function (DetectionClass) {
     DetectionClass["Motion"] = "motion";
@@ -70322,6 +73639,7 @@ var DetectionClass;
     DetectionClass["Package"] = "package";
     DetectionClass["Doorbell"] = "doorbell";
     DetectionClass["Sensor"] = "sensor";
+    DetectionClass["Things"] = "things";
 })(DetectionClass || (exports.DetectionClass = DetectionClass = {}));
 exports.classnamePrio = {
     [DetectionClass.Face]: 1,
@@ -70330,6 +73648,7 @@ exports.classnamePrio = {
     [DetectionClass.Vehicle]: 3,
     [DetectionClass.Animal]: 4,
     [DetectionClass.Package]: 5,
+    [DetectionClass.Things]: 5,
     [DetectionClass.Motion]: 6,
 };
 exports.basicDetectionClasses = [
@@ -70457,6 +73776,7 @@ exports.licensePlateClasses = [
     'motorcycle_plate',
     'temporary_plate',
     'dealer_plate',
+    'licensePlate',
     // Plate Components
     'plate_number',
     'plate_character',
@@ -70489,9 +73809,8 @@ exports.objectClasses = [
     DetectionClass.AnyObject,
     'object',
 ];
-exports.audioClasses = [
-    DetectionClass.Audio,
-    "speech", "babbling", "yell", "bellow", "whoop", "whispering", "laughter", "snicker",
+exports.audioLabels = [
+    "speech", "scream", "babbling", "yell", "bellow", "whoop", "whispering", "laughter", "snicker",
     "crying", "sigh", "singing", "choir", "sodeling", "chant", "mantra", "child_singing",
     "synthetic_singing", "rapping", "humming", "groan", "grunt", "whistling", "breathing",
     "wheeze", "snoring", "gasp", "pant", "snort", "cough", "throat_clearing", "sneeze",
@@ -70557,9 +73876,16 @@ exports.audioClasses = [
     "environmental_noise", "static", "mains_hum", "distortion", "sidetone", "cacophony",
     "white_noise", "pink_noise", "throbbing", "vibration", "television", "radio", "field_recording"
 ];
+exports.thingsClasses = [
+    DetectionClass.Things,
+    'waste_bind',
+];
+exports.audioClasses = [DetectionClass.Audio];
 exports.doorbellClasses = [
     DetectionClass.Doorbell,
     'ring',
+    /** YAMNet audio label for doorbell chime */
+    'ding-dong',
 ];
 const isFaceClassname = (classname) => exports.faceClasses.includes(classname);
 exports.isFaceClassname = isFaceClassname;
@@ -70577,8 +73903,14 @@ const isDoorbellClassname = (classname) => exports.doorbellClasses.includes(clas
 exports.isDoorbellClassname = isDoorbellClassname;
 const isPackageClassname = (classname) => exports.packageClasses.includes(classname);
 exports.isPackageClassname = isPackageClassname;
-const isAudioClassname = (classname) => exports.audioClasses.includes(classname);
+const isAudioLabel = (label) => exports.audioClasses.includes(label) || exports.audioLabels.includes(label);
+exports.isAudioLabel = isAudioLabel;
+const isObjectLabel = (label) => !(0, exports.isAudioLabel)(label);
+exports.isObjectLabel = isObjectLabel;
+const isAudioClassname = (classname) => exports.audioClasses.includes(classname) || (0, exports.isAudioLabel)(classname);
 exports.isAudioClassname = isAudioClassname;
+const isThingClassname = (classname) => exports.thingsClasses.includes(classname);
+exports.isThingClassname = isThingClassname;
 const isLabelDetection = (classname) => (0, exports.isFaceClassname)(classname) || (0, exports.isPlateClassname)(classname);
 exports.isLabelDetection = isLabelDetection;
 const isObjectClassname = (classname) => (0, exports.isPackageClassname)(classname) ||
@@ -70597,6 +73929,7 @@ exports.detectionClassesDefaultMap = {
     ...exports.objectClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.AnyObject }), {}),
     ...exports.audioClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Audio }), {}),
     ...exports.doorbellClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Doorbell }), {}),
+    ...exports.thingsClasses.reduce((tot, curr) => ({ ...tot, [curr]: DetectionClass.Things }), {}),
 };
 const getParentDetectionClass = (det) => {
     const { className } = det;
@@ -70680,13 +74013,13 @@ const levenshteinDistance = (str1, str2) => {
 exports.levenshteinDistance = levenshteinDistance;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/src/basePlugin.ts":
+/***/ "../scrypted-apocaliss-base/src/basePlugin.ts"
 /*!****************************************************!*\
   !*** ../scrypted-apocaliss-base/src/basePlugin.ts ***!
   \****************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -70727,7 +74060,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BasePlugin = exports.getMqttBasicClient = exports.getBaseSettings = exports.logLevelSetting = exports.getBaseLogger = exports.applySettingsShow = void 0;
+exports.BasePlugin = exports.getMqttBasicClient = exports.getBaseSettings = exports.logTimezoneSetting = exports.logLevelSetting = exports.getBaseLogger = exports.applySettingsShow = exports.deleteMqttDeviceByIdentifier = void 0;
 const sdk_1 = __importStar(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-apocaliss-base/node_modules/@scrypted/sdk/dist/src/index.js"));
 const axios_1 = __importDefault(__webpack_require__(/*! axios */ "../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs"));
 const https_1 = __importDefault(__webpack_require__(/*! https */ "https"));
@@ -70737,44 +74070,155 @@ const { systemManager } = sdk_1.default;
 const httpsAgent = new https_1.default.Agent({
     rejectUnauthorized: false,
 });
+const HA_WS_PATH = '/api/websocket';
+/**
+ * Deletes an MQTT device from Home Assistant by identifier (e.g. "scrypted-an-1976").
+ * Uses HA WebSocket API: list config entries (get MQTT entry_id), list devices (find by identifiers),
+ * remove_config_entry from device. Requires Long-Lived Access Token from HA profile.
+ *
+ * @param haBaseUrl - HA base URL (e.g. "http://192.168.1.4:8123")
+ * @param haAccessToken - Long-Lived Access Token
+ * @param deviceIdentifier - Device identifier used in MQTT discovery (e.g. idPrefix + "-" + device.id)
+ * @param console - Optional logger
+ */
+async function deleteMqttDeviceByIdentifierWs(haBaseUrl, haAccessToken, deviceIdentifier, console) {
+    const log = (msg, ...args) => console?.log?.('HA device API:', msg, ...args);
+    const wsUrl = haBaseUrl.replace(/^http/, 'ws').replace(/\/$/, '') + HA_WS_PATH;
+    return new Promise((resolve) => {
+        let resolved = false;
+        const done = (result) => {
+            if (resolved)
+                return;
+            resolved = true;
+            try {
+                ws.close();
+            }
+            catch { /* ignore */ }
+            resolve(result);
+        };
+        let msgId = 0;
+        const nextId = () => ++msgId;
+        let ws;
+        try {
+            ws = new WebSocket(wsUrl);
+        }
+        catch (e) {
+            done({ deleted: false, error: `WebSocket connect failed: ${e.message}` });
+            return;
+        }
+        const send = (type, extra = {}) => {
+            const id = nextId();
+            ws.send(JSON.stringify({ id, type, ...extra }));
+            return id;
+        };
+        let mqttEntryId = null;
+        let haDeviceId = null;
+        let step = 'auth';
+        ws.onerror = () => done({ deleted: false, error: 'WebSocket error' });
+        ws.onclose = () => {
+            if (!resolved)
+                done({ deleted: false, error: 'Connection closed before completion' });
+        };
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                const type = data.type;
+                if (type === 'auth_required') {
+                    ws.send(JSON.stringify({ type: 'auth', access_token: haAccessToken }));
+                    return;
+                }
+                if (type === 'auth_invalid') {
+                    done({ deleted: false, error: 'Invalid HA access token' });
+                    return;
+                }
+                if (type === 'auth_ok') {
+                    step = 'config_entries';
+                    send('config_entries/get', { domain: 'mqtt' });
+                    return;
+                }
+                if (type === 'result') {
+                    if (data.success === false) {
+                        done({ deleted: false, error: data.error?.message ?? JSON.stringify(data.error) });
+                        return;
+                    }
+                    const result = data.result;
+                    if (step === 'config_entries' && Array.isArray(result)) {
+                        const mqttEntry = result.find((e) => e.domain === 'mqtt') ?? result[0];
+                        const entryId = mqttEntry?.entry_id;
+                        if (!entryId) {
+                            done({ deleted: false, error: 'MQTT config entry not found in HA' });
+                            return;
+                        }
+                        mqttEntryId = entryId;
+                        step = 'devices';
+                        send('config/device_registry/list');
+                        return;
+                    }
+                    if (step === 'devices' && Array.isArray(result)) {
+                        const device = result.find((d) => Array.isArray(d.identifiers) &&
+                            d.identifiers.some((tuple) => tuple[1] === deviceIdentifier));
+                        if (!device?.id) {
+                            log('Device not found in HA registry:', deviceIdentifier);
+                            done({ deleted: true }); // not an error: device was already removed
+                            return;
+                        }
+                        haDeviceId = device.id;
+                        step = 'remove';
+                        send('config/device_registry/remove_config_entry', {
+                            config_entry_id: mqttEntryId,
+                            device_id: haDeviceId,
+                        });
+                        return;
+                    }
+                    if (step === 'remove') {
+                        log('Device removed from HA');
+                        done({ deleted: true });
+                    }
+                }
+            }
+            catch (e) {
+                done({ deleted: false, error: e.message });
+            }
+        };
+    });
+}
+/** Exported for callers that have their own HA URL/token (e.g. from getHaApiUrl()). */
+exports.deleteMqttDeviceByIdentifier = deleteMqttDeviceByIdentifierWs;
 const applySettingsShow = (storageSettings) => {
     const hasMqttDevice = !!systemManager.getDeviceByName('MQTT');
-    if (!hasMqttDevice) {
-        storageSettings.settings.useMqttPluginCredentials.defaultValue = false;
-        storageSettings.putSetting('useMqttPluginCredentials', false);
-    }
+    const hasHaDevice = !!systemManager.getDeviceByName('Home Assistant');
     const { mqttEnabled, useMqttPluginCredentials, haEnabled, useHaPluginCredentials } = storageSettings.values;
-    const { haEnabled: haEnabledSetting, mqttEnabled: mqttEnabledSetting } = storageSettings.settings;
-    if (mqttEnabledSetting?.hide || !mqttEnabled) {
-        storageSettings.settings.mqttHost && (storageSettings.settings.mqttHost.hide = true);
-        storageSettings.settings.mqttPassword && (storageSettings.settings.mqttPassword.hide = true);
-        storageSettings.settings.mqttUsename && (storageSettings.settings.mqttUsename.hide = true);
-        storageSettings.settings.useMqttPluginCredentials && (storageSettings.settings.useMqttPluginCredentials.hide = true);
-    }
-    else {
-        storageSettings.settings.mqttHost.hide = useMqttPluginCredentials;
-        storageSettings.settings.mqttPassword.hide = useMqttPluginCredentials;
-        storageSettings.settings.mqttUsename.hide = useMqttPluginCredentials;
-        storageSettings.settings.useMqttPluginCredentials.hide = false;
-    }
-    if (haEnabledSetting?.hide || !haEnabled) {
-        storageSettings.settings.haAccessToken && (storageSettings.settings.haAccessToken.hide = true);
-        storageSettings.settings.haProtocol && (storageSettings.settings.haProtocol.hide = true);
-        storageSettings.settings.haAddress && (storageSettings.settings.haAddress.hide = true);
-        storageSettings.settings.useHaPluginCredentials && (storageSettings.settings.useHaPluginCredentials.hide = true);
-    }
-    else {
-        storageSettings.settings.haAccessToken.hide = useHaPluginCredentials;
-        storageSettings.settings.haProtocol.hide = useHaPluginCredentials;
-        storageSettings.settings.haAddress.hide = useHaPluginCredentials;
-        storageSettings.settings.useHaPluginCredentials.hide = false;
-    }
+    // const shouldShowMqtt = hasMqttDevice;
+    // const shouldShowHa = hasHaDevice;
+    // storageSettings.settings.haEnabled.readonly = !shouldShowHa;
+    // storageSettings.settings.mqttEnabled.readonly = !shouldShowMqtt;
+    // storageSettings.settings.mqttEnabled.description = hasMqttDevice ? undefined : 'MQTT plugin not installed. Please install it to enable MQTT features.';
+    // storageSettings.settings.haEnabled.description = hasHaDevice ? undefined : 'Home Assistant plugin not installed. Please install it to enable Home Assistant features.';
+    storageSettings.settings.useMqttPluginCredentials.hide = !hasMqttDevice || !mqttEnabled;
+    storageSettings.settings.useHaPluginCredentials.hide = !hasHaDevice || !haEnabled;
+    const shouldShowMqttCredentials = mqttEnabled && (!useMqttPluginCredentials || !hasMqttDevice);
+    const shouldShowHaCredentials = haEnabled && (!useHaPluginCredentials || !hasHaDevice);
+    storageSettings.settings.mqttUsename.hide = !shouldShowMqttCredentials;
+    storageSettings.settings.mqttPassword.hide = !shouldShowMqttCredentials;
+    storageSettings.settings.mqttHost.hide = !shouldShowMqttCredentials;
+    storageSettings.settings.haAccessToken.hide = !shouldShowHaCredentials;
+    storageSettings.settings.haAddress.hide = !shouldShowHaCredentials;
+    storageSettings.settings.haProtocol.hide = !shouldShowHaCredentials;
 };
 exports.applySettingsShow = applySettingsShow;
 const getBaseLogger = (props) => {
-    const { console, storage, friendlyName } = props;
+    const { console, storage, friendlyName, tzStorage } = props;
     const log = (type, message, ...optionalParams) => {
-        const now = new Date().toLocaleString();
+        const timeZone = tzStorage?.getItem('logTimezone') || storage.getItem('logTimezone');
+        let now;
+        try {
+            now = timeZone
+                ? new Date().toLocaleString(undefined, { timeZone })
+                : new Date().toLocaleString();
+        }
+        catch {
+            now = new Date().toLocaleString();
+        }
         const logLevel = storage.getItem('logLevel');
         const canDebug = logLevel === utils_1.LogLevel.DEBUG;
         const canInfo = canDebug || logLevel === utils_1.LogLevel.INFO;
@@ -70832,8 +74276,26 @@ exports.logLevelSetting = {
         utils_1.LogLevel.DEBUG,
     ]
 };
+const getSupportedTimezones = () => {
+    try {
+        const anyIntl = Intl;
+        if (typeof anyIntl.supportedValuesOf === 'function') {
+            return anyIntl.supportedValuesOf('timeZone');
+        }
+    }
+    catch { }
+    return [];
+};
+exports.logTimezoneSetting = {
+    title: 'Log timezone',
+    description: 'IANA timezone used to format log timestamps. Leave empty to use the system default.',
+    type: 'string',
+    immediate: true,
+    combobox: true,
+    choices: ['', ...getSupportedTimezones()],
+};
 const getBaseSettings = (props) => {
-    const { onPluginSwitch, hideMqtt, mqttAlwaysEnabled, hideHa = true, baseGroupName = 'Base' } = props;
+    const { defaultMqtt = false, onPluginSwitch, hideMqtt, mqttAlwaysEnabled, hideHa = true, baseGroupName = 'Base', onRefresh } = props;
     const group = baseGroupName === '' ? undefined : baseGroupName;
     const settings = {
         pluginEnabled: {
@@ -70848,20 +74310,27 @@ const getBaseSettings = (props) => {
             ...exports.logLevelSetting,
             group,
         },
+        logTimezone: {
+            ...exports.logTimezoneSetting,
+            group,
+            subgroup: 'Advanced',
+        },
         mqttEnabled: {
             title: 'MQTT enabled',
             type: 'boolean',
-            defaultValue: true,
+            defaultValue: defaultMqtt,
             immediate: true,
             group,
             hide: hideMqtt,
             readonly: mqttAlwaysEnabled,
+            onPut: onRefresh
         },
         devNotifier: {
             title: 'DEV notifier',
             type: 'device',
             deviceFilter: `(type === '${sdk_1.ScryptedDeviceType.Notifier}')`,
             group,
+            subgroup: 'Advanced',
         },
         useMqttPluginCredentials: {
             title: 'Use MQTT plugin credentials',
@@ -70870,7 +74339,8 @@ const getBaseSettings = (props) => {
             immediate: true,
             group,
             defaultValue: true,
-            hide: hideMqtt
+            hide: hideMqtt,
+            onPut: onRefresh
         },
         mqttHost: {
             title: 'Host',
@@ -70902,6 +74372,7 @@ const getBaseSettings = (props) => {
             immediate: true,
             hide: hideHa,
             group,
+            onPut: onRefresh
         },
         useHaPluginCredentials: {
             group,
@@ -70910,7 +74381,8 @@ const getBaseSettings = (props) => {
             type: 'boolean',
             defaultValue: true,
             immediate: true,
-            hide: hideHa
+            hide: hideHa,
+            onPut: onRefresh
         },
         haAccessToken: {
             group,
@@ -70941,40 +74413,51 @@ const getBaseSettings = (props) => {
 };
 exports.getBaseSettings = getBaseSettings;
 const getMqttBasicClient = async (props) => {
-    const { useMqttPluginCredentials, logger, clientId, configTopicPattern } = props;
-    let mqttHost;
-    let mqttUsename;
-    let mqttPassword;
-    let client;
-    if (useMqttPluginCredentials) {
-        logger.debug(`Using MQTT plugin credentials.`);
-        const mqttDevice = systemManager.getDeviceByName('MQTT');
-        if (!mqttDevice) {
-            logger.log(`MQTT plugin not installed, please provide the connection information manually`);
-            return;
-        }
-        const mqttSettings = await mqttDevice.getSettings();
-        const isInternalBroker = (JSON.parse(mqttSettings.find(setting => setting.key === 'enableBroker')?.value || 'false'));
-        if (isInternalBroker) {
-            logger.debug(`Internal MQTT broker not supported yet. Please disable useMqttPluginCredentials.`);
+    const { useMqttPluginCredentials, logger, clientId, configTopicPattern, cache = true, cacheTtlMs } = props;
+    try {
+        let mqttHost;
+        let mqttUsename;
+        let mqttPassword;
+        let client;
+        if (useMqttPluginCredentials) {
+            logger.debug(`Using MQTT plugin credentials.`);
+            const mqttDevice = systemManager.getDeviceByName('MQTT');
+            if (!mqttDevice) {
+                logger.log(`MQTT plugin not installed, please provide the connection information manually`);
+                return;
+            }
+            const mqttSettings = await mqttDevice.getSettings();
+            const isInternalBroker = (JSON.parse(mqttSettings.find(setting => setting.key === 'enableBroker')?.value || 'false'));
+            if (isInternalBroker) {
+                logger.debug(`Internal MQTT broker not supported yet. Please disable useMqttPluginCredentials.`);
+            }
+            else {
+                mqttHost = mqttSettings.find(setting => setting.key === 'externalBroker')?.value;
+                mqttUsename = mqttSettings.find(setting => setting.key === 'username')?.value;
+                mqttPassword = mqttSettings.find(setting => setting.key === 'password')?.value;
+            }
         }
         else {
-            mqttHost = mqttSettings.find(setting => setting.key === 'externalBroker')?.value;
-            mqttUsename = mqttSettings.find(setting => setting.key === 'username')?.value;
-            mqttPassword = mqttSettings.find(setting => setting.key === 'password')?.value;
+            logger.debug(`Using provided credentials.`);
+            mqttHost = props.mqttHost;
+            mqttUsename = props.mqttUsename;
+            mqttPassword = props.mqttPassword;
         }
+        if (!mqttHost || !mqttUsename || !mqttPassword) {
+            logger.error(`MQTT params not provided: ${JSON.stringify({
+                mqttHost,
+                mqttUsename: !!mqttUsename ? 'SET' : 'NOT_SET',
+                mqttPassword: !!mqttPassword ? 'SET' : 'NOT_SET',
+            })}`);
+            return null;
+        }
+        client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger, clientId, configTopicPattern, cache, cacheTtlMs);
+        return client;
     }
-    else {
-        logger.debug(`Using provided credentials.`);
-        mqttHost = props.mqttHost;
-        mqttUsename = props.mqttUsename;
-        mqttPassword = props.mqttPassword;
+    catch (e) {
+        logger.error('Error in getMqttBasicClient', e);
+        return null;
     }
-    if (!mqttHost || !mqttUsename || !mqttPassword) {
-        logger.debug('MQTT params not provided');
-    }
-    client = new mqtt_client_1.default(mqttHost, mqttUsename, mqttPassword, logger, clientId, configTopicPattern);
-    return client;
 };
 exports.getMqttBasicClient = getMqttBasicClient;
 class BasePlugin extends sdk_1.ScryptedDeviceBase {
@@ -70989,13 +74472,27 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             let address = haAddress;
             if (useHaPluginCredentials) {
                 const haDevice = systemManager.getDeviceByName('Home Assistant');
-                const haSettings = await haDevice.getSettings();
-                accessToken = haSettings.find(setting => setting.key === 'personalAccessToken')?.value;
-                address = haSettings.find(setting => setting.key === 'address')?.value;
-                protocol = haSettings.find(setting => setting.key === 'protocol')?.value;
+                if (!haDevice) {
+                    this.console.warn('[getHaApiUrl] "Use HA plugin credentials" is enabled but no Home Assistant plugin found in Scrypted. Please install and configure the Home Assistant plugin, or disable "Use HA plugin credentials" and set credentials manually.');
+                }
+                else {
+                    const haSettings = await haDevice.getSettings();
+                    accessToken = haSettings.find(setting => setting.key === 'personalAccessToken')?.value;
+                    address = haSettings.find(setting => setting.key === 'address')?.value;
+                    protocol = haSettings.find(setting => setting.key === 'protocol')?.value;
+                }
             }
-            if (!accessToken || !address || !protocol) {
-                throw new Error(`HA access params not set correctly: AccessToken: ${accessToken}, Address: ${address}, Protocol: ${protocol}`);
+            const missing = [];
+            if (!accessToken)
+                missing.push('HA Personal Access Token');
+            if (!address)
+                missing.push('HA Address');
+            if (!protocol)
+                missing.push('HA Protocol');
+            if (missing.length) {
+                const source = useHaPluginCredentials ? 'from the HA plugin' : 'in General → Homeassistant';
+                this.console.error(`[getHaApiUrl] Missing HA credentials: ${missing.join(', ')}. Configure them ${source}.`);
+                throw new Error(`HA access params not set correctly: ${missing.join(', ')}`);
             }
             const url = `${protocol}://${address}`;
             return {
@@ -71004,6 +74501,36 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
                 protocol,
                 url,
             };
+        };
+        /**
+         * Returns just the HA base URL (protocol://address) without requiring the access token.
+         * Used by the REST push transport which authenticates via ha_secret instead.
+         */
+        this.getHaBaseUrl = async () => {
+            const { haAddress, haProtocol, useHaPluginCredentials } = this.storageSettings.values;
+            let protocol = haProtocol;
+            let address = haAddress;
+            if (useHaPluginCredentials) {
+                const haDevice = systemManager.getDeviceByName('Home Assistant');
+                if (haDevice) {
+                    const haSettings = await haDevice.getSettings();
+                    address = haSettings.find(setting => setting.key === 'address')?.value;
+                    protocol = haSettings.find(setting => setting.key === 'protocol')?.value;
+                }
+            }
+            if (!address || !protocol) {
+                this.console.error('[getHaBaseUrl] HA address or protocol not configured. Set them in General → Homeassistant or enable "Use HA plugin credentials".');
+                throw new Error('HA URL not configured: address or protocol missing');
+            }
+            return `${protocol}://${address}`;
+        };
+        /**
+         * Removes an MQTT-discovered device from Home Assistant by identifier.
+         * Uses getHaApiUrl() for URL and token. Use before clearing MQTT topics and republishing discovery.
+         */
+        this.deleteMqttDeviceByIdentifier = async (deviceIdentifier, console) => {
+            const { url, accessToken } = await this.getHaApiUrl();
+            return deleteMqttDeviceByIdentifierWs(url, accessToken, deviceIdentifier, console);
         };
     }
     async getSettings() {
@@ -71045,11 +74572,52 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
                 httpsAgent
             });
         };
+        const deleteAutomation = (automationId) => {
+            return axios_1.default.delete(`${url}/api/config/automation/config/${automationId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                },
+                httpsAgent
+            });
+        };
+        const postCamera = async (name, url) => {
+            const flowCreationResponse = await axios_1.default.post(`${url}/api/config/config_entries/flow`, { handler: 'generic' }, {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                },
+                httpsAgent
+            });
+            const flowId = flowCreationResponse.data.flow_id;
+            if (flowId) {
+                const step1Response = await axios_1.default.post(`${url}/api/config/config_entries/flow/${flowId}`, {
+                    stream_source: url,
+                    authentication: "basic",
+                    username: "",
+                    password: "",
+                    framerate: 2,
+                    verify_ssl: false
+                }, {
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                    },
+                    httpsAgent
+                });
+                const step2Response = await axios_1.default.post(`${url}/api/config/config_entries/flow/${flowId}`, {
+                    confirmed_ok: true,
+                }, {
+                    headers: {
+                        'Authorization': 'Bearer ' + accessToken,
+                    },
+                    httpsAgent
+                });
+            }
+        };
         return {
             getTemplateData,
             getStatesData,
             getCalendarEvents,
             postAutomation,
+            deleteAutomation,
         };
     }
     putSetting(key, value) {
@@ -71127,7 +74695,8 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
             return (0, exports.getBaseLogger)({
                 console,
                 storage,
-                friendlyName
+                friendlyName,
+                tzStorage: this.storageSettings,
             });
         }
         else {
@@ -71135,7 +74704,8 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
                 this.mainLogger = (0, exports.getBaseLogger)({
                     console: this.console,
                     storage: this.storageSettings,
-                    friendlyName: this.opts.pluginFriendlyName
+                    friendlyName: this.opts.pluginFriendlyName,
+                    tzStorage: this.storageSettings,
                 });
             }
             return this.mainLogger;
@@ -71145,13 +74715,13 @@ class BasePlugin extends sdk_1.ScryptedDeviceBase {
 exports.BasePlugin = BasePlugin;
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/src/mqtt-client.ts":
+/***/ "../scrypted-apocaliss-base/src/mqtt-client.ts"
 /*!*****************************************************!*\
   !*** ../scrypted-apocaliss-base/src/mqtt-client.ts ***!
   \*****************************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -71172,8 +74742,11 @@ const topicMatches = (pattern, topic) => {
     return patternLevels.length === topicLevels.length;
 };
 class MqttClient {
-    constructor(host, username, password, logger, clientId, configTopicPattern) {
-        this.topicLastValue = {};
+    constructor(host, username, password, logger, clientId, configTopicPattern, cache = true, 
+    /** Optional. TTL for topic cache entries in ms. Default 60000 (1 minute). */
+    cacheTtlMs = 60 * 1000) {
+        /** Map topic -> { value, expiresAt }. Used when cache is enabled. */
+        this.topicCache = {};
         this.topicCbMap = {};
         this.currentAutodiscoveryTopics = [];
         this.host = host;
@@ -71182,12 +74755,15 @@ class MqttClient {
         this.logger = logger;
         this.clientId = clientId;
         this.configTopicPattern = configTopicPattern;
+        this.cache = cache;
+        this.cacheTtlMs = cacheTtlMs;
     }
     async disconnect() {
         if (this.mqttClient) {
             try {
                 this.logger.log('Disconnecting mqtt client');
                 await this.mqttClient.endAsync(true);
+                this.mqttClient = undefined;
             }
             catch (e) {
                 this.logger.log('Error closing MQTT connection', e);
@@ -71214,16 +74790,16 @@ class MqttClient {
                 }
                 client.on('message', async (messageTopic, message, data) => {
                     const cbs = [];
-                    for (const [key, data] of Object.entries(this.topicCbMap)) {
+                    for (const [key] of Object.entries(this.topicCbMap)) {
                         if (topicMatches(key, messageTopic)) {
-                            cbs.push(...data);
+                            cbs.push(...this.topicCbMap[key]);
                         }
                     }
                     const messageString = message.toString();
                     if (cbs?.length) {
-                        logger.info(`Topic ${messageTopic} for ${cbs.length} cbs sent with data ${message}: ${JSON.stringify(data)}`);
+                        logger.debug(`Topic ${messageTopic} for ${cbs.length} cbs sent with data ${messageString}`);
                         for (const cb of cbs) {
-                            cb(messageTopic, messageString, data).catch(logger.log);
+                            cb(messageTopic, messageString).catch(logger.log);
                         }
                     }
                     if (this.configTopicPattern) {
@@ -71285,6 +74861,10 @@ class MqttClient {
         }
     }
     async publish(topic, inputValue, retain = true) {
+        if (inputValue === undefined || inputValue === null) {
+            this.logger.debug(`Skipping publish, value is undefined or null: ${JSON.stringify({ topic, inputValue })}`);
+            return;
+        }
         let value;
         try {
             if (typeof inputValue === 'object')
@@ -71293,11 +74873,13 @@ class MqttClient {
                 value = inputValue.toString();
         }
         catch (e) {
-            this.logger.log(`Error parsing publish values: ${JSON.stringify({ topic, value })}`, e);
+            this.logger.log(`Error parsing publish values: ${JSON.stringify({ topic, value: value?.slice(0, 50) })}`, e);
             return;
         }
-        if (this.topicLastValue[topic] === value) {
-            this.logger.debug(`Skipping publish, same as previous value: ${JSON.stringify({ topic, value, previousValue: this.topicLastValue[topic] })}`);
+        const entry = this.topicCache[topic];
+        const cacheValid = entry && entry.value === value && (!this.cacheTtlMs || Date.now() <= entry.expiresAt);
+        if (this.cache && cacheValid) {
+            this.logger.debug(`Skipping publish, same as previous value: ${JSON.stringify({ topic, value: value?.slice(0, 50), previousValue: entry?.value })}`);
             return;
         }
         this.logger.debug(`Publishing ${JSON.stringify({ topic, value })}`);
@@ -71307,12 +74889,17 @@ class MqttClient {
                 await client.publishAsync(topic, value, { retain });
             }
             catch (e) {
-                this.logger.log(`Error publishing to MQTT. Reconnecting. ${JSON.stringify({ topic, value })}`, e);
+                this.logger.log(`Error publishing to MQTT. Reconnecting. ${JSON.stringify({ topic, value: value?.slice(0, 50) })}`, e);
                 await this.getMqttClient(true);
-                await client.publishAsync(topic, value, { retain }).catch(e => this.logger.log(`Error publish retry. ${JSON.stringify({ topic, value })}`, e));
+                await client.publishAsync(topic, value, { retain }).catch(e => this.logger.log(`Error publish retry. ${JSON.stringify({ topic, value: value?.slice(0, 50) })}`, e));
             }
             finally {
-                this.topicLastValue[topic] = value;
+                if (this.cache) {
+                    this.topicCache[topic] = {
+                        value,
+                        expiresAt: this.cacheTtlMs ? Date.now() + this.cacheTtlMs : Number.MAX_SAFE_INTEGER,
+                    };
+                }
             }
         }
     }
@@ -71383,13 +74970,489 @@ class MqttClient {
 exports["default"] = MqttClient;
 
 
-/***/ }),
+/***/ },
 
-/***/ "./src/eventsRecorderMixin.ts":
+/***/ "../scrypted-syslog/src/utils.ts"
+/*!***************************************!*\
+  !*** ../scrypted-syslog/src/utils.ts ***!
+  \***************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseLog = exports.getPluginConsole = exports.LogLevel = exports.RemoteLogServiceEnum = void 0;
+const sdk_1 = __importDefault(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js"));
+const async_queue_1 = __webpack_require__(/*! ../../scrypted/common/src/async-queue */ "../scrypted/common/src/async-queue.ts");
+const net_1 = __importDefault(__webpack_require__(/*! net */ "net"));
+const events_1 = __webpack_require__(/*! events */ "events");
+var RemoteLogServiceEnum;
+(function (RemoteLogServiceEnum) {
+    RemoteLogServiceEnum["Syslog"] = "Syslog";
+})(RemoteLogServiceEnum || (exports.RemoteLogServiceEnum = RemoteLogServiceEnum = {}));
+var LogLevel;
+(function (LogLevel) {
+    LogLevel["ERROR"] = "ERROR";
+    LogLevel["WARN"] = "WARN";
+    LogLevel["NOTICE"] = "NOTICE";
+    LogLevel["INFO"] = "INFO";
+    LogLevel["DEBUG"] = "DEBUG";
+})(LogLevel || (exports.LogLevel = LogLevel = {}));
+const getPluginConsole = async (props) => {
+    const { pluginId, onClosed } = props;
+    const dataQueue = (0, async_queue_1.createAsyncQueue)();
+    const hello = Buffer.from('undefined', 'utf8');
+    dataQueue.enqueue(hello);
+    async function* localGenerator() {
+        while (true) {
+            const dataBuffers = dataQueue.clear();
+            if (dataBuffers.length === 0) {
+                const buf = await dataQueue.dequeue();
+                if (buf.length)
+                    yield buf;
+                continue;
+            }
+            const concat = Buffer.concat(dataBuffers);
+            if (concat.length)
+                yield concat;
+        }
+    }
+    const localQueue = (0, async_queue_1.createAsyncQueueFromGenerator)(localGenerator());
+    const plugin = sdk_1.default.systemManager.getDeviceByName("@scrypted/core");
+    const streamSvc = await plugin.getDevice('consoleservice');
+    const streamSvcDirect = await sdk_1.default.connectRPCObject(streamSvc);
+    const remoteGenerator = await streamSvcDirect.connectStream(localQueue.queue, {
+        pluginId
+    });
+    const plugins = await sdk_1.default.systemManager.getComponent('plugins');
+    const servicePort = await plugins.getRemoteServicePort(pluginId, 'console');
+    const [port, host] = Array.isArray(servicePort) ? servicePort : [servicePort, undefined];
+    const socket = net_1.default.connect({
+        port,
+        host,
+    });
+    await (0, events_1.once)(socket, 'connect');
+    socket.on('close', onClosed);
+    // socket.on('end', () => queue.end());
+    return { remoteGenerator };
+};
+exports.getPluginConsole = getPluginConsole;
+const parseLog = (lineParent) => {
+    const line = lineParent.replaceAll('\n', '');
+    const cameraRegex = /^(\[.*\]) .*, .* - \[(.*)\]: (.*)$/;
+    const matchCamera = line.match(cameraRegex);
+    if (matchCamera) {
+        const cameraName = matchCamera[1];
+        const severity = matchCamera[2];
+        const messageBody = matchCamera[3];
+        const message = `[${severity}]: ${cameraName} - ${messageBody}`;
+        return { severity, message };
+    }
+    else {
+        const pluginRegex = /^.*, .* - \[(.*)\]: (.*)$/;
+        const matchPlugin = line.match(pluginRegex);
+        if (matchPlugin) {
+            const severity = matchPlugin[1];
+            const messageBody = matchPlugin[2];
+            const message = `[${severity}]: ${messageBody}`;
+            return { severity, message };
+        }
+    }
+    return { message: line, severity: LogLevel.NOTICE };
+};
+exports.parseLog = parseLog;
+
+
+/***/ },
+
+/***/ "../scrypted/common/src/async-queue.ts"
+/*!*********************************************!*\
+  !*** ../scrypted/common/src/async-queue.ts ***!
+  \*********************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createAsyncQueue = createAsyncQueue;
+exports.createAsyncQueueFromGenerator = createAsyncQueueFromGenerator;
+const deferred_1 = __webpack_require__(/*! ./deferred */ "../scrypted/server/src/deferred.ts");
+class EndError extends Error {
+}
+function createAsyncQueue() {
+    let ended;
+    const endDeferred = new deferred_1.Deferred();
+    const waiting = [];
+    const queued = [];
+    const wait = async (index) => {
+        const q = queued[index];
+        if (!q)
+            return;
+        if (!q.dequeued) {
+            q.dequeued = new deferred_1.Deferred();
+        }
+        return q.dequeued.promise;
+    };
+    const dequeue = async () => {
+        if (queued.length) {
+            const { item, dequeued: enqueue } = queued.shift();
+            enqueue?.resolve();
+            return item;
+        }
+        if (ended)
+            throw ended;
+        const deferred = new deferred_1.Deferred();
+        waiting.push(deferred);
+        return deferred.promise;
+    };
+    const take = () => {
+        if (queued.length) {
+            const { item, dequeued: enqueue } = queued.shift();
+            enqueue?.resolve();
+            return item;
+        }
+        if (ended)
+            throw ended;
+    };
+    const submit = (item, dequeued, signal) => {
+        if (ended)
+            return false;
+        if (waiting.length) {
+            const deferred = waiting.shift();
+            dequeued?.resolve();
+            deferred.resolve(item);
+            return true;
+        }
+        if (signal)
+            dequeued ||= new deferred_1.Deferred();
+        const qi = {
+            item,
+            dequeued,
+        };
+        queued.push(qi);
+        if (!signal)
+            return true;
+        const h = () => {
+            const index = queued.indexOf(qi);
+            if (index === -1)
+                return;
+            queued.splice(index, 1);
+            dequeued?.reject(new Error('abort'));
+        };
+        dequeued?.promise.catch(() => { }).finally(() => signal.removeEventListener('abort', h));
+        signal.addEventListener('abort', h);
+        return true;
+    };
+    function end(e) {
+        if (ended)
+            return false;
+        // catch to prevent unhandled rejection.
+        ended = e || new EndError();
+        endDeferred.resolve();
+        while (waiting.length) {
+            waiting.shift().reject(ended);
+        }
+        return true;
+    }
+    function queue() {
+        return (async function* () {
+            try {
+                while (true) {
+                    try {
+                        const item = await dequeue();
+                        yield item;
+                    }
+                    catch (e) {
+                        // the yield above may raise an error, and the queue should be ended.
+                        end(e);
+                        if (e instanceof EndError)
+                            return;
+                        throw e;
+                    }
+                }
+            }
+            finally {
+                // the yield above may cause an iterator return, and the queue should be ended.
+                end();
+            }
+        })();
+    }
+    function clear(error) {
+        const ret = [];
+        const items = queued.splice(0, queued.length);
+        for (const item of items) {
+            if (error)
+                item.dequeued?.reject(error);
+            else
+                item.dequeued?.resolve(undefined);
+            ret.push(item.item);
+        }
+        return ret;
+    }
+    return {
+        [Symbol.dispose]() {
+            end(new Error('async queue disposed'));
+        },
+        get ended() {
+            return ended;
+        },
+        endPromise: endDeferred.promise,
+        take,
+        clear() {
+            return clear();
+        },
+        queued,
+        async pipe(callback) {
+            for await (const i of queue()) {
+                callback(i);
+            }
+        },
+        submit(item, signal) {
+            return submit(item, undefined, signal);
+        },
+        end,
+        async enqueue(item, signal) {
+            const dequeued = new deferred_1.Deferred();
+            if (!submit(item, dequeued, signal))
+                return false;
+            await dequeued.promise;
+            return true;
+        },
+        dequeue,
+        get queue() {
+            return queue();
+        },
+        wait,
+    };
+}
+function createAsyncQueueFromGenerator(generator) {
+    const q = createAsyncQueue();
+    (async () => {
+        try {
+            for await (const i of generator) {
+                await q.enqueue(i);
+            }
+        }
+        catch (e) {
+            q.end(e);
+        }
+        q.end();
+    })();
+    return q;
+}
+// async function testSlowEnqueue() {
+//     const asyncQueue = createAsyncQueue<number>();
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     asyncQueue.submit(-1);
+//     (async () => {
+//         console.log('go');
+//         for (let i = 0; i < 10; i++) {
+//             asyncQueue.submit(i);
+//             await sleep(100);
+//         }
+//         asyncQueue.end(new Error('fail'));
+//     })();
+//     const runQueue = async (str?: string) => {
+//         for await (const n of asyncQueue.queue) {
+//             console.log(str, n);
+//         }
+//     }
+//     runQueue('start');
+//     setTimeout(runQueue, 400);
+// }
+// async function testSlowDequeue() {
+//     const asyncQueue = createAsyncQueue<number>();
+//     const runQueue = async (str?: string) => {
+//         for await (const n of asyncQueue.queue) {
+//             await sleep(100);
+//         }
+//     }
+//     runQueue()
+//     .catch(e => console.error('queue threw', e));
+//     console.log('go');
+//     for (let i = 0; i < 10; i++) {
+//         console.log(await asyncQueue.enqueue(i));
+//         console.log(i);
+//     }
+//     asyncQueue.end(new Error('fail'));
+//     console.log(await asyncQueue.enqueue(555));
+// }
+// testSlowDequeue();
+
+
+/***/ },
+
+/***/ "../scrypted/common/src/settings-mixin.ts"
+/*!************************************************!*\
+  !*** ../scrypted/common/src/settings-mixin.ts ***!
+  \************************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SettingsMixinDeviceBase = void 0;
+const sdk_1 = __webpack_require__(/*! @scrypted/sdk */ "../scrypted/sdk/dist/src/index.js");
+const sdk_2 = __importDefault(__webpack_require__(/*! @scrypted/sdk */ "../scrypted/sdk/dist/src/index.js"));
+const { deviceManager } = sdk_2.default;
+class SettingsMixinDeviceBase extends sdk_1.MixinDeviceBase {
+    constructor(options) {
+        super(options);
+        this.settingsGroup = options.group;
+        this.settingsGroupKey = options.groupKey;
+        process.nextTick(() => deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null));
+    }
+    async getSettings() {
+        const settingsPromise = this.mixinDeviceInterfaces.includes(sdk_1.ScryptedInterface.Settings) ? this.mixinDevice.getSettings() : undefined;
+        const mixinSettingsPromise = this.getMixinSettings();
+        const allSettings = [];
+        try {
+            const settings = (await settingsPromise) || [];
+            allSettings.push(...settings);
+        }
+        catch (e) {
+            const name = this.name;
+            const description = `${name} Extension settings failed to load.`;
+            this.console.error(description, e);
+            allSettings.push({
+                key: Math.random().toString(),
+                title: name,
+                value: 'Settings Error',
+                group: 'Errors',
+                description,
+                readonly: true,
+            });
+        }
+        try {
+            const mixinSettings = (await mixinSettingsPromise) || [];
+            for (const setting of mixinSettings) {
+                setting.group = setting.group || this.settingsGroup;
+                setting.key = this.settingsGroupKey + ':' + setting.key;
+            }
+            allSettings.push(...mixinSettings);
+        }
+        catch (e) {
+            const name = deviceManager.getDeviceState(this.mixinProviderNativeId).name;
+            const description = `${name} Extension settings failed to load.`;
+            this.console.error(description, e);
+            allSettings.push({
+                key: Math.random().toString(),
+                title: name,
+                value: 'Settings Error',
+                group: 'Errors',
+                description,
+                readonly: true,
+            });
+        }
+        return allSettings;
+    }
+    async putSetting(key, value) {
+        const prefix = this.settingsGroupKey + ':';
+        if (!key?.startsWith(prefix)) {
+            return this.mixinDevice.putSetting(key, value);
+        }
+        if (!await this.putMixinSetting(key.substring(prefix.length), value))
+            deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null);
+    }
+    async release() {
+        await deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null);
+    }
+}
+exports.SettingsMixinDeviceBase = SettingsMixinDeviceBase;
+
+
+/***/ },
+
+/***/ "../scrypted/common/src/sleep.ts"
+/*!***************************************!*\
+  !*** ../scrypted/common/src/sleep.ts ***!
+  \***************************************/
+(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sleep = void 0;
+var sleep_1 = __webpack_require__(/*! ../../server/src/sleep */ "../scrypted/server/src/sleep.ts");
+Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_1.sleep; } }));
+
+
+/***/ },
+
+/***/ "../scrypted/server/src/deferred.ts"
+/*!******************************************!*\
+  !*** ../scrypted/server/src/deferred.ts ***!
+  \******************************************/
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Deferred = void 0;
+class Deferred {
+    constructor() {
+        this.finished = false;
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = v => {
+                this.finished = true;
+                resolve(v);
+                return this;
+            };
+            this.reject = e => {
+                this.finished = true;
+                reject(e);
+                return this;
+            };
+        });
+    }
+    [Symbol.dispose]() {
+        if (!this.finished)
+            this.reject(new Error('deferred disposed without being resolved'));
+    }
+    async resolvePromise(p) {
+        try {
+            this.resolve(await p);
+        }
+        catch (e) {
+            this.reject(e);
+        }
+    }
+}
+exports.Deferred = Deferred;
+
+
+/***/ },
+
+/***/ "../scrypted/server/src/sleep.ts"
+/*!***************************************!*\
+  !*** ../scrypted/server/src/sleep.ts ***!
+  \***************************************/
+(__unused_webpack_module, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sleep = sleep;
+async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+/***/ },
+
+/***/ "./src/eventsRecorderMixin.ts"
 /*!************************************!*\
   !*** ./src/eventsRecorderMixin.ts ***!
   \************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -71533,6 +75596,35 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                 type: 'boolean',
                 defaultValue: false,
                 immediate: true,
+            },
+            clipToDelete: {
+                title: 'Clip to delete',
+                description: 'Pick a recorded clip and press "Delete selected clip" below to permanently remove it (video + thumbnail).',
+                type: 'string',
+                combobox: true,
+                immediate: true,
+                onGet: async () => ({
+                    choices: this.scanData.slice()
+                        .sort((a, b) => b.startTime - a.startTime)
+                        .map(item => this.describeClipChoice(item)),
+                }),
+            },
+            deleteSelectedClip: {
+                title: 'Delete selected clip',
+                description: 'Deletes the clip currently selected above. This cannot be undone.',
+                type: 'button',
+                onPut: async () => {
+                    const logger = this.getLogger();
+                    const selected = this.storageSettings.values.clipToDelete;
+                    const filename = this.parseClipChoice(selected);
+                    if (!filename) {
+                        logger.log(`No clip selected to delete`);
+                        return;
+                    }
+                    await this.removeVideoClips(filename);
+                    this.storageSettings.values.clipToDelete = undefined;
+                    await this.indexFs();
+                },
             },
             processPid: {
                 type: 'string',
@@ -71701,7 +75793,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             if (options?.count) {
                 events = events.slice(0, options.count);
             }
-            logger.log(`RecordedEvents: ${JSON.stringify(events)}`);
+            logger.debug(`RecordedEvents: ${JSON.stringify(events)}`);
             return events;
         }
         catch (e) {
@@ -71826,27 +75918,34 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             for (const item of this.scanData) {
                 const { detectionClasses, endTime, filename, startTime } = item;
                 if (startTime >= startTimeInner && startTime <= endTimeInner) {
-                    const durationInMs = endTime - startTime;
-                    const event = (0, util_1.getMainDetectionClass)(detectionClasses);
-                    const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
-                    videoclips.push({
-                        id: filename,
-                        startTime,
-                        duration: Math.round(durationInMs),
-                        videoId: filename,
-                        thumbnailId: filename,
-                        detectionClasses: [...detectionClasses],
-                        event,
-                        description: util_1.pluginId,
-                        resources: {
-                            thumbnail: {
-                                href: thumbnailUrl
-                            },
-                            video: {
-                                href: videoclipUrl
+                    try {
+                        const durationInMs = endTime - startTime;
+                        const event = (0, util_1.getMainDetectionClass)(detectionClasses);
+                        const { thumbnailUrl, videoclipUrl } = await this.getVideoclipWebhookUrls(filename);
+                        videoclips.push({
+                            id: filename,
+                            startTime,
+                            duration: Math.round(durationInMs),
+                            videoId: filename,
+                            thumbnailId: filename,
+                            detectionClasses: [...detectionClasses],
+                            event,
+                            description: util_1.pluginId,
+                            resources: {
+                                thumbnail: {
+                                    href: thumbnailUrl
+                                },
+                                video: {
+                                    href: videoclipUrl
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                    catch (e) {
+                        // Do not let a single clip's webhook URL generation (e.g. missing
+                        // public/cloud endpoint support) blow up the entire clips list.
+                        this.getLogger().error(`Error building video clip entry for ${filename}`, e);
+                    }
                 }
             }
             return videoclips;
@@ -71867,9 +75966,10 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
         catch { }
         const logger = this.getLogger();
-        logger.debug(JSON.stringify(videoclips));
+        logger.debug(`Videoclips: ${JSON.stringify(videoclips)}`);
         return (0, lodash_1.sortBy)(videoclips, 'startTime');
-        ;
+        // removed by dead control flow
+
     }
     async getVideoClip(videoId) {
         const logger = this.getLogger();
@@ -71915,6 +76015,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     catch {
                         logger.log('Videoclip probably corrupted, removing');
                         await fs_1.default.promises.rm(videoClipPath);
+                        await this.indexFs();
                         throw new Error();
                     }
                 }
@@ -71933,10 +76034,23 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
                     return null;
                 }
             }
-            catch (e) {
-                // logger.log(`Error in getVideoClipThumbnail`, thumbnailId, e);
-            }
+            catch { }
         }
+    }
+    // Builds a human-readable label for the "Clip to delete" dropdown that still
+    // embeds the underlying filename, so the selection can be parsed back out
+    // without needing separate value/label support (Setting.choices is string[]).
+    describeClipChoice(item) {
+        const durationInSeconds = Math.round((item.endTime - item.startTime) / 1000);
+        const date = new Date(item.startTime).toLocaleString();
+        return `${date} (${durationInSeconds}s, ${item.detectionClasses.join(', ')}) — ${item.filename}`;
+    }
+    parseClipChoice(choice) {
+        if (!choice) {
+            return undefined;
+        }
+        const match = choice.match(/— (.+)$/);
+        return match ? match[1] : choice;
     }
     async removeVideoClips(...videoClipIds) {
         const logger = this.getLogger();
@@ -72017,7 +76131,7 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
             const startTimeNumber = Number(startTime);
             const endTimeNumber = Number(endTime);
             const fildeData = {
-                detectionClasses,
+                detectionClasses: sortedClassnames,
                 endTime: endTimeNumber,
                 startTime: startTimeNumber,
                 size: stats.size,
@@ -72245,9 +76359,24 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
     }
     async storeEvent(details, data) {
         const logger = this.getLogger();
-        if (data.detectionId) {
+        {
             try {
-                const mo = await this.cameraDevice.getDetectionInput(data.detectionId);
+                let mo;
+                if (data.detectionId) {
+                    mo = await this.cameraDevice.getDetectionInput(data.detectionId);
+                }
+                if (!mo) {
+                    // Cameras that run detection on-board (e.g. UniFi Direct) report
+                    // detections without a detectionId/detection input frame available.
+                    // Fall back to a live snapshot so these events still get indexed
+                    // instead of being silently dropped.
+                    try {
+                        mo = await this.cameraDevice.takePicture();
+                    }
+                    catch (e) {
+                        logger.debug(`No detection input or snapshot available for event ${data.detectionId}`, e);
+                    }
+                }
                 if (!mo) {
                     return;
                 }
@@ -72353,14 +76482,27 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
         }
     }
     async getVideoclipWebhookUrls(filename) {
-        const cloudEndpoint = await sdk_1.default.endpointManager.getCloudEndpoint(undefined, { public: true });
+        // Use a relative path rather than an absolute cloud/local endpoint:
+        // - getCloudEndpoint() always round-trips through
+        //   mediaManager.convertMediaObjectToUrl(), which throws ("no converter
+        //   found: text/x-local-uri to text/x-uri") unless a plugin providing
+        //   that MIME conversion (e.g. Scrypted Cloud) is installed.
+        // - getLocalEndpoint() avoids that, but returns an absolute URL bound to
+        //   whatever IP/port the server detects itself as (e.g. https://10.0.1.10:10443),
+        //   which can differ from the hostname the browser is actually using
+        //   (e.g. https://server:10443), causing cert/host mismatches and blocked
+        //   requests in the browser.
+        // getPath() returns a same-origin relative path, so it always works
+        // regardless of the hostname used to reach the server.
+        const cloudEndpoint = await sdk_1.default.endpointManager.getPath(undefined, { public: true });
         const [endpoint, parameters] = cloudEndpoint.split('?') ?? '';
         const params = {
             deviceId: this.id,
             filename,
         };
-        const videoclipUrl = `${endpoint}videoclip?params=${JSON.stringify(params)}&${parameters}`;
-        const thumbnailUrl = `${endpoint}videoclipThumbnail?params=${JSON.stringify(params)}&${parameters}`;
+        const extraParams = parameters ? `&${parameters}` : '';
+        const videoclipUrl = `${endpoint}videoclip?params=${JSON.stringify(params)}${extraParams}`;
+        const thumbnailUrl = `${endpoint}videoclipThumbnail?params=${JSON.stringify(params)}${extraParams}`;
         return { videoclipUrl, thumbnailUrl };
     }
     getStorageDirs(props) {
@@ -72405,13 +76547,13 @@ class EventsRecorderMixin extends settings_mixin_1.SettingsMixinDeviceBase {
 exports.EventsRecorderMixin = EventsRecorderMixin;
 
 
-/***/ }),
+/***/ },
 
-/***/ "./src/main.ts":
+/***/ "./src/main.ts"
 /*!*********************!*\
   !*** ./src/main.ts ***!
   \*********************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -72458,6 +76600,68 @@ const storage_settings_1 = __webpack_require__(/*! @scrypted/sdk/storage-setting
 const eventsRecorderMixin_1 = __webpack_require__(/*! ./eventsRecorderMixin */ "./src/eventsRecorderMixin.ts");
 const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
 const basePlugin_1 = __webpack_require__(/*! ../../scrypted-apocaliss-base/src/basePlugin */ "../scrypted-apocaliss-base/src/basePlugin.ts");
+// Optional helper script for a Tampermonkey/userscript overlay (see
+// scrypted-clip-delete-overlay.user.js). Served as a static file; not injected
+// into @scrypted/core — plugins must not mutate another plugin's UI files.
+const CLIP_DELETE_OVERLAY_JS = `(function () {
+  const THUMB_MARKER = 'videoclipThumbnail?';
+  const DELETE_MARKER = 'deleteVideoclip?';
+
+  function position(btn, img) {
+    btn.style.top = (img.offsetTop + 2) + 'px';
+    btn.style.left = (img.offsetLeft + img.offsetWidth - 24) + 'px';
+  }
+
+  function decorate(img) {
+    if (img.dataset.deleteBtnAdded) return;
+    img.dataset.deleteBtnAdded = '1';
+
+    const parent = img.parentElement;
+    if (getComputedStyle(parent).position === 'static') {
+      parent.style.position = 'relative';
+    }
+
+    const btn = document.createElement('button');
+    btn.textContent = '\\u{1F5D1}';
+    btn.title = 'Delete this recorded clip';
+    btn.style.cssText = [
+      'position:absolute', 'z-index:9999',
+      'background:rgba(0,0,0,.65)', 'color:#fff', 'border:none',
+      'border-radius:4px', 'width:22px', 'height:22px', 'cursor:pointer',
+      'font-size:13px', 'line-height:1', 'padding:0',
+    ].join(';');
+    position(btn, img);
+
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!confirm('Delete this recorded clip permanently?')) return;
+
+      btn.disabled = true;
+      btn.textContent = '\\u2026';
+      try {
+        const url = img.src.replace(THUMB_MARKER, DELETE_MARKER);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(res.status + ' ' + await res.text());
+        parent.remove();
+      } catch (err) {
+        alert('Failed to delete clip: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = '\\u{1F5D1}';
+      }
+    });
+
+    parent.appendChild(btn);
+  }
+
+  function scan() {
+    document.querySelectorAll('img[src*="' + THUMB_MARKER + '"]').forEach(decorate);
+  }
+
+  new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
+  scan();
+})();
+`;
 class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
     constructor(nativeId) {
         super(nativeId, {
@@ -72544,6 +76748,15 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
         try {
             const [_, __, ___, ____, privateWebhook, ...rest] = url.pathname.split('/');
             try {
+                // Optional static helper for the Tampermonkey userscript overlay.
+                if (privateWebhook === 'public' && rest[0] === 'clipDeleteOverlay.js') {
+                    response.send(CLIP_DELETE_OVERLAY_JS, {
+                        headers: {
+                            'Content-Type': 'application/javascript',
+                        }
+                    });
+                    return;
+                }
                 // Since no API is available, needs to mimic NVR
                 if (privateWebhook === 'thumbnail') {
                     const [deviceId, filename] = rest;
@@ -72660,6 +76873,18 @@ class EventsRecorderPlugin extends basePlugin_1.BasePlugin {
                         });
                         return;
                     }
+                    else if (webhook === 'deleteVideoclip') {
+                        // Public webhook — reject path traversal / unexpected names.
+                        if (typeof filename !== 'string' || !/^[\w.\-]+$/.test(filename)) {
+                            response.send('Invalid filename', { code: 400 });
+                            return;
+                        }
+                        devConsole.log(`Deleting videoclip via webhook: ${filename}`);
+                        await dev.removeVideoClips(filename);
+                        await dev.indexFs();
+                        response.send('OK', { code: 200 });
+                        return;
+                    }
                 }
             }
             catch (e) {
@@ -72723,13 +76948,13 @@ exports.EventsRecorderPlugin = EventsRecorderPlugin;
 exports["default"] = EventsRecorderPlugin;
 
 
-/***/ }),
+/***/ },
 
-/***/ "./src/util.ts":
+/***/ "./src/util.ts"
 /*!*********************!*\
   !*** ./src/util.ts ***!
   \*********************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
 
@@ -72885,3700 +77110,229 @@ exports.calculateSize = calculateSize;
 // }
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-syslog/src/utils.ts":
-/*!***************************************!*\
-  !*** ../scrypted-syslog/src/utils.ts ***!
-  \***************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseLog = exports.getPluginConsole = exports.LogLevel = exports.RemoteLogServiceEnum = void 0;
-const sdk_1 = __importDefault(__webpack_require__(/*! @scrypted/sdk */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js"));
-const async_queue_1 = __webpack_require__(/*! ../../scrypted/common/src/async-queue */ "../scrypted/common/src/async-queue.ts");
-const net_1 = __importDefault(__webpack_require__(/*! net */ "net"));
-const events_1 = __webpack_require__(/*! events */ "events");
-var RemoteLogServiceEnum;
-(function (RemoteLogServiceEnum) {
-    RemoteLogServiceEnum["Syslog"] = "Syslog";
-})(RemoteLogServiceEnum || (exports.RemoteLogServiceEnum = RemoteLogServiceEnum = {}));
-var LogLevel;
-(function (LogLevel) {
-    LogLevel["ERROR"] = "ERROR";
-    LogLevel["WARN"] = "WARN";
-    LogLevel["NOTICE"] = "NOTICE";
-    LogLevel["INFO"] = "INFO";
-    LogLevel["DEBUG"] = "DEBUG";
-})(LogLevel || (exports.LogLevel = LogLevel = {}));
-const getPluginConsole = async (props) => {
-    const { pluginId, onClosed } = props;
-    const dataQueue = (0, async_queue_1.createAsyncQueue)();
-    const hello = Buffer.from('undefined', 'utf8');
-    dataQueue.enqueue(hello);
-    async function* localGenerator() {
-        while (true) {
-            const dataBuffers = dataQueue.clear();
-            if (dataBuffers.length === 0) {
-                const buf = await dataQueue.dequeue();
-                if (buf.length)
-                    yield buf;
-                continue;
-            }
-            const concat = Buffer.concat(dataBuffers);
-            if (concat.length)
-                yield concat;
-        }
-    }
-    const localQueue = (0, async_queue_1.createAsyncQueueFromGenerator)(localGenerator());
-    const plugin = sdk_1.default.systemManager.getDeviceByName("@scrypted/core");
-    const streamSvc = await plugin.getDevice('consoleservice');
-    const streamSvcDirect = await sdk_1.default.connectRPCObject(streamSvc);
-    const remoteGenerator = await streamSvcDirect.connectStream(localQueue.queue, {
-        pluginId
-    });
-    const plugins = await sdk_1.default.systemManager.getComponent('plugins');
-    const servicePort = await plugins.getRemoteServicePort(pluginId, 'console');
-    const [port, host] = Array.isArray(servicePort) ? servicePort : [servicePort, undefined];
-    const socket = net_1.default.connect({
-        port,
-        host,
-    });
-    await (0, events_1.once)(socket, 'connect');
-    socket.on('close', onClosed);
-    // socket.on('end', () => queue.end());
-    return { remoteGenerator };
-};
-exports.getPluginConsole = getPluginConsole;
-const parseLog = (lineParent) => {
-    const line = lineParent.replaceAll('\n', '');
-    const cameraRegex = /^(\[.*\]) .*, .* - \[(.*)\]: (.*)$/;
-    const matchCamera = line.match(cameraRegex);
-    if (matchCamera) {
-        const cameraName = matchCamera[1];
-        const severity = matchCamera[2];
-        const messageBody = matchCamera[3];
-        const message = `[${severity}]: ${cameraName} - ${messageBody}`;
-        return { severity, message };
-    }
-    else {
-        const pluginRegex = /^.*, .* - \[(.*)\]: (.*)$/;
-        const matchPlugin = line.match(pluginRegex);
-        if (matchPlugin) {
-            const severity = matchPlugin[1];
-            const messageBody = matchPlugin[2];
-            const message = `[${severity}]: ${messageBody}`;
-            return { severity, message };
-        }
-    }
-    return { message: line, severity: LogLevel.NOTICE };
-};
-exports.parseLog = parseLog;
-
-
-/***/ }),
-
-/***/ "../scrypted/common/src/async-queue.ts":
-/*!*********************************************!*\
-  !*** ../scrypted/common/src/async-queue.ts ***!
-  \*********************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createAsyncQueue = createAsyncQueue;
-exports.createAsyncQueueFromGenerator = createAsyncQueueFromGenerator;
-const deferred_1 = __webpack_require__(/*! ./deferred */ "../scrypted/server/src/deferred.ts");
-class EndError extends Error {
-}
-function createAsyncQueue() {
-    let ended;
-    const endDeferred = new deferred_1.Deferred();
-    const waiting = [];
-    const queued = [];
-    const dequeue = async () => {
-        if (queued.length) {
-            const { item, dequeued: enqueue } = queued.shift();
-            enqueue?.resolve();
-            return item;
-        }
-        if (ended)
-            throw ended;
-        const deferred = new deferred_1.Deferred();
-        waiting.push(deferred);
-        return deferred.promise;
-    };
-    const take = () => {
-        if (queued.length) {
-            const { item, dequeued: enqueue } = queued.shift();
-            enqueue?.resolve();
-            return item;
-        }
-        if (ended)
-            throw ended;
-    };
-    const submit = (item, dequeued, signal) => {
-        if (ended)
-            return false;
-        if (waiting.length) {
-            const deferred = waiting.shift();
-            dequeued?.resolve();
-            deferred.resolve(item);
-            return true;
-        }
-        if (signal)
-            dequeued ||= new deferred_1.Deferred();
-        const qi = {
-            item,
-            dequeued,
-        };
-        queued.push(qi);
-        if (!signal)
-            return true;
-        const h = () => {
-            const index = queued.indexOf(qi);
-            if (index === -1)
-                return;
-            queued.splice(index, 1);
-            dequeued?.reject(new Error('abort'));
-        };
-        dequeued?.promise.catch(() => { }).finally(() => signal.removeEventListener('abort', h));
-        signal.addEventListener('abort', h);
-        return true;
-    };
-    function end(e) {
-        if (ended)
-            return false;
-        // catch to prevent unhandled rejection.
-        ended = e || new EndError();
-        endDeferred.resolve();
-        while (waiting.length) {
-            waiting.shift().reject(ended);
-        }
-        return true;
-    }
-    function queue() {
-        return (async function* () {
-            try {
-                while (true) {
-                    try {
-                        const item = await dequeue();
-                        yield item;
-                    }
-                    catch (e) {
-                        // the yield above may raise an error, and the queue should be ended.
-                        end(e);
-                        if (e instanceof EndError)
-                            return;
-                        throw e;
-                    }
-                }
-            }
-            finally {
-                // the yield above may cause an iterator return, and the queue should be ended.
-                end();
-            }
-        })();
-    }
-    function clear(error) {
-        const ret = [];
-        const items = queued.splice(0, queued.length);
-        for (const item of items) {
-            if (error)
-                item.dequeued?.reject(error);
-            else
-                item.dequeued?.resolve(undefined);
-            ret.push(item.item);
-        }
-        return ret;
-    }
-    return {
-        [Symbol.dispose]() {
-            end(new Error('async queue disposed'));
-        },
-        get ended() {
-            return ended;
-        },
-        endPromise: endDeferred.promise,
-        take,
-        clear() {
-            return clear();
-        },
-        queued,
-        async pipe(callback) {
-            for await (const i of queue()) {
-                callback(i);
-            }
-        },
-        submit(item, signal) {
-            return submit(item, undefined, signal);
-        },
-        end,
-        async enqueue(item, signal) {
-            const dequeued = new deferred_1.Deferred();
-            if (!submit(item, dequeued, signal))
-                return false;
-            await dequeued.promise;
-            return true;
-        },
-        dequeue,
-        get queue() {
-            return queue();
-        }
-    };
-}
-function createAsyncQueueFromGenerator(generator) {
-    const q = createAsyncQueue();
-    (async () => {
-        try {
-            for await (const i of generator) {
-                await q.enqueue(i);
-            }
-        }
-        catch (e) {
-            q.end(e);
-        }
-        q.end();
-    })();
-    return q;
-}
-// async function testSlowEnqueue() {
-//     const asyncQueue = createAsyncQueue<number>();
-//     asyncQueue.submit(-1);
-//     asyncQueue.submit(-1);
-//     asyncQueue.submit(-1);
-//     asyncQueue.submit(-1);
-//     (async () => {
-//         console.log('go');
-//         for (let i = 0; i < 10; i++) {
-//             asyncQueue.submit(i);
-//             await sleep(100);
-//         }
-//         asyncQueue.end(new Error('fail'));
-//     })();
-//     const runQueue = async (str?: string) => {
-//         for await (const n of asyncQueue.queue) {
-//             console.log(str, n);
-//         }
-//     }
-//     runQueue('start');
-//     setTimeout(runQueue, 400);
-// }
-// async function testSlowDequeue() {
-//     const asyncQueue = createAsyncQueue<number>();
-//     const runQueue = async (str?: string) => {
-//         for await (const n of asyncQueue.queue) {
-//             await sleep(100);
-//         }
-//     }
-//     runQueue()
-//     .catch(e => console.error('queue threw', e));
-//     console.log('go');
-//     for (let i = 0; i < 10; i++) {
-//         console.log(await asyncQueue.enqueue(i));
-//         console.log(i);
-//     }
-//     asyncQueue.end(new Error('fail'));
-//     console.log(await asyncQueue.enqueue(555));
-// }
-// testSlowDequeue();
-
-
-/***/ }),
-
-/***/ "../scrypted/common/src/settings-mixin.ts":
-/*!************************************************!*\
-  !*** ../scrypted/common/src/settings-mixin.ts ***!
-  \************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SettingsMixinDeviceBase = void 0;
-const sdk_1 = __webpack_require__(/*! @scrypted/sdk */ "../scrypted/sdk/dist/src/index.js");
-const sdk_2 = __importDefault(__webpack_require__(/*! @scrypted/sdk */ "../scrypted/sdk/dist/src/index.js"));
-const { deviceManager } = sdk_2.default;
-class SettingsMixinDeviceBase extends sdk_1.MixinDeviceBase {
-    constructor(options) {
-        super(options);
-        this.settingsGroup = options.group;
-        this.settingsGroupKey = options.groupKey;
-        process.nextTick(() => deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null));
-    }
-    async getSettings() {
-        const settingsPromise = this.mixinDeviceInterfaces.includes(sdk_1.ScryptedInterface.Settings) ? this.mixinDevice.getSettings() : undefined;
-        const mixinSettingsPromise = this.getMixinSettings();
-        const allSettings = [];
-        try {
-            const settings = (await settingsPromise) || [];
-            allSettings.push(...settings);
-        }
-        catch (e) {
-            const name = this.name;
-            const description = `${name} Extension settings failed to load.`;
-            this.console.error(description, e);
-            allSettings.push({
-                key: Math.random().toString(),
-                title: name,
-                value: 'Settings Error',
-                group: 'Errors',
-                description,
-                readonly: true,
-            });
-        }
-        try {
-            const mixinSettings = (await mixinSettingsPromise) || [];
-            for (const setting of mixinSettings) {
-                setting.group = setting.group || this.settingsGroup;
-                setting.key = this.settingsGroupKey + ':' + setting.key;
-            }
-            allSettings.push(...mixinSettings);
-        }
-        catch (e) {
-            const name = deviceManager.getDeviceState(this.mixinProviderNativeId).name;
-            const description = `${name} Extension settings failed to load.`;
-            this.console.error(description, e);
-            allSettings.push({
-                key: Math.random().toString(),
-                title: name,
-                value: 'Settings Error',
-                group: 'Errors',
-                description,
-                readonly: true,
-            });
-        }
-        return allSettings;
-    }
-    async putSetting(key, value) {
-        const prefix = this.settingsGroupKey + ':';
-        if (!key?.startsWith(prefix)) {
-            return this.mixinDevice.putSetting(key, value);
-        }
-        if (!await this.putMixinSetting(key.substring(prefix.length), value))
-            deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null);
-    }
-    async release() {
-        await deviceManager.onMixinEvent(this.id, this, sdk_1.ScryptedInterface.Settings, null);
-    }
-}
-exports.SettingsMixinDeviceBase = SettingsMixinDeviceBase;
-
-
-/***/ }),
-
-/***/ "../scrypted/common/src/sleep.ts":
-/*!***************************************!*\
-  !*** ../scrypted/common/src/sleep.ts ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = void 0;
-var sleep_1 = __webpack_require__(/*! ../../server/src/sleep */ "../scrypted/server/src/sleep.ts");
-Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_1.sleep; } }));
-
-
-/***/ }),
-
-/***/ "../scrypted/server/src/deferred.ts":
-/*!******************************************!*\
-  !*** ../scrypted/server/src/deferred.ts ***!
-  \******************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Deferred = void 0;
-class Deferred {
-    constructor() {
-        this.finished = false;
-        this.promise = new Promise((resolve, reject) => {
-            this.resolve = v => {
-                this.finished = true;
-                resolve(v);
-                return this;
-            };
-            this.reject = e => {
-                this.finished = true;
-                reject(e);
-                return this;
-            };
-        });
-    }
-    [Symbol.dispose]() {
-        if (!this.finished)
-            this.reject(new Error('deferred disposed without being resolved'));
-    }
-    async resolvePromise(p) {
-        try {
-            this.resolve(await p);
-        }
-        catch (e) {
-            this.reject(e);
-        }
-    }
-}
-exports.Deferred = Deferred;
-
-
-/***/ }),
-
-/***/ "../scrypted/server/src/sleep.ts":
-/*!***************************************!*\
-  !*** ../scrypted/server/src/sleep.ts ***!
-  \***************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = sleep;
-async function sleep(ms) {
-    await new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-/***/ }),
-
-/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js":
-/*!***********************************************************************!*\
-  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/index.js ***!
-  \***********************************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sdk = exports.MixinDeviceBase = exports.ScryptedDeviceBase = void 0;
-__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js"), exports);
-const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js");
-const module_1 = __webpack_require__(/*! module */ "module");
-/**
- * @category Core Reference
- */
-class ScryptedDeviceBase extends index_1.DeviceBase {
-    constructor(nativeId) {
-        super();
-        this.nativeId = nativeId;
-    }
-    get storage() {
-        if (!this._storage) {
-            this._storage = exports.sdk.deviceManager.getDeviceStorage(this.nativeId);
-        }
-        return this._storage;
-    }
-    get log() {
-        if (!this._log) {
-            this._log = exports.sdk.deviceManager.getDeviceLogger(this.nativeId);
-        }
-        return this._log;
-    }
-    get console() {
-        if (!this._console) {
-            this._console = exports.sdk.deviceManager.getDeviceConsole(this.nativeId);
-        }
-        return this._console;
-    }
-    async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
-            sourceId: this.id,
-        });
-    }
-    getMediaObjectConsole(mediaObject) {
-        if (typeof mediaObject.sourceId !== 'string')
-            return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
-    }
-    _lazyLoadDeviceState() {
-        if (!this._deviceState) {
-            if (this.nativeId) {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState(this.nativeId);
-            }
-            else {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState();
-            }
-        }
-    }
-    /**
-     * Fire an event for this device.
-     */
-    onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
-    }
-}
-exports.ScryptedDeviceBase = ScryptedDeviceBase;
-/**
- * @category Mixin Reference
- */
-class MixinDeviceBase extends index_1.DeviceBase {
-    constructor(options) {
-        super();
-        this._listeners = new Set();
-        this.mixinDevice = options.mixinDevice;
-        this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
-        this.mixinStorageSuffix = options.mixinStorageSuffix;
-        this._deviceState = options.mixinDeviceState;
-        this.nativeId = exports.sdk.systemManager.getDeviceById(this.id).nativeId;
-        this.mixinProviderNativeId = options.mixinProviderNativeId;
-        // RpcProxy will trap all properties, and the following check/hack will determine
-        // if the device state came from another node worker thread.
-        // This should ultimately be discouraged and warned at some point in the future.
-        if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
-            this._deviceState = exports.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
-        }
-    }
-    get storage() {
-        if (!this._storage) {
-            const mixinStorageSuffix = this.mixinStorageSuffix;
-            const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
-            this._storage = exports.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
-        }
-        return this._storage;
-    }
-    get console() {
-        if (!this._console) {
-            if (exports.sdk.deviceManager.getMixinConsole)
-                this._console = exports.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
-            else
-                this._console = exports.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
-        }
-        return this._console;
-    }
-    async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
-            sourceId: this.id,
-        });
-    }
-    getMediaObjectConsole(mediaObject) {
-        if (typeof mediaObject.sourceId !== 'string')
-            return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
-    }
-    /**
-     * Fire an event for this device.
-     */
-    onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
-    }
-    _lazyLoadDeviceState() {
-    }
-    manageListener(listener) {
-        this._listeners.add(listener);
-    }
-    release() {
-        for (const l of this._listeners) {
-            l.removeListener();
-        }
-    }
-}
-exports.MixinDeviceBase = MixinDeviceBase;
-(function () {
-    function _createGetState(state) {
-        return function () {
-            this._lazyLoadDeviceState();
-            // @ts-ignore: accessing private property
-            return this._deviceState?.[state];
-        };
-    }
-    function _createSetState(state) {
-        return function (value) {
-            this._lazyLoadDeviceState();
-            // @ts-ignore: accessing private property
-            if (!this._deviceState) {
-                console.warn('device state is unavailable. the device must be discovered with deviceManager.onDeviceDiscovered or deviceManager.onDevicesChanged before the state can be set.');
-            }
-            else {
-                // @ts-ignore: accessing private property
-                this._deviceState[state] = value;
-            }
-        };
-    }
-    for (const field of Object.values(index_1.ScryptedInterfaceProperty)) {
-        if (field === index_1.ScryptedInterfaceProperty.nativeId)
-            continue;
-        Object.defineProperty(ScryptedDeviceBase.prototype, field, {
-            set: _createSetState(field),
-            get: _createGetState(field),
-        });
-        Object.defineProperty(MixinDeviceBase.prototype, field, {
-            set: _createSetState(field),
-            get: _createGetState(field),
-        });
-    }
-})();
-exports.sdk = {};
-try {
-    let loaded = false;
-    try {
-        // todo: remove usage of process.env.SCRYPTED_SDK_MODULE, only existed in prerelease builds.
-        // import.meta is not a reliable way to detect es module support in webpack since webpack
-        // evaluates that to true at runtime.
-        const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
-        const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
-        // @ts-expect-error
-        if (esModule && "undefined" !== 'undefined') {}
-        else if (cjsModule) {
-            // @ts-expect-error
-            if (typeof require !== 'undefined') {
-                // @ts-expect-error
-                const sdkModule = require(process.env.SCRYPTED_SDK_MODULE);
-                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
-                loaded = true;
-            }
-            else {
-                const sdkModule = __webpack_require__("../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive")(cjsModule);
-                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
-                loaded = true;
-            }
-        }
-    }
-    catch (e) {
-        console.warn("failed to load sdk module", e);
-        throw e;
-    }
-    if (!loaded) {
-        let runtimeAPI;
-        try {
-            runtimeAPI = pluginRuntimeAPI;
-        }
-        catch (e) {
-        }
-        Object.assign(exports.sdk, {
-            log: deviceManager.getDeviceLogger(undefined),
-            deviceManager,
-            endpointManager,
-            mediaManager,
-            systemManager,
-            pluginHostAPI,
-            ...runtimeAPI,
-        });
-    }
-    try {
-        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, index_1.ScryptedInterfaceDescriptors)?.catch(() => { });
-    }
-    catch (e) {
-    }
-}
-catch (e) {
-    console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
-}
-exports["default"] = exports.sdk;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive":
-/*!********************************************************************!*\
-  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/src/ sync ***!
-  \********************************************************************/
-/***/ ((module) => {
-
-function webpackEmptyContext(req) {
-	var e = new Error("Cannot find module '" + req + "'");
-	e.code = 'MODULE_NOT_FOUND';
-	throw e;
-}
-webpackEmptyContext.keys = () => ([]);
-webpackEmptyContext.resolve = webpackEmptyContext;
-webpackEmptyContext.id = "../scrypted-syslog/node_modules/@scrypted/sdk/dist/src sync recursive";
-module.exports = webpackEmptyContext;
-
-/***/ }),
-
-/***/ "../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js":
-/*!*****************************************************************************!*\
-  !*** ../scrypted-syslog/node_modules/@scrypted/sdk/dist/types/gen/index.js ***!
-  \*****************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.114";
-class DeviceBase {
-}
-exports.DeviceBase = DeviceBase;
-var ScryptedInterfaceProperty;
-(function (ScryptedInterfaceProperty) {
-    ScryptedInterfaceProperty["id"] = "id";
-    ScryptedInterfaceProperty["info"] = "info";
-    ScryptedInterfaceProperty["interfaces"] = "interfaces";
-    ScryptedInterfaceProperty["mixins"] = "mixins";
-    ScryptedInterfaceProperty["name"] = "name";
-    ScryptedInterfaceProperty["nativeId"] = "nativeId";
-    ScryptedInterfaceProperty["pluginId"] = "pluginId";
-    ScryptedInterfaceProperty["providedInterfaces"] = "providedInterfaces";
-    ScryptedInterfaceProperty["providedName"] = "providedName";
-    ScryptedInterfaceProperty["providedRoom"] = "providedRoom";
-    ScryptedInterfaceProperty["providedType"] = "providedType";
-    ScryptedInterfaceProperty["providerId"] = "providerId";
-    ScryptedInterfaceProperty["room"] = "room";
-    ScryptedInterfaceProperty["type"] = "type";
-    ScryptedInterfaceProperty["scryptedRuntimeArguments"] = "scryptedRuntimeArguments";
-    ScryptedInterfaceProperty["on"] = "on";
-    ScryptedInterfaceProperty["brightness"] = "brightness";
-    ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
-    ScryptedInterfaceProperty["rgb"] = "rgb";
-    ScryptedInterfaceProperty["hsv"] = "hsv";
-    ScryptedInterfaceProperty["buttons"] = "buttons";
-    ScryptedInterfaceProperty["sensors"] = "sensors";
-    ScryptedInterfaceProperty["running"] = "running";
-    ScryptedInterfaceProperty["paused"] = "paused";
-    ScryptedInterfaceProperty["docked"] = "docked";
-    ScryptedInterfaceProperty["temperatureSetting"] = "temperatureSetting";
-    ScryptedInterfaceProperty["temperature"] = "temperature";
-    ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
-    ScryptedInterfaceProperty["humidity"] = "humidity";
-    ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
-    ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
-    ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
-    ScryptedInterfaceProperty["lockState"] = "lockState";
-    ScryptedInterfaceProperty["entryOpen"] = "entryOpen";
-    ScryptedInterfaceProperty["batteryLevel"] = "batteryLevel";
-    ScryptedInterfaceProperty["chargeState"] = "chargeState";
-    ScryptedInterfaceProperty["online"] = "online";
-    ScryptedInterfaceProperty["fromMimeType"] = "fromMimeType";
-    ScryptedInterfaceProperty["toMimeType"] = "toMimeType";
-    ScryptedInterfaceProperty["converters"] = "converters";
-    ScryptedInterfaceProperty["binaryState"] = "binaryState";
-    ScryptedInterfaceProperty["tampered"] = "tampered";
-    ScryptedInterfaceProperty["sleeping"] = "sleeping";
-    ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
-    ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
-    ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
-    ScryptedInterfaceProperty["ambientLight"] = "ambientLight";
-    ScryptedInterfaceProperty["occupied"] = "occupied";
-    ScryptedInterfaceProperty["flooded"] = "flooded";
-    ScryptedInterfaceProperty["ultraviolet"] = "ultraviolet";
-    ScryptedInterfaceProperty["luminance"] = "luminance";
-    ScryptedInterfaceProperty["position"] = "position";
-    ScryptedInterfaceProperty["securitySystemState"] = "securitySystemState";
-    ScryptedInterfaceProperty["pm10Density"] = "pm10Density";
-    ScryptedInterfaceProperty["pm25Density"] = "pm25Density";
-    ScryptedInterfaceProperty["vocDensity"] = "vocDensity";
-    ScryptedInterfaceProperty["noxDensity"] = "noxDensity";
-    ScryptedInterfaceProperty["co2ppm"] = "co2ppm";
-    ScryptedInterfaceProperty["airQuality"] = "airQuality";
-    ScryptedInterfaceProperty["airPurifierState"] = "airPurifierState";
-    ScryptedInterfaceProperty["filterChangeIndication"] = "filterChangeIndication";
-    ScryptedInterfaceProperty["filterLifeLevel"] = "filterLifeLevel";
-    ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
-    ScryptedInterfaceProperty["fan"] = "fan";
-    ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
-    ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
-})(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
-var ScryptedInterfaceMethod;
-(function (ScryptedInterfaceMethod) {
-    ScryptedInterfaceMethod["listen"] = "listen";
-    ScryptedInterfaceMethod["probe"] = "probe";
-    ScryptedInterfaceMethod["setMixins"] = "setMixins";
-    ScryptedInterfaceMethod["setName"] = "setName";
-    ScryptedInterfaceMethod["setRoom"] = "setRoom";
-    ScryptedInterfaceMethod["setType"] = "setType";
-    ScryptedInterfaceMethod["getPluginJson"] = "getPluginJson";
-    ScryptedInterfaceMethod["turnOff"] = "turnOff";
-    ScryptedInterfaceMethod["turnOn"] = "turnOn";
-    ScryptedInterfaceMethod["setBrightness"] = "setBrightness";
-    ScryptedInterfaceMethod["getTemperatureMaxK"] = "getTemperatureMaxK";
-    ScryptedInterfaceMethod["getTemperatureMinK"] = "getTemperatureMinK";
-    ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
-    ScryptedInterfaceMethod["setRgb"] = "setRgb";
-    ScryptedInterfaceMethod["setHsv"] = "setHsv";
-    ScryptedInterfaceMethod["pressButton"] = "pressButton";
-    ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
-    ScryptedInterfaceMethod["start"] = "start";
-    ScryptedInterfaceMethod["stop"] = "stop";
-    ScryptedInterfaceMethod["pause"] = "pause";
-    ScryptedInterfaceMethod["resume"] = "resume";
-    ScryptedInterfaceMethod["dock"] = "dock";
-    ScryptedInterfaceMethod["setTemperature"] = "setTemperature";
-    ScryptedInterfaceMethod["setTemperatureUnit"] = "setTemperatureUnit";
-    ScryptedInterfaceMethod["getPictureOptions"] = "getPictureOptions";
-    ScryptedInterfaceMethod["takePicture"] = "takePicture";
-    ScryptedInterfaceMethod["getAudioStream"] = "getAudioStream";
-    ScryptedInterfaceMethod["setAudioVolumes"] = "setAudioVolumes";
-    ScryptedInterfaceMethod["startDisplay"] = "startDisplay";
-    ScryptedInterfaceMethod["stopDisplay"] = "stopDisplay";
-    ScryptedInterfaceMethod["getVideoStream"] = "getVideoStream";
-    ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
-    ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
-    ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
-    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
-    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
-    ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
-    ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
-    ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
-    ScryptedInterfaceMethod["getRecordingStreamThumbnail"] = "getRecordingStreamThumbnail";
-    ScryptedInterfaceMethod["deleteRecordingStream"] = "deleteRecordingStream";
-    ScryptedInterfaceMethod["setRecordingActive"] = "setRecordingActive";
-    ScryptedInterfaceMethod["ptzCommand"] = "ptzCommand";
-    ScryptedInterfaceMethod["getRecordedEvents"] = "getRecordedEvents";
-    ScryptedInterfaceMethod["getVideoClip"] = "getVideoClip";
-    ScryptedInterfaceMethod["getVideoClips"] = "getVideoClips";
-    ScryptedInterfaceMethod["getVideoClipThumbnail"] = "getVideoClipThumbnail";
-    ScryptedInterfaceMethod["removeVideoClips"] = "removeVideoClips";
-    ScryptedInterfaceMethod["setVideoStreamOptions"] = "setVideoStreamOptions";
-    ScryptedInterfaceMethod["startIntercom"] = "startIntercom";
-    ScryptedInterfaceMethod["stopIntercom"] = "stopIntercom";
-    ScryptedInterfaceMethod["lock"] = "lock";
-    ScryptedInterfaceMethod["unlock"] = "unlock";
-    ScryptedInterfaceMethod["addPassword"] = "addPassword";
-    ScryptedInterfaceMethod["getPasswords"] = "getPasswords";
-    ScryptedInterfaceMethod["removePassword"] = "removePassword";
-    ScryptedInterfaceMethod["activate"] = "activate";
-    ScryptedInterfaceMethod["deactivate"] = "deactivate";
-    ScryptedInterfaceMethod["isReversible"] = "isReversible";
-    ScryptedInterfaceMethod["closeEntry"] = "closeEntry";
-    ScryptedInterfaceMethod["openEntry"] = "openEntry";
-    ScryptedInterfaceMethod["getDevice"] = "getDevice";
-    ScryptedInterfaceMethod["releaseDevice"] = "releaseDevice";
-    ScryptedInterfaceMethod["adoptDevice"] = "adoptDevice";
-    ScryptedInterfaceMethod["discoverDevices"] = "discoverDevices";
-    ScryptedInterfaceMethod["createDevice"] = "createDevice";
-    ScryptedInterfaceMethod["getCreateDeviceSettings"] = "getCreateDeviceSettings";
-    ScryptedInterfaceMethod["reboot"] = "reboot";
-    ScryptedInterfaceMethod["getRefreshFrequency"] = "getRefreshFrequency";
-    ScryptedInterfaceMethod["refresh"] = "refresh";
-    ScryptedInterfaceMethod["getMediaStatus"] = "getMediaStatus";
-    ScryptedInterfaceMethod["load"] = "load";
-    ScryptedInterfaceMethod["seek"] = "seek";
-    ScryptedInterfaceMethod["skipNext"] = "skipNext";
-    ScryptedInterfaceMethod["skipPrevious"] = "skipPrevious";
-    ScryptedInterfaceMethod["convert"] = "convert";
-    ScryptedInterfaceMethod["convertMedia"] = "convertMedia";
-    ScryptedInterfaceMethod["getSettings"] = "getSettings";
-    ScryptedInterfaceMethod["putSetting"] = "putSetting";
-    ScryptedInterfaceMethod["armSecuritySystem"] = "armSecuritySystem";
-    ScryptedInterfaceMethod["disarmSecuritySystem"] = "disarmSecuritySystem";
-    ScryptedInterfaceMethod["setAirPurifierState"] = "setAirPurifierState";
-    ScryptedInterfaceMethod["getReadmeMarkdown"] = "getReadmeMarkdown";
-    ScryptedInterfaceMethod["getOauthUrl"] = "getOauthUrl";
-    ScryptedInterfaceMethod["onOauthCallback"] = "onOauthCallback";
-    ScryptedInterfaceMethod["canMixin"] = "canMixin";
-    ScryptedInterfaceMethod["getMixin"] = "getMixin";
-    ScryptedInterfaceMethod["releaseMixin"] = "releaseMixin";
-    ScryptedInterfaceMethod["onRequest"] = "onRequest";
-    ScryptedInterfaceMethod["onConnection"] = "onConnection";
-    ScryptedInterfaceMethod["onPush"] = "onPush";
-    ScryptedInterfaceMethod["run"] = "run";
-    ScryptedInterfaceMethod["eval"] = "eval";
-    ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
-    ScryptedInterfaceMethod["saveScript"] = "saveScript";
-    ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
-    ScryptedInterfaceMethod["trackObjects"] = "trackObjects";
-    ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
-    ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
-    ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
-    ScryptedInterfaceMethod["generateObjectDetections"] = "generateObjectDetections";
-    ScryptedInterfaceMethod["getDetectionModel"] = "getDetectionModel";
-    ScryptedInterfaceMethod["setHumidity"] = "setHumidity";
-    ScryptedInterfaceMethod["setFan"] = "setFan";
-    ScryptedInterfaceMethod["startRTCSignalingSession"] = "startRTCSignalingSession";
-    ScryptedInterfaceMethod["createRTCSignalingSession"] = "createRTCSignalingSession";
-    ScryptedInterfaceMethod["getScryptedUserAccessControl"] = "getScryptedUserAccessControl";
-    ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
-    ScryptedInterfaceMethod["connectStream"] = "connectStream";
-    ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
-})(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
-exports.ScryptedInterfaceDescriptors = {
-    "ScryptedDevice": {
-        "name": "ScryptedDevice",
-        "methods": [
-            "listen",
-            "probe",
-            "setMixins",
-            "setName",
-            "setRoom",
-            "setType"
-        ],
-        "properties": [
-            "id",
-            "info",
-            "interfaces",
-            "mixins",
-            "name",
-            "nativeId",
-            "pluginId",
-            "providedInterfaces",
-            "providedName",
-            "providedRoom",
-            "providedType",
-            "providerId",
-            "room",
-            "type"
-        ]
-    },
-    "ScryptedPlugin": {
-        "name": "ScryptedPlugin",
-        "methods": [
-            "getPluginJson"
-        ],
-        "properties": []
-    },
-    "ScryptedPluginRuntime": {
-        "name": "ScryptedPluginRuntime",
-        "methods": [],
-        "properties": [
-            "scryptedRuntimeArguments"
-        ]
-    },
-    "OnOff": {
-        "name": "OnOff",
-        "methods": [
-            "turnOff",
-            "turnOn"
-        ],
-        "properties": [
-            "on"
-        ]
-    },
-    "Brightness": {
-        "name": "Brightness",
-        "methods": [
-            "setBrightness"
-        ],
-        "properties": [
-            "brightness"
-        ]
-    },
-    "ColorSettingTemperature": {
-        "name": "ColorSettingTemperature",
-        "methods": [
-            "getTemperatureMaxK",
-            "getTemperatureMinK",
-            "setColorTemperature"
-        ],
-        "properties": [
-            "colorTemperature"
-        ]
-    },
-    "ColorSettingRgb": {
-        "name": "ColorSettingRgb",
-        "methods": [
-            "setRgb"
-        ],
-        "properties": [
-            "rgb"
-        ]
-    },
-    "ColorSettingHsv": {
-        "name": "ColorSettingHsv",
-        "methods": [
-            "setHsv"
-        ],
-        "properties": [
-            "hsv"
-        ]
-    },
-    "Buttons": {
-        "name": "Buttons",
-        "methods": [],
-        "properties": [
-            "buttons"
-        ]
-    },
-    "PressButtons": {
-        "name": "PressButtons",
-        "methods": [
-            "pressButton"
-        ],
-        "properties": []
-    },
-    "Sensors": {
-        "name": "Sensors",
-        "methods": [],
-        "properties": [
-            "sensors"
-        ]
-    },
-    "Notifier": {
-        "name": "Notifier",
-        "methods": [
-            "sendNotification"
-        ],
-        "properties": []
-    },
-    "StartStop": {
-        "name": "StartStop",
-        "methods": [
-            "start",
-            "stop"
-        ],
-        "properties": [
-            "running"
-        ]
-    },
-    "Pause": {
-        "name": "Pause",
-        "methods": [
-            "pause",
-            "resume"
-        ],
-        "properties": [
-            "paused"
-        ]
-    },
-    "Dock": {
-        "name": "Dock",
-        "methods": [
-            "dock"
-        ],
-        "properties": [
-            "docked"
-        ]
-    },
-    "TemperatureSetting": {
-        "name": "TemperatureSetting",
-        "methods": [
-            "setTemperature"
-        ],
-        "properties": [
-            "temperatureSetting"
-        ]
-    },
-    "Thermometer": {
-        "name": "Thermometer",
-        "methods": [
-            "setTemperatureUnit"
-        ],
-        "properties": [
-            "temperature",
-            "temperatureUnit"
-        ]
-    },
-    "HumiditySensor": {
-        "name": "HumiditySensor",
-        "methods": [],
-        "properties": [
-            "humidity"
-        ]
-    },
-    "Camera": {
-        "name": "Camera",
-        "methods": [
-            "getPictureOptions",
-            "takePicture"
-        ],
-        "properties": []
-    },
-    "Microphone": {
-        "name": "Microphone",
-        "methods": [
-            "getAudioStream"
-        ],
-        "properties": []
-    },
-    "AudioVolumeControl": {
-        "name": "AudioVolumeControl",
-        "methods": [
-            "setAudioVolumes"
-        ],
-        "properties": [
-            "audioVolumes"
-        ]
-    },
-    "Display": {
-        "name": "Display",
-        "methods": [
-            "startDisplay",
-            "stopDisplay"
-        ],
-        "properties": []
-    },
-    "VideoCamera": {
-        "name": "VideoCamera",
-        "methods": [
-            "getVideoStream",
-            "getVideoStreamOptions"
-        ],
-        "properties": []
-    },
-    "VideoCameraMask": {
-        "name": "VideoCameraMask",
-        "methods": [
-            "getPrivacyMasks",
-            "setPrivacyMasks"
-        ],
-        "properties": []
-    },
-    "VideoTextOverlays": {
-        "name": "VideoTextOverlays",
-        "methods": [
-            "getVideoTextOverlays",
-            "setVideoTextOverlay"
-        ],
-        "properties": []
-    },
-    "VideoRecorder": {
-        "name": "VideoRecorder",
-        "methods": [
-            "getRecordingStream",
-            "getRecordingStreamCurrentTime",
-            "getRecordingStreamOptions",
-            "getRecordingStreamThumbnail"
-        ],
-        "properties": [
-            "recordingActive"
-        ]
-    },
-    "VideoRecorderManagement": {
-        "name": "VideoRecorderManagement",
-        "methods": [
-            "deleteRecordingStream",
-            "setRecordingActive"
-        ],
-        "properties": []
-    },
-    "PanTiltZoom": {
-        "name": "PanTiltZoom",
-        "methods": [
-            "ptzCommand"
-        ],
-        "properties": [
-            "ptzCapabilities"
-        ]
-    },
-    "EventRecorder": {
-        "name": "EventRecorder",
-        "methods": [
-            "getRecordedEvents"
-        ],
-        "properties": []
-    },
-    "VideoClips": {
-        "name": "VideoClips",
-        "methods": [
-            "getVideoClip",
-            "getVideoClips",
-            "getVideoClipThumbnail",
-            "removeVideoClips"
-        ],
-        "properties": []
-    },
-    "VideoCameraConfiguration": {
-        "name": "VideoCameraConfiguration",
-        "methods": [
-            "setVideoStreamOptions"
-        ],
-        "properties": []
-    },
-    "Intercom": {
-        "name": "Intercom",
-        "methods": [
-            "startIntercom",
-            "stopIntercom"
-        ],
-        "properties": []
-    },
-    "Lock": {
-        "name": "Lock",
-        "methods": [
-            "lock",
-            "unlock"
-        ],
-        "properties": [
-            "lockState"
-        ]
-    },
-    "PasswordStore": {
-        "name": "PasswordStore",
-        "methods": [
-            "addPassword",
-            "getPasswords",
-            "removePassword"
-        ],
-        "properties": []
-    },
-    "Scene": {
-        "name": "Scene",
-        "methods": [
-            "activate",
-            "deactivate",
-            "isReversible"
-        ],
-        "properties": []
-    },
-    "Entry": {
-        "name": "Entry",
-        "methods": [
-            "closeEntry",
-            "openEntry"
-        ],
-        "properties": []
-    },
-    "EntrySensor": {
-        "name": "EntrySensor",
-        "methods": [],
-        "properties": [
-            "entryOpen"
-        ]
-    },
-    "DeviceProvider": {
-        "name": "DeviceProvider",
-        "methods": [
-            "getDevice",
-            "releaseDevice"
-        ],
-        "properties": []
-    },
-    "DeviceDiscovery": {
-        "name": "DeviceDiscovery",
-        "methods": [
-            "adoptDevice",
-            "discoverDevices"
-        ],
-        "properties": []
-    },
-    "DeviceCreator": {
-        "name": "DeviceCreator",
-        "methods": [
-            "createDevice",
-            "getCreateDeviceSettings"
-        ],
-        "properties": []
-    },
-    "Battery": {
-        "name": "Battery",
-        "methods": [],
-        "properties": [
-            "batteryLevel"
-        ]
-    },
-    "Charger": {
-        "name": "Charger",
-        "methods": [],
-        "properties": [
-            "chargeState"
-        ]
-    },
-    "Reboot": {
-        "name": "Reboot",
-        "methods": [
-            "reboot"
-        ],
-        "properties": []
-    },
-    "Refresh": {
-        "name": "Refresh",
-        "methods": [
-            "getRefreshFrequency",
-            "refresh"
-        ],
-        "properties": []
-    },
-    "MediaPlayer": {
-        "name": "MediaPlayer",
-        "methods": [
-            "getMediaStatus",
-            "load",
-            "seek",
-            "skipNext",
-            "skipPrevious"
-        ],
-        "properties": []
-    },
-    "Online": {
-        "name": "Online",
-        "methods": [],
-        "properties": [
-            "online"
-        ]
-    },
-    "BufferConverter": {
-        "name": "BufferConverter",
-        "methods": [
-            "convert"
-        ],
-        "properties": [
-            "fromMimeType",
-            "toMimeType"
-        ]
-    },
-    "MediaConverter": {
-        "name": "MediaConverter",
-        "methods": [
-            "convertMedia"
-        ],
-        "properties": [
-            "converters"
-        ]
-    },
-    "Settings": {
-        "name": "Settings",
-        "methods": [
-            "getSettings",
-            "putSetting"
-        ],
-        "properties": []
-    },
-    "BinarySensor": {
-        "name": "BinarySensor",
-        "methods": [],
-        "properties": [
-            "binaryState"
-        ]
-    },
-    "TamperSensor": {
-        "name": "TamperSensor",
-        "methods": [],
-        "properties": [
-            "tampered"
-        ]
-    },
-    "Sleep": {
-        "name": "Sleep",
-        "methods": [],
-        "properties": [
-            "sleeping"
-        ]
-    },
-    "PowerSensor": {
-        "name": "PowerSensor",
-        "methods": [],
-        "properties": [
-            "powerDetected"
-        ]
-    },
-    "AudioSensor": {
-        "name": "AudioSensor",
-        "methods": [],
-        "properties": [
-            "audioDetected"
-        ]
-    },
-    "MotionSensor": {
-        "name": "MotionSensor",
-        "methods": [],
-        "properties": [
-            "motionDetected"
-        ]
-    },
-    "AmbientLightSensor": {
-        "name": "AmbientLightSensor",
-        "methods": [],
-        "properties": [
-            "ambientLight"
-        ]
-    },
-    "OccupancySensor": {
-        "name": "OccupancySensor",
-        "methods": [],
-        "properties": [
-            "occupied"
-        ]
-    },
-    "FloodSensor": {
-        "name": "FloodSensor",
-        "methods": [],
-        "properties": [
-            "flooded"
-        ]
-    },
-    "UltravioletSensor": {
-        "name": "UltravioletSensor",
-        "methods": [],
-        "properties": [
-            "ultraviolet"
-        ]
-    },
-    "LuminanceSensor": {
-        "name": "LuminanceSensor",
-        "methods": [],
-        "properties": [
-            "luminance"
-        ]
-    },
-    "PositionSensor": {
-        "name": "PositionSensor",
-        "methods": [],
-        "properties": [
-            "position"
-        ]
-    },
-    "SecuritySystem": {
-        "name": "SecuritySystem",
-        "methods": [
-            "armSecuritySystem",
-            "disarmSecuritySystem"
-        ],
-        "properties": [
-            "securitySystemState"
-        ]
-    },
-    "PM10Sensor": {
-        "name": "PM10Sensor",
-        "methods": [],
-        "properties": [
-            "pm10Density"
-        ]
-    },
-    "PM25Sensor": {
-        "name": "PM25Sensor",
-        "methods": [],
-        "properties": [
-            "pm25Density"
-        ]
-    },
-    "VOCSensor": {
-        "name": "VOCSensor",
-        "methods": [],
-        "properties": [
-            "vocDensity"
-        ]
-    },
-    "NOXSensor": {
-        "name": "NOXSensor",
-        "methods": [],
-        "properties": [
-            "noxDensity"
-        ]
-    },
-    "CO2Sensor": {
-        "name": "CO2Sensor",
-        "methods": [],
-        "properties": [
-            "co2ppm"
-        ]
-    },
-    "AirQualitySensor": {
-        "name": "AirQualitySensor",
-        "methods": [],
-        "properties": [
-            "airQuality"
-        ]
-    },
-    "AirPurifier": {
-        "name": "AirPurifier",
-        "methods": [
-            "setAirPurifierState"
-        ],
-        "properties": [
-            "airPurifierState"
-        ]
-    },
-    "FilterMaintenance": {
-        "name": "FilterMaintenance",
-        "methods": [],
-        "properties": [
-            "filterChangeIndication",
-            "filterLifeLevel"
-        ]
-    },
-    "Readme": {
-        "name": "Readme",
-        "methods": [
-            "getReadmeMarkdown"
-        ],
-        "properties": []
-    },
-    "OauthClient": {
-        "name": "OauthClient",
-        "methods": [
-            "getOauthUrl",
-            "onOauthCallback"
-        ],
-        "properties": []
-    },
-    "MixinProvider": {
-        "name": "MixinProvider",
-        "methods": [
-            "canMixin",
-            "getMixin",
-            "releaseMixin"
-        ],
-        "properties": []
-    },
-    "HttpRequestHandler": {
-        "name": "HttpRequestHandler",
-        "methods": [
-            "onRequest"
-        ],
-        "properties": []
-    },
-    "EngineIOHandler": {
-        "name": "EngineIOHandler",
-        "methods": [
-            "onConnection"
-        ],
-        "properties": []
-    },
-    "PushHandler": {
-        "name": "PushHandler",
-        "methods": [
-            "onPush"
-        ],
-        "properties": []
-    },
-    "Program": {
-        "name": "Program",
-        "methods": [
-            "run"
-        ],
-        "properties": []
-    },
-    "Scriptable": {
-        "name": "Scriptable",
-        "methods": [
-            "eval",
-            "loadScripts",
-            "saveScript"
-        ],
-        "properties": []
-    },
-    "ClusterForkInterface": {
-        "name": "ClusterForkInterface",
-        "methods": [
-            "forkInterface"
-        ],
-        "properties": []
-    },
-    "ObjectTracker": {
-        "name": "ObjectTracker",
-        "methods": [
-            "trackObjects"
-        ],
-        "properties": []
-    },
-    "ObjectDetector": {
-        "name": "ObjectDetector",
-        "methods": [
-            "getDetectionInput",
-            "getObjectTypes"
-        ],
-        "properties": []
-    },
-    "ObjectDetection": {
-        "name": "ObjectDetection",
-        "methods": [
-            "detectObjects",
-            "generateObjectDetections",
-            "getDetectionModel"
-        ],
-        "properties": []
-    },
-    "ObjectDetectionPreview": {
-        "name": "ObjectDetectionPreview",
-        "methods": [],
-        "properties": []
-    },
-    "ObjectDetectionGenerator": {
-        "name": "ObjectDetectionGenerator",
-        "methods": [],
-        "properties": []
-    },
-    "HumiditySetting": {
-        "name": "HumiditySetting",
-        "methods": [
-            "setHumidity"
-        ],
-        "properties": [
-            "humiditySetting"
-        ]
-    },
-    "Fan": {
-        "name": "Fan",
-        "methods": [
-            "setFan"
-        ],
-        "properties": [
-            "fan"
-        ]
-    },
-    "RTCSignalingChannel": {
-        "name": "RTCSignalingChannel",
-        "methods": [
-            "startRTCSignalingSession"
-        ],
-        "properties": []
-    },
-    "RTCSignalingClient": {
-        "name": "RTCSignalingClient",
-        "methods": [
-            "createRTCSignalingSession"
-        ],
-        "properties": []
-    },
-    "LauncherApplication": {
-        "name": "LauncherApplication",
-        "methods": [],
-        "properties": [
-            "applicationInfo"
-        ]
-    },
-    "ScryptedUser": {
-        "name": "ScryptedUser",
-        "methods": [
-            "getScryptedUserAccessControl"
-        ],
-        "properties": []
-    },
-    "VideoFrameGenerator": {
-        "name": "VideoFrameGenerator",
-        "methods": [
-            "generateVideoFrames"
-        ],
-        "properties": []
-    },
-    "StreamService": {
-        "name": "StreamService",
-        "methods": [
-            "connectStream"
-        ],
-        "properties": []
-    },
-    "TTY": {
-        "name": "TTY",
-        "methods": [],
-        "properties": []
-    },
-    "TTYSettings": {
-        "name": "TTYSettings",
-        "methods": [
-            "getTTYSettings"
-        ],
-        "properties": []
-    },
-    "ScryptedSystemDevice": {
-        "name": "ScryptedSystemDevice",
-        "methods": [],
-        "properties": [
-            "systemDevice"
-        ]
-    },
-    "ScryptedDeviceCreator": {
-        "name": "ScryptedDeviceCreator",
-        "methods": [],
-        "properties": []
-    },
-    "ScryptedSettings": {
-        "name": "ScryptedSettings",
-        "methods": [],
-        "properties": []
-    }
-};
-/**
- * @category Core Reference
- */
-var ScryptedDeviceType;
-(function (ScryptedDeviceType) {
-    /**
-     * @deprecated
-     */
-    ScryptedDeviceType["Builtin"] = "Builtin";
-    /**
-     * Internal devices will not show up in device lists unless explicitly searched.
-     */
-    ScryptedDeviceType["Internal"] = "Internal";
-    ScryptedDeviceType["Camera"] = "Camera";
-    ScryptedDeviceType["Fan"] = "Fan";
-    ScryptedDeviceType["Light"] = "Light";
-    ScryptedDeviceType["Switch"] = "Switch";
-    ScryptedDeviceType["Outlet"] = "Outlet";
-    ScryptedDeviceType["Sensor"] = "Sensor";
-    ScryptedDeviceType["Scene"] = "Scene";
-    ScryptedDeviceType["Program"] = "Program";
-    ScryptedDeviceType["Automation"] = "Automation";
-    ScryptedDeviceType["Vacuum"] = "Vacuum";
-    ScryptedDeviceType["Notifier"] = "Notifier";
-    ScryptedDeviceType["Thermostat"] = "Thermostat";
-    ScryptedDeviceType["Lock"] = "Lock";
-    ScryptedDeviceType["PasswordControl"] = "PasswordControl";
-    /**
-     * Displays have audio and video output.
-     */
-    ScryptedDeviceType["Display"] = "Display";
-    /**
-     * Smart Displays have two way audio and video.
-     */
-    ScryptedDeviceType["SmartDisplay"] = "SmartDisplay";
-    ScryptedDeviceType["Speaker"] = "Speaker";
-    /**
-     * Smart Speakers have two way audio.
-     */
-    ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
-    ScryptedDeviceType["Event"] = "Event";
-    ScryptedDeviceType["Entry"] = "Entry";
-    ScryptedDeviceType["Garage"] = "Garage";
-    ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
-    ScryptedDeviceType["DataSource"] = "DataSource";
-    ScryptedDeviceType["API"] = "API";
-    ScryptedDeviceType["Doorbell"] = "Doorbell";
-    ScryptedDeviceType["Irrigation"] = "Irrigation";
-    ScryptedDeviceType["Valve"] = "Valve";
-    ScryptedDeviceType["Person"] = "Person";
-    ScryptedDeviceType["SecuritySystem"] = "SecuritySystem";
-    ScryptedDeviceType["WindowCovering"] = "WindowCovering";
-    ScryptedDeviceType["Siren"] = "Siren";
-    ScryptedDeviceType["AirPurifier"] = "AirPurifier";
-    ScryptedDeviceType["Unknown"] = "Unknown";
-})(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
-var HumidityMode;
-(function (HumidityMode) {
-    HumidityMode["Humidify"] = "Humidify";
-    HumidityMode["Dehumidify"] = "Dehumidify";
-    HumidityMode["Auto"] = "Auto";
-    HumidityMode["Off"] = "Off";
-})(HumidityMode || (exports.HumidityMode = HumidityMode = {}));
-var FanMode;
-(function (FanMode) {
-    FanMode["Auto"] = "Auto";
-    FanMode["Manual"] = "Manual";
-})(FanMode || (exports.FanMode = FanMode = {}));
-var TemperatureUnit;
-(function (TemperatureUnit) {
-    TemperatureUnit["C"] = "C";
-    TemperatureUnit["F"] = "F";
-})(TemperatureUnit || (exports.TemperatureUnit = TemperatureUnit = {}));
-var ThermostatMode;
-(function (ThermostatMode) {
-    ThermostatMode["Off"] = "Off";
-    ThermostatMode["Cool"] = "Cool";
-    ThermostatMode["Heat"] = "Heat";
-    ThermostatMode["HeatCool"] = "HeatCool";
-    ThermostatMode["Auto"] = "Auto";
-    ThermostatMode["FanOnly"] = "FanOnly";
-    ThermostatMode["Purifier"] = "Purifier";
-    ThermostatMode["Eco"] = "Eco";
-    ThermostatMode["Dry"] = "Dry";
-    ThermostatMode["On"] = "On";
-})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
-var PanTiltZoomMovement;
-(function (PanTiltZoomMovement) {
-    PanTiltZoomMovement["Absolute"] = "Absolute";
-    PanTiltZoomMovement["Relative"] = "Relative";
-    PanTiltZoomMovement["Continuous"] = "Continuous";
-    PanTiltZoomMovement["Preset"] = "Preset";
-    PanTiltZoomMovement["Home"] = "Home";
-})(PanTiltZoomMovement || (exports.PanTiltZoomMovement = PanTiltZoomMovement = {}));
-var LockState;
-(function (LockState) {
-    LockState["Locked"] = "Locked";
-    LockState["Unlocked"] = "Unlocked";
-    LockState["Jammed"] = "Jammed";
-})(LockState || (exports.LockState = LockState = {}));
-var ChargeState;
-(function (ChargeState) {
-    ChargeState["Trickle"] = "trickle";
-    ChargeState["Charging"] = "charging";
-    ChargeState["NotCharging"] = "not-charging";
-})(ChargeState || (exports.ChargeState = ChargeState = {}));
-var AirPurifierStatus;
-(function (AirPurifierStatus) {
-    AirPurifierStatus["Inactive"] = "Inactive";
-    AirPurifierStatus["Idle"] = "Idle";
-    AirPurifierStatus["Active"] = "Active";
-    AirPurifierStatus["ActiveNightMode"] = "ActiveNightMode";
-})(AirPurifierStatus || (exports.AirPurifierStatus = AirPurifierStatus = {}));
-var AirPurifierMode;
-(function (AirPurifierMode) {
-    AirPurifierMode["Manual"] = "Manual";
-    AirPurifierMode["Automatic"] = "Automatic";
-})(AirPurifierMode || (exports.AirPurifierMode = AirPurifierMode = {}));
-var AirQuality;
-(function (AirQuality) {
-    AirQuality["Unknown"] = "Unknown";
-    AirQuality["Excellent"] = "Excellent";
-    AirQuality["Good"] = "Good";
-    AirQuality["Fair"] = "Fair";
-    AirQuality["Inferior"] = "Inferior";
-    AirQuality["Poor"] = "Poor";
-})(AirQuality || (exports.AirQuality = AirQuality = {}));
-var SecuritySystemMode;
-(function (SecuritySystemMode) {
-    SecuritySystemMode["Disarmed"] = "Disarmed";
-    SecuritySystemMode["HomeArmed"] = "HomeArmed";
-    SecuritySystemMode["AwayArmed"] = "AwayArmed";
-    SecuritySystemMode["NightArmed"] = "NightArmed";
-})(SecuritySystemMode || (exports.SecuritySystemMode = SecuritySystemMode = {}));
-var SecuritySystemObstruction;
-(function (SecuritySystemObstruction) {
-    SecuritySystemObstruction["Sensor"] = "Sensor";
-    SecuritySystemObstruction["Occupied"] = "Occupied";
-    SecuritySystemObstruction["Time"] = "Time";
-    SecuritySystemObstruction["Error"] = "Error";
-})(SecuritySystemObstruction || (exports.SecuritySystemObstruction = SecuritySystemObstruction = {}));
-var MediaPlayerState;
-(function (MediaPlayerState) {
-    MediaPlayerState["Idle"] = "Idle";
-    MediaPlayerState["Playing"] = "Playing";
-    MediaPlayerState["Paused"] = "Paused";
-    MediaPlayerState["Buffering"] = "Buffering";
-})(MediaPlayerState || (exports.MediaPlayerState = MediaPlayerState = {}));
-var ScryptedInterface;
-(function (ScryptedInterface) {
-    ScryptedInterface["ScryptedDevice"] = "ScryptedDevice";
-    ScryptedInterface["ScryptedPlugin"] = "ScryptedPlugin";
-    ScryptedInterface["ScryptedPluginRuntime"] = "ScryptedPluginRuntime";
-    ScryptedInterface["OnOff"] = "OnOff";
-    ScryptedInterface["Brightness"] = "Brightness";
-    ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
-    ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
-    ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
-    ScryptedInterface["Buttons"] = "Buttons";
-    ScryptedInterface["PressButtons"] = "PressButtons";
-    ScryptedInterface["Sensors"] = "Sensors";
-    ScryptedInterface["Notifier"] = "Notifier";
-    ScryptedInterface["StartStop"] = "StartStop";
-    ScryptedInterface["Pause"] = "Pause";
-    ScryptedInterface["Dock"] = "Dock";
-    ScryptedInterface["TemperatureSetting"] = "TemperatureSetting";
-    ScryptedInterface["Thermometer"] = "Thermometer";
-    ScryptedInterface["HumiditySensor"] = "HumiditySensor";
-    ScryptedInterface["Camera"] = "Camera";
-    ScryptedInterface["Microphone"] = "Microphone";
-    ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
-    ScryptedInterface["Display"] = "Display";
-    ScryptedInterface["VideoCamera"] = "VideoCamera";
-    ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
-    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
-    ScryptedInterface["VideoRecorder"] = "VideoRecorder";
-    ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
-    ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
-    ScryptedInterface["EventRecorder"] = "EventRecorder";
-    ScryptedInterface["VideoClips"] = "VideoClips";
-    ScryptedInterface["VideoCameraConfiguration"] = "VideoCameraConfiguration";
-    ScryptedInterface["Intercom"] = "Intercom";
-    ScryptedInterface["Lock"] = "Lock";
-    ScryptedInterface["PasswordStore"] = "PasswordStore";
-    ScryptedInterface["Scene"] = "Scene";
-    ScryptedInterface["Entry"] = "Entry";
-    ScryptedInterface["EntrySensor"] = "EntrySensor";
-    ScryptedInterface["DeviceProvider"] = "DeviceProvider";
-    ScryptedInterface["DeviceDiscovery"] = "DeviceDiscovery";
-    ScryptedInterface["DeviceCreator"] = "DeviceCreator";
-    ScryptedInterface["Battery"] = "Battery";
-    ScryptedInterface["Charger"] = "Charger";
-    ScryptedInterface["Reboot"] = "Reboot";
-    ScryptedInterface["Refresh"] = "Refresh";
-    ScryptedInterface["MediaPlayer"] = "MediaPlayer";
-    ScryptedInterface["Online"] = "Online";
-    ScryptedInterface["BufferConverter"] = "BufferConverter";
-    ScryptedInterface["MediaConverter"] = "MediaConverter";
-    ScryptedInterface["Settings"] = "Settings";
-    ScryptedInterface["BinarySensor"] = "BinarySensor";
-    ScryptedInterface["TamperSensor"] = "TamperSensor";
-    ScryptedInterface["Sleep"] = "Sleep";
-    ScryptedInterface["PowerSensor"] = "PowerSensor";
-    ScryptedInterface["AudioSensor"] = "AudioSensor";
-    ScryptedInterface["MotionSensor"] = "MotionSensor";
-    ScryptedInterface["AmbientLightSensor"] = "AmbientLightSensor";
-    ScryptedInterface["OccupancySensor"] = "OccupancySensor";
-    ScryptedInterface["FloodSensor"] = "FloodSensor";
-    ScryptedInterface["UltravioletSensor"] = "UltravioletSensor";
-    ScryptedInterface["LuminanceSensor"] = "LuminanceSensor";
-    ScryptedInterface["PositionSensor"] = "PositionSensor";
-    ScryptedInterface["SecuritySystem"] = "SecuritySystem";
-    ScryptedInterface["PM10Sensor"] = "PM10Sensor";
-    ScryptedInterface["PM25Sensor"] = "PM25Sensor";
-    ScryptedInterface["VOCSensor"] = "VOCSensor";
-    ScryptedInterface["NOXSensor"] = "NOXSensor";
-    ScryptedInterface["CO2Sensor"] = "CO2Sensor";
-    ScryptedInterface["AirQualitySensor"] = "AirQualitySensor";
-    ScryptedInterface["AirPurifier"] = "AirPurifier";
-    ScryptedInterface["FilterMaintenance"] = "FilterMaintenance";
-    ScryptedInterface["Readme"] = "Readme";
-    ScryptedInterface["OauthClient"] = "OauthClient";
-    ScryptedInterface["MixinProvider"] = "MixinProvider";
-    ScryptedInterface["HttpRequestHandler"] = "HttpRequestHandler";
-    ScryptedInterface["EngineIOHandler"] = "EngineIOHandler";
-    ScryptedInterface["PushHandler"] = "PushHandler";
-    ScryptedInterface["Program"] = "Program";
-    ScryptedInterface["Scriptable"] = "Scriptable";
-    ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
-    ScryptedInterface["ObjectTracker"] = "ObjectTracker";
-    ScryptedInterface["ObjectDetector"] = "ObjectDetector";
-    ScryptedInterface["ObjectDetection"] = "ObjectDetection";
-    ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
-    ScryptedInterface["ObjectDetectionGenerator"] = "ObjectDetectionGenerator";
-    ScryptedInterface["HumiditySetting"] = "HumiditySetting";
-    ScryptedInterface["Fan"] = "Fan";
-    ScryptedInterface["RTCSignalingChannel"] = "RTCSignalingChannel";
-    ScryptedInterface["RTCSignalingClient"] = "RTCSignalingClient";
-    ScryptedInterface["LauncherApplication"] = "LauncherApplication";
-    ScryptedInterface["ScryptedUser"] = "ScryptedUser";
-    ScryptedInterface["VideoFrameGenerator"] = "VideoFrameGenerator";
-    ScryptedInterface["StreamService"] = "StreamService";
-    ScryptedInterface["TTY"] = "TTY";
-    ScryptedInterface["TTYSettings"] = "TTYSettings";
-    ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
-    ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
-    ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
-})(ScryptedInterface || (exports.ScryptedInterface = ScryptedInterface = {}));
-var ScryptedMimeTypes;
-(function (ScryptedMimeTypes) {
-    ScryptedMimeTypes["Url"] = "text/x-uri";
-    ScryptedMimeTypes["InsecureLocalUrl"] = "text/x-insecure-local-uri";
-    ScryptedMimeTypes["LocalUrl"] = "text/x-local-uri";
-    ScryptedMimeTypes["ServerId"] = "text/x-server-id";
-    ScryptedMimeTypes["PushEndpoint"] = "text/x-push-endpoint";
-    ScryptedMimeTypes["SchemePrefix"] = "x-scrypted/x-scrypted-scheme-";
-    ScryptedMimeTypes["MediaStreamUrl"] = "text/x-media-url";
-    ScryptedMimeTypes["MediaObject"] = "x-scrypted/x-scrypted-media-object";
-    ScryptedMimeTypes["RequestMediaObject"] = "x-scrypted/x-scrypted-request-media-object";
-    ScryptedMimeTypes["RequestMediaStream"] = "x-scrypted/x-scrypted-request-stream";
-    ScryptedMimeTypes["MediaStreamFeedback"] = "x-scrypted/x-media-stream-feedback";
-    ScryptedMimeTypes["FFmpegInput"] = "x-scrypted/x-ffmpeg-input";
-    ScryptedMimeTypes["FFmpegTranscodeStream"] = "x-scrypted/x-ffmpeg-transcode-stream";
-    ScryptedMimeTypes["RTCSignalingChannel"] = "x-scrypted/x-scrypted-rtc-signaling-channel";
-    ScryptedMimeTypes["RTCSignalingSession"] = "x-scrypted/x-scrypted-rtc-signaling-session";
-    ScryptedMimeTypes["RTCConnectionManagement"] = "x-scrypted/x-scrypted-rtc-connection-management";
-    ScryptedMimeTypes["Image"] = "x-scrypted/x-scrypted-image";
-})(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ "../scrypted/sdk/dist/src/index.js":
-/*!*****************************************!*\
-  !*** ../scrypted/sdk/dist/src/index.js ***!
-  \*****************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sdk = exports.MixinDeviceBase = exports.ScryptedDeviceBase = void 0;
-__exportStar(__webpack_require__(/*! ../types/gen/index */ "../scrypted/sdk/dist/types/gen/index.js"), exports);
-const index_1 = __webpack_require__(/*! ../types/gen/index */ "../scrypted/sdk/dist/types/gen/index.js");
-const module_1 = __webpack_require__(/*! module */ "module");
-/**
- * @category Core Reference
- */
-class ScryptedDeviceBase extends index_1.DeviceBase {
-    constructor(nativeId) {
-        super();
-        this.nativeId = nativeId;
-    }
-    get storage() {
-        if (!this._storage) {
-            this._storage = exports.sdk.deviceManager.getDeviceStorage(this.nativeId);
-        }
-        return this._storage;
-    }
-    get log() {
-        if (!this._log) {
-            this._log = exports.sdk.deviceManager.getDeviceLogger(this.nativeId);
-        }
-        return this._log;
-    }
-    get console() {
-        if (!this._console) {
-            this._console = exports.sdk.deviceManager.getDeviceConsole(this.nativeId);
-        }
-        return this._console;
-    }
-    async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
-            sourceId: this.id,
-        });
-    }
-    getMediaObjectConsole(mediaObject) {
-        if (typeof mediaObject.sourceId !== 'string')
-            return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.nativeId);
-    }
-    _lazyLoadDeviceState() {
-        if (!this._deviceState) {
-            if (this.nativeId) {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState(this.nativeId);
-            }
-            else {
-                this._deviceState = exports.sdk.deviceManager.getDeviceState();
-            }
-        }
-    }
-    /**
-     * Fire an event for this device.
-     */
-    onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onDeviceEvent(this.nativeId, eventInterface, eventData);
-    }
-}
-exports.ScryptedDeviceBase = ScryptedDeviceBase;
-/**
- * @category Mixin Reference
- */
-class MixinDeviceBase extends index_1.DeviceBase {
-    constructor(options) {
-        super();
-        this._listeners = new Set();
-        this.mixinDevice = options.mixinDevice;
-        this.mixinDeviceInterfaces = options.mixinDeviceInterfaces;
-        this.mixinStorageSuffix = options.mixinStorageSuffix;
-        this._deviceState = options.mixinDeviceState;
-        this.nativeId = exports.sdk.systemManager.getDeviceById(this.id).nativeId;
-        this.mixinProviderNativeId = options.mixinProviderNativeId;
-        // RpcProxy will trap all properties, and the following check/hack will determine
-        // if the device state came from another node worker thread.
-        // This should ultimately be discouraged and warned at some point in the future.
-        if (this._deviceState.__rpcproxy_traps_all_properties && typeof this._deviceState.id === 'string') {
-            this._deviceState = exports.sdk.deviceManager.createDeviceState(this._deviceState.id, this._deviceState.setState);
-        }
-    }
-    get storage() {
-        if (!this._storage) {
-            const mixinStorageSuffix = this.mixinStorageSuffix;
-            const mixinStorageKey = this.id + (mixinStorageSuffix ? ':' + mixinStorageSuffix : '');
-            this._storage = exports.sdk.deviceManager.getMixinStorage(mixinStorageKey, this.mixinProviderNativeId);
-        }
-        return this._storage;
-    }
-    get console() {
-        if (!this._console) {
-            if (exports.sdk.deviceManager.getMixinConsole)
-                this._console = exports.sdk.deviceManager.getMixinConsole(this.id, this.mixinProviderNativeId);
-            else
-                this._console = exports.sdk.deviceManager.getDeviceConsole(this.mixinProviderNativeId);
-        }
-        return this._console;
-    }
-    async createMediaObject(data, mimeType) {
-        return exports.sdk.mediaManager.createMediaObject(data, mimeType, {
-            sourceId: this.id,
-        });
-    }
-    getMediaObjectConsole(mediaObject) {
-        if (typeof mediaObject.sourceId !== 'string')
-            return this.console;
-        return exports.sdk.deviceManager.getMixinConsole(mediaObject.sourceId, this.mixinProviderNativeId);
-    }
-    /**
-     * Fire an event for this device.
-     */
-    onDeviceEvent(eventInterface, eventData) {
-        return exports.sdk.deviceManager.onMixinEvent(this.id, this, eventInterface, eventData);
-    }
-    _lazyLoadDeviceState() {
-    }
-    manageListener(listener) {
-        this._listeners.add(listener);
-    }
-    release() {
-        for (const l of this._listeners) {
-            l.removeListener();
-        }
-    }
-}
-exports.MixinDeviceBase = MixinDeviceBase;
-(function () {
-    function _createGetState(state) {
-        return function () {
-            this._lazyLoadDeviceState();
-            // @ts-ignore: accessing private property
-            return this._deviceState?.[state];
-        };
-    }
-    function _createSetState(state) {
-        return function (value) {
-            this._lazyLoadDeviceState();
-            // @ts-ignore: accessing private property
-            if (!this._deviceState) {
-                console.warn('device state is unavailable. the device must be discovered with deviceManager.onDeviceDiscovered or deviceManager.onDevicesChanged before the state can be set.');
-            }
-            else {
-                // @ts-ignore: accessing private property
-                this._deviceState[state] = value;
-            }
-        };
-    }
-    for (const field of Object.values(index_1.ScryptedInterfaceProperty)) {
-        if (field === index_1.ScryptedInterfaceProperty.nativeId)
-            continue;
-        Object.defineProperty(ScryptedDeviceBase.prototype, field, {
-            set: _createSetState(field),
-            get: _createGetState(field),
-        });
-        Object.defineProperty(MixinDeviceBase.prototype, field, {
-            set: _createSetState(field),
-            get: _createGetState(field),
-        });
-    }
-})();
-exports.sdk = {};
-try {
-    let loaded = false;
-    try {
-        // todo: remove usage of process.env.SCRYPTED_SDK_MODULE, only existed in prerelease builds.
-        // import.meta is not a reliable way to detect es module support in webpack since webpack
-        // evaluates that to true at runtime.
-        const esModule = process.env.SCRYPTED_SDK_ES_MODULE || process.env.SCRYPTED_SDK_MODULE;
-        const cjsModule = process.env.SCRYPTED_SDK_CJS_MODULE || process.env.SCRYPTED_SDK_MODULE;
-        // @ts-expect-error
-        if (esModule && "undefined" !== 'undefined') {}
-        else if (cjsModule) {
-            // @ts-expect-error
-            if (typeof require !== 'undefined') {
-                // @ts-expect-error
-                const sdkModule = require(process.env.SCRYPTED_SDK_MODULE);
-                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
-                loaded = true;
-            }
-            else {
-                const sdkModule = __webpack_require__("../scrypted/sdk/dist/src sync recursive")(cjsModule);
-                Object.assign(exports.sdk, sdkModule.getScryptedStatic());
-                loaded = true;
-            }
-        }
-    }
-    catch (e) {
-        console.warn("failed to load sdk module", e);
-        throw e;
-    }
-    if (!loaded) {
-        let runtimeAPI;
-        try {
-            runtimeAPI = pluginRuntimeAPI;
-        }
-        catch (e) {
-        }
-        Object.assign(exports.sdk, {
-            log: deviceManager.getDeviceLogger(undefined),
-            deviceManager,
-            endpointManager,
-            mediaManager,
-            systemManager,
-            pluginHostAPI,
-            ...runtimeAPI,
-        });
-    }
-    try {
-        exports.sdk.systemManager.setScryptedInterfaceDescriptors?.(index_1.TYPES_VERSION, index_1.ScryptedInterfaceDescriptors)?.catch(() => { });
-    }
-    catch (e) {
-    }
-}
-catch (e) {
-    console.error('sdk initialization error, import @scrypted/types or use @scrypted/client instead', e);
-}
-exports["default"] = exports.sdk;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ "../scrypted/sdk/dist/src sync recursive":
-/*!**************************************!*\
-  !*** ../scrypted/sdk/dist/src/ sync ***!
-  \**************************************/
-/***/ ((module) => {
-
-function webpackEmptyContext(req) {
-	var e = new Error("Cannot find module '" + req + "'");
-	e.code = 'MODULE_NOT_FOUND';
-	throw e;
-}
-webpackEmptyContext.keys = () => ([]);
-webpackEmptyContext.resolve = webpackEmptyContext;
-webpackEmptyContext.id = "../scrypted/sdk/dist/src sync recursive";
-module.exports = webpackEmptyContext;
-
-/***/ }),
-
-/***/ "../scrypted/sdk/dist/types/gen/index.js":
-/*!***********************************************!*\
-  !*** ../scrypted/sdk/dist/types/gen/index.js ***!
-  \***********************************************/
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScryptedMimeTypes = exports.ScryptedInterface = exports.MediaPlayerState = exports.SecuritySystemObstruction = exports.SecuritySystemMode = exports.AirQuality = exports.AirPurifierMode = exports.AirPurifierStatus = exports.ChargeState = exports.LockState = exports.PanTiltZoomMovement = exports.ThermostatMode = exports.TemperatureUnit = exports.FanMode = exports.HumidityMode = exports.ScryptedDeviceType = exports.ScryptedInterfaceDescriptors = exports.ScryptedInterfaceMethod = exports.ScryptedInterfaceProperty = exports.DeviceBase = exports.TYPES_VERSION = void 0;
-exports.TYPES_VERSION = "0.3.114";
-class DeviceBase {
-}
-exports.DeviceBase = DeviceBase;
-var ScryptedInterfaceProperty;
-(function (ScryptedInterfaceProperty) {
-    ScryptedInterfaceProperty["id"] = "id";
-    ScryptedInterfaceProperty["info"] = "info";
-    ScryptedInterfaceProperty["interfaces"] = "interfaces";
-    ScryptedInterfaceProperty["mixins"] = "mixins";
-    ScryptedInterfaceProperty["name"] = "name";
-    ScryptedInterfaceProperty["nativeId"] = "nativeId";
-    ScryptedInterfaceProperty["pluginId"] = "pluginId";
-    ScryptedInterfaceProperty["providedInterfaces"] = "providedInterfaces";
-    ScryptedInterfaceProperty["providedName"] = "providedName";
-    ScryptedInterfaceProperty["providedRoom"] = "providedRoom";
-    ScryptedInterfaceProperty["providedType"] = "providedType";
-    ScryptedInterfaceProperty["providerId"] = "providerId";
-    ScryptedInterfaceProperty["room"] = "room";
-    ScryptedInterfaceProperty["type"] = "type";
-    ScryptedInterfaceProperty["scryptedRuntimeArguments"] = "scryptedRuntimeArguments";
-    ScryptedInterfaceProperty["on"] = "on";
-    ScryptedInterfaceProperty["brightness"] = "brightness";
-    ScryptedInterfaceProperty["colorTemperature"] = "colorTemperature";
-    ScryptedInterfaceProperty["rgb"] = "rgb";
-    ScryptedInterfaceProperty["hsv"] = "hsv";
-    ScryptedInterfaceProperty["buttons"] = "buttons";
-    ScryptedInterfaceProperty["sensors"] = "sensors";
-    ScryptedInterfaceProperty["running"] = "running";
-    ScryptedInterfaceProperty["paused"] = "paused";
-    ScryptedInterfaceProperty["docked"] = "docked";
-    ScryptedInterfaceProperty["temperatureSetting"] = "temperatureSetting";
-    ScryptedInterfaceProperty["temperature"] = "temperature";
-    ScryptedInterfaceProperty["temperatureUnit"] = "temperatureUnit";
-    ScryptedInterfaceProperty["humidity"] = "humidity";
-    ScryptedInterfaceProperty["audioVolumes"] = "audioVolumes";
-    ScryptedInterfaceProperty["recordingActive"] = "recordingActive";
-    ScryptedInterfaceProperty["ptzCapabilities"] = "ptzCapabilities";
-    ScryptedInterfaceProperty["lockState"] = "lockState";
-    ScryptedInterfaceProperty["entryOpen"] = "entryOpen";
-    ScryptedInterfaceProperty["batteryLevel"] = "batteryLevel";
-    ScryptedInterfaceProperty["chargeState"] = "chargeState";
-    ScryptedInterfaceProperty["online"] = "online";
-    ScryptedInterfaceProperty["fromMimeType"] = "fromMimeType";
-    ScryptedInterfaceProperty["toMimeType"] = "toMimeType";
-    ScryptedInterfaceProperty["converters"] = "converters";
-    ScryptedInterfaceProperty["binaryState"] = "binaryState";
-    ScryptedInterfaceProperty["tampered"] = "tampered";
-    ScryptedInterfaceProperty["sleeping"] = "sleeping";
-    ScryptedInterfaceProperty["powerDetected"] = "powerDetected";
-    ScryptedInterfaceProperty["audioDetected"] = "audioDetected";
-    ScryptedInterfaceProperty["motionDetected"] = "motionDetected";
-    ScryptedInterfaceProperty["ambientLight"] = "ambientLight";
-    ScryptedInterfaceProperty["occupied"] = "occupied";
-    ScryptedInterfaceProperty["flooded"] = "flooded";
-    ScryptedInterfaceProperty["ultraviolet"] = "ultraviolet";
-    ScryptedInterfaceProperty["luminance"] = "luminance";
-    ScryptedInterfaceProperty["position"] = "position";
-    ScryptedInterfaceProperty["securitySystemState"] = "securitySystemState";
-    ScryptedInterfaceProperty["pm10Density"] = "pm10Density";
-    ScryptedInterfaceProperty["pm25Density"] = "pm25Density";
-    ScryptedInterfaceProperty["vocDensity"] = "vocDensity";
-    ScryptedInterfaceProperty["noxDensity"] = "noxDensity";
-    ScryptedInterfaceProperty["co2ppm"] = "co2ppm";
-    ScryptedInterfaceProperty["airQuality"] = "airQuality";
-    ScryptedInterfaceProperty["airPurifierState"] = "airPurifierState";
-    ScryptedInterfaceProperty["filterChangeIndication"] = "filterChangeIndication";
-    ScryptedInterfaceProperty["filterLifeLevel"] = "filterLifeLevel";
-    ScryptedInterfaceProperty["humiditySetting"] = "humiditySetting";
-    ScryptedInterfaceProperty["fan"] = "fan";
-    ScryptedInterfaceProperty["applicationInfo"] = "applicationInfo";
-    ScryptedInterfaceProperty["systemDevice"] = "systemDevice";
-})(ScryptedInterfaceProperty || (exports.ScryptedInterfaceProperty = ScryptedInterfaceProperty = {}));
-var ScryptedInterfaceMethod;
-(function (ScryptedInterfaceMethod) {
-    ScryptedInterfaceMethod["listen"] = "listen";
-    ScryptedInterfaceMethod["probe"] = "probe";
-    ScryptedInterfaceMethod["setMixins"] = "setMixins";
-    ScryptedInterfaceMethod["setName"] = "setName";
-    ScryptedInterfaceMethod["setRoom"] = "setRoom";
-    ScryptedInterfaceMethod["setType"] = "setType";
-    ScryptedInterfaceMethod["getPluginJson"] = "getPluginJson";
-    ScryptedInterfaceMethod["turnOff"] = "turnOff";
-    ScryptedInterfaceMethod["turnOn"] = "turnOn";
-    ScryptedInterfaceMethod["setBrightness"] = "setBrightness";
-    ScryptedInterfaceMethod["getTemperatureMaxK"] = "getTemperatureMaxK";
-    ScryptedInterfaceMethod["getTemperatureMinK"] = "getTemperatureMinK";
-    ScryptedInterfaceMethod["setColorTemperature"] = "setColorTemperature";
-    ScryptedInterfaceMethod["setRgb"] = "setRgb";
-    ScryptedInterfaceMethod["setHsv"] = "setHsv";
-    ScryptedInterfaceMethod["pressButton"] = "pressButton";
-    ScryptedInterfaceMethod["sendNotification"] = "sendNotification";
-    ScryptedInterfaceMethod["start"] = "start";
-    ScryptedInterfaceMethod["stop"] = "stop";
-    ScryptedInterfaceMethod["pause"] = "pause";
-    ScryptedInterfaceMethod["resume"] = "resume";
-    ScryptedInterfaceMethod["dock"] = "dock";
-    ScryptedInterfaceMethod["setTemperature"] = "setTemperature";
-    ScryptedInterfaceMethod["setTemperatureUnit"] = "setTemperatureUnit";
-    ScryptedInterfaceMethod["getPictureOptions"] = "getPictureOptions";
-    ScryptedInterfaceMethod["takePicture"] = "takePicture";
-    ScryptedInterfaceMethod["getAudioStream"] = "getAudioStream";
-    ScryptedInterfaceMethod["setAudioVolumes"] = "setAudioVolumes";
-    ScryptedInterfaceMethod["startDisplay"] = "startDisplay";
-    ScryptedInterfaceMethod["stopDisplay"] = "stopDisplay";
-    ScryptedInterfaceMethod["getVideoStream"] = "getVideoStream";
-    ScryptedInterfaceMethod["getVideoStreamOptions"] = "getVideoStreamOptions";
-    ScryptedInterfaceMethod["getPrivacyMasks"] = "getPrivacyMasks";
-    ScryptedInterfaceMethod["setPrivacyMasks"] = "setPrivacyMasks";
-    ScryptedInterfaceMethod["getVideoTextOverlays"] = "getVideoTextOverlays";
-    ScryptedInterfaceMethod["setVideoTextOverlay"] = "setVideoTextOverlay";
-    ScryptedInterfaceMethod["getRecordingStream"] = "getRecordingStream";
-    ScryptedInterfaceMethod["getRecordingStreamCurrentTime"] = "getRecordingStreamCurrentTime";
-    ScryptedInterfaceMethod["getRecordingStreamOptions"] = "getRecordingStreamOptions";
-    ScryptedInterfaceMethod["getRecordingStreamThumbnail"] = "getRecordingStreamThumbnail";
-    ScryptedInterfaceMethod["deleteRecordingStream"] = "deleteRecordingStream";
-    ScryptedInterfaceMethod["setRecordingActive"] = "setRecordingActive";
-    ScryptedInterfaceMethod["ptzCommand"] = "ptzCommand";
-    ScryptedInterfaceMethod["getRecordedEvents"] = "getRecordedEvents";
-    ScryptedInterfaceMethod["getVideoClip"] = "getVideoClip";
-    ScryptedInterfaceMethod["getVideoClips"] = "getVideoClips";
-    ScryptedInterfaceMethod["getVideoClipThumbnail"] = "getVideoClipThumbnail";
-    ScryptedInterfaceMethod["removeVideoClips"] = "removeVideoClips";
-    ScryptedInterfaceMethod["setVideoStreamOptions"] = "setVideoStreamOptions";
-    ScryptedInterfaceMethod["startIntercom"] = "startIntercom";
-    ScryptedInterfaceMethod["stopIntercom"] = "stopIntercom";
-    ScryptedInterfaceMethod["lock"] = "lock";
-    ScryptedInterfaceMethod["unlock"] = "unlock";
-    ScryptedInterfaceMethod["addPassword"] = "addPassword";
-    ScryptedInterfaceMethod["getPasswords"] = "getPasswords";
-    ScryptedInterfaceMethod["removePassword"] = "removePassword";
-    ScryptedInterfaceMethod["activate"] = "activate";
-    ScryptedInterfaceMethod["deactivate"] = "deactivate";
-    ScryptedInterfaceMethod["isReversible"] = "isReversible";
-    ScryptedInterfaceMethod["closeEntry"] = "closeEntry";
-    ScryptedInterfaceMethod["openEntry"] = "openEntry";
-    ScryptedInterfaceMethod["getDevice"] = "getDevice";
-    ScryptedInterfaceMethod["releaseDevice"] = "releaseDevice";
-    ScryptedInterfaceMethod["adoptDevice"] = "adoptDevice";
-    ScryptedInterfaceMethod["discoverDevices"] = "discoverDevices";
-    ScryptedInterfaceMethod["createDevice"] = "createDevice";
-    ScryptedInterfaceMethod["getCreateDeviceSettings"] = "getCreateDeviceSettings";
-    ScryptedInterfaceMethod["reboot"] = "reboot";
-    ScryptedInterfaceMethod["getRefreshFrequency"] = "getRefreshFrequency";
-    ScryptedInterfaceMethod["refresh"] = "refresh";
-    ScryptedInterfaceMethod["getMediaStatus"] = "getMediaStatus";
-    ScryptedInterfaceMethod["load"] = "load";
-    ScryptedInterfaceMethod["seek"] = "seek";
-    ScryptedInterfaceMethod["skipNext"] = "skipNext";
-    ScryptedInterfaceMethod["skipPrevious"] = "skipPrevious";
-    ScryptedInterfaceMethod["convert"] = "convert";
-    ScryptedInterfaceMethod["convertMedia"] = "convertMedia";
-    ScryptedInterfaceMethod["getSettings"] = "getSettings";
-    ScryptedInterfaceMethod["putSetting"] = "putSetting";
-    ScryptedInterfaceMethod["armSecuritySystem"] = "armSecuritySystem";
-    ScryptedInterfaceMethod["disarmSecuritySystem"] = "disarmSecuritySystem";
-    ScryptedInterfaceMethod["setAirPurifierState"] = "setAirPurifierState";
-    ScryptedInterfaceMethod["getReadmeMarkdown"] = "getReadmeMarkdown";
-    ScryptedInterfaceMethod["getOauthUrl"] = "getOauthUrl";
-    ScryptedInterfaceMethod["onOauthCallback"] = "onOauthCallback";
-    ScryptedInterfaceMethod["canMixin"] = "canMixin";
-    ScryptedInterfaceMethod["getMixin"] = "getMixin";
-    ScryptedInterfaceMethod["releaseMixin"] = "releaseMixin";
-    ScryptedInterfaceMethod["onRequest"] = "onRequest";
-    ScryptedInterfaceMethod["onConnection"] = "onConnection";
-    ScryptedInterfaceMethod["onPush"] = "onPush";
-    ScryptedInterfaceMethod["run"] = "run";
-    ScryptedInterfaceMethod["eval"] = "eval";
-    ScryptedInterfaceMethod["loadScripts"] = "loadScripts";
-    ScryptedInterfaceMethod["saveScript"] = "saveScript";
-    ScryptedInterfaceMethod["forkInterface"] = "forkInterface";
-    ScryptedInterfaceMethod["trackObjects"] = "trackObjects";
-    ScryptedInterfaceMethod["getDetectionInput"] = "getDetectionInput";
-    ScryptedInterfaceMethod["getObjectTypes"] = "getObjectTypes";
-    ScryptedInterfaceMethod["detectObjects"] = "detectObjects";
-    ScryptedInterfaceMethod["generateObjectDetections"] = "generateObjectDetections";
-    ScryptedInterfaceMethod["getDetectionModel"] = "getDetectionModel";
-    ScryptedInterfaceMethod["setHumidity"] = "setHumidity";
-    ScryptedInterfaceMethod["setFan"] = "setFan";
-    ScryptedInterfaceMethod["startRTCSignalingSession"] = "startRTCSignalingSession";
-    ScryptedInterfaceMethod["createRTCSignalingSession"] = "createRTCSignalingSession";
-    ScryptedInterfaceMethod["getScryptedUserAccessControl"] = "getScryptedUserAccessControl";
-    ScryptedInterfaceMethod["generateVideoFrames"] = "generateVideoFrames";
-    ScryptedInterfaceMethod["connectStream"] = "connectStream";
-    ScryptedInterfaceMethod["getTTYSettings"] = "getTTYSettings";
-})(ScryptedInterfaceMethod || (exports.ScryptedInterfaceMethod = ScryptedInterfaceMethod = {}));
-exports.ScryptedInterfaceDescriptors = {
-    "ScryptedDevice": {
-        "name": "ScryptedDevice",
-        "methods": [
-            "listen",
-            "probe",
-            "setMixins",
-            "setName",
-            "setRoom",
-            "setType"
-        ],
-        "properties": [
-            "id",
-            "info",
-            "interfaces",
-            "mixins",
-            "name",
-            "nativeId",
-            "pluginId",
-            "providedInterfaces",
-            "providedName",
-            "providedRoom",
-            "providedType",
-            "providerId",
-            "room",
-            "type"
-        ]
-    },
-    "ScryptedPlugin": {
-        "name": "ScryptedPlugin",
-        "methods": [
-            "getPluginJson"
-        ],
-        "properties": []
-    },
-    "ScryptedPluginRuntime": {
-        "name": "ScryptedPluginRuntime",
-        "methods": [],
-        "properties": [
-            "scryptedRuntimeArguments"
-        ]
-    },
-    "OnOff": {
-        "name": "OnOff",
-        "methods": [
-            "turnOff",
-            "turnOn"
-        ],
-        "properties": [
-            "on"
-        ]
-    },
-    "Brightness": {
-        "name": "Brightness",
-        "methods": [
-            "setBrightness"
-        ],
-        "properties": [
-            "brightness"
-        ]
-    },
-    "ColorSettingTemperature": {
-        "name": "ColorSettingTemperature",
-        "methods": [
-            "getTemperatureMaxK",
-            "getTemperatureMinK",
-            "setColorTemperature"
-        ],
-        "properties": [
-            "colorTemperature"
-        ]
-    },
-    "ColorSettingRgb": {
-        "name": "ColorSettingRgb",
-        "methods": [
-            "setRgb"
-        ],
-        "properties": [
-            "rgb"
-        ]
-    },
-    "ColorSettingHsv": {
-        "name": "ColorSettingHsv",
-        "methods": [
-            "setHsv"
-        ],
-        "properties": [
-            "hsv"
-        ]
-    },
-    "Buttons": {
-        "name": "Buttons",
-        "methods": [],
-        "properties": [
-            "buttons"
-        ]
-    },
-    "PressButtons": {
-        "name": "PressButtons",
-        "methods": [
-            "pressButton"
-        ],
-        "properties": []
-    },
-    "Sensors": {
-        "name": "Sensors",
-        "methods": [],
-        "properties": [
-            "sensors"
-        ]
-    },
-    "Notifier": {
-        "name": "Notifier",
-        "methods": [
-            "sendNotification"
-        ],
-        "properties": []
-    },
-    "StartStop": {
-        "name": "StartStop",
-        "methods": [
-            "start",
-            "stop"
-        ],
-        "properties": [
-            "running"
-        ]
-    },
-    "Pause": {
-        "name": "Pause",
-        "methods": [
-            "pause",
-            "resume"
-        ],
-        "properties": [
-            "paused"
-        ]
-    },
-    "Dock": {
-        "name": "Dock",
-        "methods": [
-            "dock"
-        ],
-        "properties": [
-            "docked"
-        ]
-    },
-    "TemperatureSetting": {
-        "name": "TemperatureSetting",
-        "methods": [
-            "setTemperature"
-        ],
-        "properties": [
-            "temperatureSetting"
-        ]
-    },
-    "Thermometer": {
-        "name": "Thermometer",
-        "methods": [
-            "setTemperatureUnit"
-        ],
-        "properties": [
-            "temperature",
-            "temperatureUnit"
-        ]
-    },
-    "HumiditySensor": {
-        "name": "HumiditySensor",
-        "methods": [],
-        "properties": [
-            "humidity"
-        ]
-    },
-    "Camera": {
-        "name": "Camera",
-        "methods": [
-            "getPictureOptions",
-            "takePicture"
-        ],
-        "properties": []
-    },
-    "Microphone": {
-        "name": "Microphone",
-        "methods": [
-            "getAudioStream"
-        ],
-        "properties": []
-    },
-    "AudioVolumeControl": {
-        "name": "AudioVolumeControl",
-        "methods": [
-            "setAudioVolumes"
-        ],
-        "properties": [
-            "audioVolumes"
-        ]
-    },
-    "Display": {
-        "name": "Display",
-        "methods": [
-            "startDisplay",
-            "stopDisplay"
-        ],
-        "properties": []
-    },
-    "VideoCamera": {
-        "name": "VideoCamera",
-        "methods": [
-            "getVideoStream",
-            "getVideoStreamOptions"
-        ],
-        "properties": []
-    },
-    "VideoCameraMask": {
-        "name": "VideoCameraMask",
-        "methods": [
-            "getPrivacyMasks",
-            "setPrivacyMasks"
-        ],
-        "properties": []
-    },
-    "VideoTextOverlays": {
-        "name": "VideoTextOverlays",
-        "methods": [
-            "getVideoTextOverlays",
-            "setVideoTextOverlay"
-        ],
-        "properties": []
-    },
-    "VideoRecorder": {
-        "name": "VideoRecorder",
-        "methods": [
-            "getRecordingStream",
-            "getRecordingStreamCurrentTime",
-            "getRecordingStreamOptions",
-            "getRecordingStreamThumbnail"
-        ],
-        "properties": [
-            "recordingActive"
-        ]
-    },
-    "VideoRecorderManagement": {
-        "name": "VideoRecorderManagement",
-        "methods": [
-            "deleteRecordingStream",
-            "setRecordingActive"
-        ],
-        "properties": []
-    },
-    "PanTiltZoom": {
-        "name": "PanTiltZoom",
-        "methods": [
-            "ptzCommand"
-        ],
-        "properties": [
-            "ptzCapabilities"
-        ]
-    },
-    "EventRecorder": {
-        "name": "EventRecorder",
-        "methods": [
-            "getRecordedEvents"
-        ],
-        "properties": []
-    },
-    "VideoClips": {
-        "name": "VideoClips",
-        "methods": [
-            "getVideoClip",
-            "getVideoClips",
-            "getVideoClipThumbnail",
-            "removeVideoClips"
-        ],
-        "properties": []
-    },
-    "VideoCameraConfiguration": {
-        "name": "VideoCameraConfiguration",
-        "methods": [
-            "setVideoStreamOptions"
-        ],
-        "properties": []
-    },
-    "Intercom": {
-        "name": "Intercom",
-        "methods": [
-            "startIntercom",
-            "stopIntercom"
-        ],
-        "properties": []
-    },
-    "Lock": {
-        "name": "Lock",
-        "methods": [
-            "lock",
-            "unlock"
-        ],
-        "properties": [
-            "lockState"
-        ]
-    },
-    "PasswordStore": {
-        "name": "PasswordStore",
-        "methods": [
-            "addPassword",
-            "getPasswords",
-            "removePassword"
-        ],
-        "properties": []
-    },
-    "Scene": {
-        "name": "Scene",
-        "methods": [
-            "activate",
-            "deactivate",
-            "isReversible"
-        ],
-        "properties": []
-    },
-    "Entry": {
-        "name": "Entry",
-        "methods": [
-            "closeEntry",
-            "openEntry"
-        ],
-        "properties": []
-    },
-    "EntrySensor": {
-        "name": "EntrySensor",
-        "methods": [],
-        "properties": [
-            "entryOpen"
-        ]
-    },
-    "DeviceProvider": {
-        "name": "DeviceProvider",
-        "methods": [
-            "getDevice",
-            "releaseDevice"
-        ],
-        "properties": []
-    },
-    "DeviceDiscovery": {
-        "name": "DeviceDiscovery",
-        "methods": [
-            "adoptDevice",
-            "discoverDevices"
-        ],
-        "properties": []
-    },
-    "DeviceCreator": {
-        "name": "DeviceCreator",
-        "methods": [
-            "createDevice",
-            "getCreateDeviceSettings"
-        ],
-        "properties": []
-    },
-    "Battery": {
-        "name": "Battery",
-        "methods": [],
-        "properties": [
-            "batteryLevel"
-        ]
-    },
-    "Charger": {
-        "name": "Charger",
-        "methods": [],
-        "properties": [
-            "chargeState"
-        ]
-    },
-    "Reboot": {
-        "name": "Reboot",
-        "methods": [
-            "reboot"
-        ],
-        "properties": []
-    },
-    "Refresh": {
-        "name": "Refresh",
-        "methods": [
-            "getRefreshFrequency",
-            "refresh"
-        ],
-        "properties": []
-    },
-    "MediaPlayer": {
-        "name": "MediaPlayer",
-        "methods": [
-            "getMediaStatus",
-            "load",
-            "seek",
-            "skipNext",
-            "skipPrevious"
-        ],
-        "properties": []
-    },
-    "Online": {
-        "name": "Online",
-        "methods": [],
-        "properties": [
-            "online"
-        ]
-    },
-    "BufferConverter": {
-        "name": "BufferConverter",
-        "methods": [
-            "convert"
-        ],
-        "properties": [
-            "fromMimeType",
-            "toMimeType"
-        ]
-    },
-    "MediaConverter": {
-        "name": "MediaConverter",
-        "methods": [
-            "convertMedia"
-        ],
-        "properties": [
-            "converters"
-        ]
-    },
-    "Settings": {
-        "name": "Settings",
-        "methods": [
-            "getSettings",
-            "putSetting"
-        ],
-        "properties": []
-    },
-    "BinarySensor": {
-        "name": "BinarySensor",
-        "methods": [],
-        "properties": [
-            "binaryState"
-        ]
-    },
-    "TamperSensor": {
-        "name": "TamperSensor",
-        "methods": [],
-        "properties": [
-            "tampered"
-        ]
-    },
-    "Sleep": {
-        "name": "Sleep",
-        "methods": [],
-        "properties": [
-            "sleeping"
-        ]
-    },
-    "PowerSensor": {
-        "name": "PowerSensor",
-        "methods": [],
-        "properties": [
-            "powerDetected"
-        ]
-    },
-    "AudioSensor": {
-        "name": "AudioSensor",
-        "methods": [],
-        "properties": [
-            "audioDetected"
-        ]
-    },
-    "MotionSensor": {
-        "name": "MotionSensor",
-        "methods": [],
-        "properties": [
-            "motionDetected"
-        ]
-    },
-    "AmbientLightSensor": {
-        "name": "AmbientLightSensor",
-        "methods": [],
-        "properties": [
-            "ambientLight"
-        ]
-    },
-    "OccupancySensor": {
-        "name": "OccupancySensor",
-        "methods": [],
-        "properties": [
-            "occupied"
-        ]
-    },
-    "FloodSensor": {
-        "name": "FloodSensor",
-        "methods": [],
-        "properties": [
-            "flooded"
-        ]
-    },
-    "UltravioletSensor": {
-        "name": "UltravioletSensor",
-        "methods": [],
-        "properties": [
-            "ultraviolet"
-        ]
-    },
-    "LuminanceSensor": {
-        "name": "LuminanceSensor",
-        "methods": [],
-        "properties": [
-            "luminance"
-        ]
-    },
-    "PositionSensor": {
-        "name": "PositionSensor",
-        "methods": [],
-        "properties": [
-            "position"
-        ]
-    },
-    "SecuritySystem": {
-        "name": "SecuritySystem",
-        "methods": [
-            "armSecuritySystem",
-            "disarmSecuritySystem"
-        ],
-        "properties": [
-            "securitySystemState"
-        ]
-    },
-    "PM10Sensor": {
-        "name": "PM10Sensor",
-        "methods": [],
-        "properties": [
-            "pm10Density"
-        ]
-    },
-    "PM25Sensor": {
-        "name": "PM25Sensor",
-        "methods": [],
-        "properties": [
-            "pm25Density"
-        ]
-    },
-    "VOCSensor": {
-        "name": "VOCSensor",
-        "methods": [],
-        "properties": [
-            "vocDensity"
-        ]
-    },
-    "NOXSensor": {
-        "name": "NOXSensor",
-        "methods": [],
-        "properties": [
-            "noxDensity"
-        ]
-    },
-    "CO2Sensor": {
-        "name": "CO2Sensor",
-        "methods": [],
-        "properties": [
-            "co2ppm"
-        ]
-    },
-    "AirQualitySensor": {
-        "name": "AirQualitySensor",
-        "methods": [],
-        "properties": [
-            "airQuality"
-        ]
-    },
-    "AirPurifier": {
-        "name": "AirPurifier",
-        "methods": [
-            "setAirPurifierState"
-        ],
-        "properties": [
-            "airPurifierState"
-        ]
-    },
-    "FilterMaintenance": {
-        "name": "FilterMaintenance",
-        "methods": [],
-        "properties": [
-            "filterChangeIndication",
-            "filterLifeLevel"
-        ]
-    },
-    "Readme": {
-        "name": "Readme",
-        "methods": [
-            "getReadmeMarkdown"
-        ],
-        "properties": []
-    },
-    "OauthClient": {
-        "name": "OauthClient",
-        "methods": [
-            "getOauthUrl",
-            "onOauthCallback"
-        ],
-        "properties": []
-    },
-    "MixinProvider": {
-        "name": "MixinProvider",
-        "methods": [
-            "canMixin",
-            "getMixin",
-            "releaseMixin"
-        ],
-        "properties": []
-    },
-    "HttpRequestHandler": {
-        "name": "HttpRequestHandler",
-        "methods": [
-            "onRequest"
-        ],
-        "properties": []
-    },
-    "EngineIOHandler": {
-        "name": "EngineIOHandler",
-        "methods": [
-            "onConnection"
-        ],
-        "properties": []
-    },
-    "PushHandler": {
-        "name": "PushHandler",
-        "methods": [
-            "onPush"
-        ],
-        "properties": []
-    },
-    "Program": {
-        "name": "Program",
-        "methods": [
-            "run"
-        ],
-        "properties": []
-    },
-    "Scriptable": {
-        "name": "Scriptable",
-        "methods": [
-            "eval",
-            "loadScripts",
-            "saveScript"
-        ],
-        "properties": []
-    },
-    "ClusterForkInterface": {
-        "name": "ClusterForkInterface",
-        "methods": [
-            "forkInterface"
-        ],
-        "properties": []
-    },
-    "ObjectTracker": {
-        "name": "ObjectTracker",
-        "methods": [
-            "trackObjects"
-        ],
-        "properties": []
-    },
-    "ObjectDetector": {
-        "name": "ObjectDetector",
-        "methods": [
-            "getDetectionInput",
-            "getObjectTypes"
-        ],
-        "properties": []
-    },
-    "ObjectDetection": {
-        "name": "ObjectDetection",
-        "methods": [
-            "detectObjects",
-            "generateObjectDetections",
-            "getDetectionModel"
-        ],
-        "properties": []
-    },
-    "ObjectDetectionPreview": {
-        "name": "ObjectDetectionPreview",
-        "methods": [],
-        "properties": []
-    },
-    "ObjectDetectionGenerator": {
-        "name": "ObjectDetectionGenerator",
-        "methods": [],
-        "properties": []
-    },
-    "HumiditySetting": {
-        "name": "HumiditySetting",
-        "methods": [
-            "setHumidity"
-        ],
-        "properties": [
-            "humiditySetting"
-        ]
-    },
-    "Fan": {
-        "name": "Fan",
-        "methods": [
-            "setFan"
-        ],
-        "properties": [
-            "fan"
-        ]
-    },
-    "RTCSignalingChannel": {
-        "name": "RTCSignalingChannel",
-        "methods": [
-            "startRTCSignalingSession"
-        ],
-        "properties": []
-    },
-    "RTCSignalingClient": {
-        "name": "RTCSignalingClient",
-        "methods": [
-            "createRTCSignalingSession"
-        ],
-        "properties": []
-    },
-    "LauncherApplication": {
-        "name": "LauncherApplication",
-        "methods": [],
-        "properties": [
-            "applicationInfo"
-        ]
-    },
-    "ScryptedUser": {
-        "name": "ScryptedUser",
-        "methods": [
-            "getScryptedUserAccessControl"
-        ],
-        "properties": []
-    },
-    "VideoFrameGenerator": {
-        "name": "VideoFrameGenerator",
-        "methods": [
-            "generateVideoFrames"
-        ],
-        "properties": []
-    },
-    "StreamService": {
-        "name": "StreamService",
-        "methods": [
-            "connectStream"
-        ],
-        "properties": []
-    },
-    "TTY": {
-        "name": "TTY",
-        "methods": [],
-        "properties": []
-    },
-    "TTYSettings": {
-        "name": "TTYSettings",
-        "methods": [
-            "getTTYSettings"
-        ],
-        "properties": []
-    },
-    "ScryptedSystemDevice": {
-        "name": "ScryptedSystemDevice",
-        "methods": [],
-        "properties": [
-            "systemDevice"
-        ]
-    },
-    "ScryptedDeviceCreator": {
-        "name": "ScryptedDeviceCreator",
-        "methods": [],
-        "properties": []
-    },
-    "ScryptedSettings": {
-        "name": "ScryptedSettings",
-        "methods": [],
-        "properties": []
-    }
-};
-/**
- * @category Core Reference
- */
-var ScryptedDeviceType;
-(function (ScryptedDeviceType) {
-    /**
-     * @deprecated
-     */
-    ScryptedDeviceType["Builtin"] = "Builtin";
-    /**
-     * Internal devices will not show up in device lists unless explicitly searched.
-     */
-    ScryptedDeviceType["Internal"] = "Internal";
-    ScryptedDeviceType["Camera"] = "Camera";
-    ScryptedDeviceType["Fan"] = "Fan";
-    ScryptedDeviceType["Light"] = "Light";
-    ScryptedDeviceType["Switch"] = "Switch";
-    ScryptedDeviceType["Outlet"] = "Outlet";
-    ScryptedDeviceType["Sensor"] = "Sensor";
-    ScryptedDeviceType["Scene"] = "Scene";
-    ScryptedDeviceType["Program"] = "Program";
-    ScryptedDeviceType["Automation"] = "Automation";
-    ScryptedDeviceType["Vacuum"] = "Vacuum";
-    ScryptedDeviceType["Notifier"] = "Notifier";
-    ScryptedDeviceType["Thermostat"] = "Thermostat";
-    ScryptedDeviceType["Lock"] = "Lock";
-    ScryptedDeviceType["PasswordControl"] = "PasswordControl";
-    /**
-     * Displays have audio and video output.
-     */
-    ScryptedDeviceType["Display"] = "Display";
-    /**
-     * Smart Displays have two way audio and video.
-     */
-    ScryptedDeviceType["SmartDisplay"] = "SmartDisplay";
-    ScryptedDeviceType["Speaker"] = "Speaker";
-    /**
-     * Smart Speakers have two way audio.
-     */
-    ScryptedDeviceType["SmartSpeaker"] = "SmartSpeaker";
-    ScryptedDeviceType["Event"] = "Event";
-    ScryptedDeviceType["Entry"] = "Entry";
-    ScryptedDeviceType["Garage"] = "Garage";
-    ScryptedDeviceType["DeviceProvider"] = "DeviceProvider";
-    ScryptedDeviceType["DataSource"] = "DataSource";
-    ScryptedDeviceType["API"] = "API";
-    ScryptedDeviceType["Doorbell"] = "Doorbell";
-    ScryptedDeviceType["Irrigation"] = "Irrigation";
-    ScryptedDeviceType["Valve"] = "Valve";
-    ScryptedDeviceType["Person"] = "Person";
-    ScryptedDeviceType["SecuritySystem"] = "SecuritySystem";
-    ScryptedDeviceType["WindowCovering"] = "WindowCovering";
-    ScryptedDeviceType["Siren"] = "Siren";
-    ScryptedDeviceType["AirPurifier"] = "AirPurifier";
-    ScryptedDeviceType["Unknown"] = "Unknown";
-})(ScryptedDeviceType || (exports.ScryptedDeviceType = ScryptedDeviceType = {}));
-var HumidityMode;
-(function (HumidityMode) {
-    HumidityMode["Humidify"] = "Humidify";
-    HumidityMode["Dehumidify"] = "Dehumidify";
-    HumidityMode["Auto"] = "Auto";
-    HumidityMode["Off"] = "Off";
-})(HumidityMode || (exports.HumidityMode = HumidityMode = {}));
-var FanMode;
-(function (FanMode) {
-    FanMode["Auto"] = "Auto";
-    FanMode["Manual"] = "Manual";
-})(FanMode || (exports.FanMode = FanMode = {}));
-var TemperatureUnit;
-(function (TemperatureUnit) {
-    TemperatureUnit["C"] = "C";
-    TemperatureUnit["F"] = "F";
-})(TemperatureUnit || (exports.TemperatureUnit = TemperatureUnit = {}));
-var ThermostatMode;
-(function (ThermostatMode) {
-    ThermostatMode["Off"] = "Off";
-    ThermostatMode["Cool"] = "Cool";
-    ThermostatMode["Heat"] = "Heat";
-    ThermostatMode["HeatCool"] = "HeatCool";
-    ThermostatMode["Auto"] = "Auto";
-    ThermostatMode["FanOnly"] = "FanOnly";
-    ThermostatMode["Purifier"] = "Purifier";
-    ThermostatMode["Eco"] = "Eco";
-    ThermostatMode["Dry"] = "Dry";
-    ThermostatMode["On"] = "On";
-})(ThermostatMode || (exports.ThermostatMode = ThermostatMode = {}));
-var PanTiltZoomMovement;
-(function (PanTiltZoomMovement) {
-    PanTiltZoomMovement["Absolute"] = "Absolute";
-    PanTiltZoomMovement["Relative"] = "Relative";
-    PanTiltZoomMovement["Continuous"] = "Continuous";
-    PanTiltZoomMovement["Preset"] = "Preset";
-    PanTiltZoomMovement["Home"] = "Home";
-})(PanTiltZoomMovement || (exports.PanTiltZoomMovement = PanTiltZoomMovement = {}));
-var LockState;
-(function (LockState) {
-    LockState["Locked"] = "Locked";
-    LockState["Unlocked"] = "Unlocked";
-    LockState["Jammed"] = "Jammed";
-})(LockState || (exports.LockState = LockState = {}));
-var ChargeState;
-(function (ChargeState) {
-    ChargeState["Trickle"] = "trickle";
-    ChargeState["Charging"] = "charging";
-    ChargeState["NotCharging"] = "not-charging";
-})(ChargeState || (exports.ChargeState = ChargeState = {}));
-var AirPurifierStatus;
-(function (AirPurifierStatus) {
-    AirPurifierStatus["Inactive"] = "Inactive";
-    AirPurifierStatus["Idle"] = "Idle";
-    AirPurifierStatus["Active"] = "Active";
-    AirPurifierStatus["ActiveNightMode"] = "ActiveNightMode";
-})(AirPurifierStatus || (exports.AirPurifierStatus = AirPurifierStatus = {}));
-var AirPurifierMode;
-(function (AirPurifierMode) {
-    AirPurifierMode["Manual"] = "Manual";
-    AirPurifierMode["Automatic"] = "Automatic";
-})(AirPurifierMode || (exports.AirPurifierMode = AirPurifierMode = {}));
-var AirQuality;
-(function (AirQuality) {
-    AirQuality["Unknown"] = "Unknown";
-    AirQuality["Excellent"] = "Excellent";
-    AirQuality["Good"] = "Good";
-    AirQuality["Fair"] = "Fair";
-    AirQuality["Inferior"] = "Inferior";
-    AirQuality["Poor"] = "Poor";
-})(AirQuality || (exports.AirQuality = AirQuality = {}));
-var SecuritySystemMode;
-(function (SecuritySystemMode) {
-    SecuritySystemMode["Disarmed"] = "Disarmed";
-    SecuritySystemMode["HomeArmed"] = "HomeArmed";
-    SecuritySystemMode["AwayArmed"] = "AwayArmed";
-    SecuritySystemMode["NightArmed"] = "NightArmed";
-})(SecuritySystemMode || (exports.SecuritySystemMode = SecuritySystemMode = {}));
-var SecuritySystemObstruction;
-(function (SecuritySystemObstruction) {
-    SecuritySystemObstruction["Sensor"] = "Sensor";
-    SecuritySystemObstruction["Occupied"] = "Occupied";
-    SecuritySystemObstruction["Time"] = "Time";
-    SecuritySystemObstruction["Error"] = "Error";
-})(SecuritySystemObstruction || (exports.SecuritySystemObstruction = SecuritySystemObstruction = {}));
-var MediaPlayerState;
-(function (MediaPlayerState) {
-    MediaPlayerState["Idle"] = "Idle";
-    MediaPlayerState["Playing"] = "Playing";
-    MediaPlayerState["Paused"] = "Paused";
-    MediaPlayerState["Buffering"] = "Buffering";
-})(MediaPlayerState || (exports.MediaPlayerState = MediaPlayerState = {}));
-var ScryptedInterface;
-(function (ScryptedInterface) {
-    ScryptedInterface["ScryptedDevice"] = "ScryptedDevice";
-    ScryptedInterface["ScryptedPlugin"] = "ScryptedPlugin";
-    ScryptedInterface["ScryptedPluginRuntime"] = "ScryptedPluginRuntime";
-    ScryptedInterface["OnOff"] = "OnOff";
-    ScryptedInterface["Brightness"] = "Brightness";
-    ScryptedInterface["ColorSettingTemperature"] = "ColorSettingTemperature";
-    ScryptedInterface["ColorSettingRgb"] = "ColorSettingRgb";
-    ScryptedInterface["ColorSettingHsv"] = "ColorSettingHsv";
-    ScryptedInterface["Buttons"] = "Buttons";
-    ScryptedInterface["PressButtons"] = "PressButtons";
-    ScryptedInterface["Sensors"] = "Sensors";
-    ScryptedInterface["Notifier"] = "Notifier";
-    ScryptedInterface["StartStop"] = "StartStop";
-    ScryptedInterface["Pause"] = "Pause";
-    ScryptedInterface["Dock"] = "Dock";
-    ScryptedInterface["TemperatureSetting"] = "TemperatureSetting";
-    ScryptedInterface["Thermometer"] = "Thermometer";
-    ScryptedInterface["HumiditySensor"] = "HumiditySensor";
-    ScryptedInterface["Camera"] = "Camera";
-    ScryptedInterface["Microphone"] = "Microphone";
-    ScryptedInterface["AudioVolumeControl"] = "AudioVolumeControl";
-    ScryptedInterface["Display"] = "Display";
-    ScryptedInterface["VideoCamera"] = "VideoCamera";
-    ScryptedInterface["VideoCameraMask"] = "VideoCameraMask";
-    ScryptedInterface["VideoTextOverlays"] = "VideoTextOverlays";
-    ScryptedInterface["VideoRecorder"] = "VideoRecorder";
-    ScryptedInterface["VideoRecorderManagement"] = "VideoRecorderManagement";
-    ScryptedInterface["PanTiltZoom"] = "PanTiltZoom";
-    ScryptedInterface["EventRecorder"] = "EventRecorder";
-    ScryptedInterface["VideoClips"] = "VideoClips";
-    ScryptedInterface["VideoCameraConfiguration"] = "VideoCameraConfiguration";
-    ScryptedInterface["Intercom"] = "Intercom";
-    ScryptedInterface["Lock"] = "Lock";
-    ScryptedInterface["PasswordStore"] = "PasswordStore";
-    ScryptedInterface["Scene"] = "Scene";
-    ScryptedInterface["Entry"] = "Entry";
-    ScryptedInterface["EntrySensor"] = "EntrySensor";
-    ScryptedInterface["DeviceProvider"] = "DeviceProvider";
-    ScryptedInterface["DeviceDiscovery"] = "DeviceDiscovery";
-    ScryptedInterface["DeviceCreator"] = "DeviceCreator";
-    ScryptedInterface["Battery"] = "Battery";
-    ScryptedInterface["Charger"] = "Charger";
-    ScryptedInterface["Reboot"] = "Reboot";
-    ScryptedInterface["Refresh"] = "Refresh";
-    ScryptedInterface["MediaPlayer"] = "MediaPlayer";
-    ScryptedInterface["Online"] = "Online";
-    ScryptedInterface["BufferConverter"] = "BufferConverter";
-    ScryptedInterface["MediaConverter"] = "MediaConverter";
-    ScryptedInterface["Settings"] = "Settings";
-    ScryptedInterface["BinarySensor"] = "BinarySensor";
-    ScryptedInterface["TamperSensor"] = "TamperSensor";
-    ScryptedInterface["Sleep"] = "Sleep";
-    ScryptedInterface["PowerSensor"] = "PowerSensor";
-    ScryptedInterface["AudioSensor"] = "AudioSensor";
-    ScryptedInterface["MotionSensor"] = "MotionSensor";
-    ScryptedInterface["AmbientLightSensor"] = "AmbientLightSensor";
-    ScryptedInterface["OccupancySensor"] = "OccupancySensor";
-    ScryptedInterface["FloodSensor"] = "FloodSensor";
-    ScryptedInterface["UltravioletSensor"] = "UltravioletSensor";
-    ScryptedInterface["LuminanceSensor"] = "LuminanceSensor";
-    ScryptedInterface["PositionSensor"] = "PositionSensor";
-    ScryptedInterface["SecuritySystem"] = "SecuritySystem";
-    ScryptedInterface["PM10Sensor"] = "PM10Sensor";
-    ScryptedInterface["PM25Sensor"] = "PM25Sensor";
-    ScryptedInterface["VOCSensor"] = "VOCSensor";
-    ScryptedInterface["NOXSensor"] = "NOXSensor";
-    ScryptedInterface["CO2Sensor"] = "CO2Sensor";
-    ScryptedInterface["AirQualitySensor"] = "AirQualitySensor";
-    ScryptedInterface["AirPurifier"] = "AirPurifier";
-    ScryptedInterface["FilterMaintenance"] = "FilterMaintenance";
-    ScryptedInterface["Readme"] = "Readme";
-    ScryptedInterface["OauthClient"] = "OauthClient";
-    ScryptedInterface["MixinProvider"] = "MixinProvider";
-    ScryptedInterface["HttpRequestHandler"] = "HttpRequestHandler";
-    ScryptedInterface["EngineIOHandler"] = "EngineIOHandler";
-    ScryptedInterface["PushHandler"] = "PushHandler";
-    ScryptedInterface["Program"] = "Program";
-    ScryptedInterface["Scriptable"] = "Scriptable";
-    ScryptedInterface["ClusterForkInterface"] = "ClusterForkInterface";
-    ScryptedInterface["ObjectTracker"] = "ObjectTracker";
-    ScryptedInterface["ObjectDetector"] = "ObjectDetector";
-    ScryptedInterface["ObjectDetection"] = "ObjectDetection";
-    ScryptedInterface["ObjectDetectionPreview"] = "ObjectDetectionPreview";
-    ScryptedInterface["ObjectDetectionGenerator"] = "ObjectDetectionGenerator";
-    ScryptedInterface["HumiditySetting"] = "HumiditySetting";
-    ScryptedInterface["Fan"] = "Fan";
-    ScryptedInterface["RTCSignalingChannel"] = "RTCSignalingChannel";
-    ScryptedInterface["RTCSignalingClient"] = "RTCSignalingClient";
-    ScryptedInterface["LauncherApplication"] = "LauncherApplication";
-    ScryptedInterface["ScryptedUser"] = "ScryptedUser";
-    ScryptedInterface["VideoFrameGenerator"] = "VideoFrameGenerator";
-    ScryptedInterface["StreamService"] = "StreamService";
-    ScryptedInterface["TTY"] = "TTY";
-    ScryptedInterface["TTYSettings"] = "TTYSettings";
-    ScryptedInterface["ScryptedSystemDevice"] = "ScryptedSystemDevice";
-    ScryptedInterface["ScryptedDeviceCreator"] = "ScryptedDeviceCreator";
-    ScryptedInterface["ScryptedSettings"] = "ScryptedSettings";
-})(ScryptedInterface || (exports.ScryptedInterface = ScryptedInterface = {}));
-var ScryptedMimeTypes;
-(function (ScryptedMimeTypes) {
-    ScryptedMimeTypes["Url"] = "text/x-uri";
-    ScryptedMimeTypes["InsecureLocalUrl"] = "text/x-insecure-local-uri";
-    ScryptedMimeTypes["LocalUrl"] = "text/x-local-uri";
-    ScryptedMimeTypes["ServerId"] = "text/x-server-id";
-    ScryptedMimeTypes["PushEndpoint"] = "text/x-push-endpoint";
-    ScryptedMimeTypes["SchemePrefix"] = "x-scrypted/x-scrypted-scheme-";
-    ScryptedMimeTypes["MediaStreamUrl"] = "text/x-media-url";
-    ScryptedMimeTypes["MediaObject"] = "x-scrypted/x-scrypted-media-object";
-    ScryptedMimeTypes["RequestMediaObject"] = "x-scrypted/x-scrypted-request-media-object";
-    ScryptedMimeTypes["RequestMediaStream"] = "x-scrypted/x-scrypted-request-stream";
-    ScryptedMimeTypes["MediaStreamFeedback"] = "x-scrypted/x-media-stream-feedback";
-    ScryptedMimeTypes["FFmpegInput"] = "x-scrypted/x-ffmpeg-input";
-    ScryptedMimeTypes["FFmpegTranscodeStream"] = "x-scrypted/x-ffmpeg-transcode-stream";
-    ScryptedMimeTypes["RTCSignalingChannel"] = "x-scrypted/x-scrypted-rtc-signaling-channel";
-    ScryptedMimeTypes["RTCSignalingSession"] = "x-scrypted/x-scrypted-rtc-signaling-session";
-    ScryptedMimeTypes["RTCConnectionManagement"] = "x-scrypted/x-scrypted-rtc-connection-management";
-    ScryptedMimeTypes["Image"] = "x-scrypted/x-scrypted-image";
-})(ScryptedMimeTypes || (exports.ScryptedMimeTypes = ScryptedMimeTypes = {}));
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-
-/***/ "assert":
+/***/ "assert"
 /*!*************************!*\
   !*** external "assert" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("assert");
 
-/***/ }),
+/***/ },
 
-/***/ "buffer":
+/***/ "buffer"
 /*!*************************!*\
   !*** external "buffer" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("buffer");
 
-/***/ }),
+/***/ },
 
-/***/ "child_process":
+/***/ "child_process"
 /*!********************************!*\
   !*** external "child_process" ***!
   \********************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("child_process");
 
-/***/ }),
+/***/ },
 
-/***/ "crypto":
+/***/ "crypto"
 /*!*************************!*\
   !*** external "crypto" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("crypto");
 
-/***/ }),
+/***/ },
 
-/***/ "events":
+/***/ "events"
 /*!*************************!*\
   !*** external "events" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("events");
 
-/***/ }),
+/***/ },
 
-/***/ "fs":
+/***/ "fs"
 /*!*********************!*\
   !*** external "fs" ***!
   \*********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("fs");
 
-/***/ }),
+/***/ },
 
-/***/ "http":
+/***/ "http"
 /*!***********************!*\
   !*** external "http" ***!
   \***********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("http");
 
-/***/ }),
+/***/ },
 
-/***/ "https":
+/***/ "https"
 /*!************************!*\
   !*** external "https" ***!
   \************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("https");
 
-/***/ }),
+/***/ },
 
-/***/ "module":
+/***/ "module"
 /*!*************************!*\
   !*** external "module" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("module");
 
-/***/ }),
+/***/ },
 
-/***/ "net":
+/***/ "net"
 /*!**********************!*\
   !*** external "net" ***!
   \**********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("net");
 
-/***/ }),
+/***/ },
 
-/***/ "os":
+/***/ "os"
 /*!*********************!*\
   !*** external "os" ***!
   \*********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("os");
 
-/***/ }),
+/***/ },
 
-/***/ "path":
+/***/ "path"
 /*!***********************!*\
   !*** external "path" ***!
   \***********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("path");
 
-/***/ }),
+/***/ },
 
-/***/ "stream":
+/***/ "stream"
 /*!*************************!*\
   !*** external "stream" ***!
   \*************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("stream");
 
-/***/ }),
+/***/ },
 
-/***/ "string_decoder":
+/***/ "string_decoder"
 /*!*********************************!*\
   !*** external "string_decoder" ***!
   \*********************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("string_decoder");
 
-/***/ }),
+/***/ },
 
-/***/ "tls":
+/***/ "tls"
 /*!**********************!*\
   !*** external "tls" ***!
   \**********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("tls");
 
-/***/ }),
+/***/ },
 
-/***/ "tty":
+/***/ "tty"
 /*!**********************!*\
   !*** external "tty" ***!
   \**********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("tty");
 
-/***/ }),
+/***/ },
 
-/***/ "url":
+/***/ "url"
 /*!**********************!*\
   !*** external "url" ***!
   \**********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("url");
 
-/***/ }),
+/***/ },
 
-/***/ "util":
+/***/ "util"
 /*!***********************!*\
   !*** external "util" ***!
   \***********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("util");
 
-/***/ }),
+/***/ },
 
-/***/ "zlib":
+/***/ "zlib"
 /*!***********************!*\
   !*** external "zlib" ***!
   \***********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = require("zlib");
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs":
+/***/ "../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs"
 /*!*************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/axios/dist/node/axios.cjs ***!
   \*************************************************************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+(module, __unused_webpack_exports, __webpack_require__) {
 
 "use strict";
-// Axios v1.7.9 Copyright (c) 2024 Matt Zabriskie and contributors
+/*! Axios v1.10.0 Copyright (c) 2025 Matt Zabriskie and contributors */
 
 
 const FormData$1 = __webpack_require__(/*! form-data */ "../scrypted-apocaliss-base/node_modules/form-data/lib/form_data.js");
+const crypto = __webpack_require__(/*! crypto */ "crypto");
 const url = __webpack_require__(/*! url */ "url");
 const proxyFromEnv = __webpack_require__(/*! proxy-from-env */ "../scrypted-apocaliss-base/node_modules/proxy-from-env/index.js");
 const http = __webpack_require__(/*! http */ "http");
@@ -76592,6 +77346,7 @@ const events = __webpack_require__(/*! events */ "events");
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
 const FormData__default = /*#__PURE__*/_interopDefaultLegacy(FormData$1);
+const crypto__default = /*#__PURE__*/_interopDefaultLegacy(crypto);
 const url__default = /*#__PURE__*/_interopDefaultLegacy(url);
 const proxyFromEnv__default = /*#__PURE__*/_interopDefaultLegacy(proxyFromEnv);
 const http__default = /*#__PURE__*/_interopDefaultLegacy(http);
@@ -76611,6 +77366,7 @@ function bind(fn, thisArg) {
 
 const {toString} = Object.prototype;
 const {getPrototypeOf} = Object;
+const {iterator, toStringTag} = Symbol;
 
 const kindOf = (cache => thing => {
     const str = toString.call(thing);
@@ -76737,7 +77493,7 @@ const isPlainObject = (val) => {
   }
 
   const prototype = getPrototypeOf(val);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in val) && !(Symbol.iterator in val);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(toStringTag in val) && !(iterator in val);
 };
 
 /**
@@ -77088,13 +77844,13 @@ const isTypedArray = (TypedArray => {
  * @returns {void}
  */
 const forEachEntry = (obj, fn) => {
-  const generator = obj && obj[Symbol.iterator];
+  const generator = obj && obj[iterator];
 
-  const iterator = generator.call(obj);
+  const _iterator = generator.call(obj);
 
   let result;
 
-  while ((result = iterator.next()) && !result.done) {
+  while ((result = _iterator.next()) && !result.done) {
     const pair = result.value;
     fn.call(obj, pair[0], pair[1]);
   }
@@ -77207,26 +77963,6 @@ const toFiniteNumber = (value, defaultValue) => {
   return value != null && Number.isFinite(value = +value) ? value : defaultValue;
 };
 
-const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
-
-const DIGIT = '0123456789';
-
-const ALPHABET = {
-  DIGIT,
-  ALPHA,
-  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT
-};
-
-const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
-  let str = '';
-  const {length} = alphabet;
-  while (size--) {
-    str += alphabet[Math.random() * length|0];
-  }
-
-  return str;
-};
-
 /**
  * If the thing is a FormData object, return true, otherwise return false.
  *
@@ -77235,7 +77971,7 @@ const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
  * @returns {boolean}
  */
 function isSpecCompliantForm(thing) {
-  return !!(thing && isFunction(thing.append) && thing[Symbol.toStringTag] === 'FormData' && thing[Symbol.iterator]);
+  return !!(thing && isFunction(thing.append) && thing[toStringTag] === 'FormData' && thing[iterator]);
 }
 
 const toJSONObject = (obj) => {
@@ -77304,6 +78040,10 @@ const asap = typeof queueMicrotask !== 'undefined' ?
 
 // *********************
 
+
+const isIterable = (thing) => thing != null && isFunction(thing[iterator]);
+
+
 const utils$1 = {
   isArray,
   isArrayBuffer,
@@ -77354,14 +78094,13 @@ const utils$1 = {
   findKey,
   global: _global,
   isContextDefined,
-  ALPHABET,
-  generateString,
   isSpecCompliantForm,
   toJSONObject,
   isAsyncFn,
   isThenable,
   setImmediate: _setImmediate,
-  asap
+  asap,
+  isIterable
 };
 
 /**
@@ -77575,6 +78314,10 @@ function toFormData(obj, formData, options) {
 
     if (utils$1.isDate(value)) {
       return value.toISOString();
+    }
+
+    if (utils$1.isBoolean(value)) {
+      return value.toString();
     }
 
     if (!useBlob && utils$1.isBlob(value)) {
@@ -77867,6 +78610,29 @@ const transitionalDefaults = {
 
 const URLSearchParams = url__default["default"].URLSearchParams;
 
+const ALPHA = 'abcdefghijklmnopqrstuvwxyz';
+
+const DIGIT = '0123456789';
+
+const ALPHABET = {
+  DIGIT,
+  ALPHA,
+  ALPHA_DIGIT: ALPHA + ALPHA.toUpperCase() + DIGIT
+};
+
+const generateString = (size = 16, alphabet = ALPHABET.ALPHA_DIGIT) => {
+  let str = '';
+  const {length} = alphabet;
+  const randomValues = new Uint32Array(size);
+  crypto__default["default"].randomFillSync(randomValues);
+  for (let i = 0; i < size; i++) {
+    str += alphabet[randomValues[i] % length];
+  }
+
+  return str;
+};
+
+
 const platform$1 = {
   isNode: true,
   classes: {
@@ -77874,6 +78640,8 @@ const platform$1 = {
     FormData: FormData__default["default"],
     Blob: typeof Blob !== 'undefined' && Blob || null
   },
+  ALPHABET,
+  generateString,
   protocols: [ 'http', 'https', 'file', 'data' ]
 };
 
@@ -78339,10 +79107,18 @@ class AxiosHeaders {
       setHeaders(header, valueOrRewrite);
     } else if(utils$1.isString(header) && (header = header.trim()) && !isValidHeaderName(header)) {
       setHeaders(parseHeaders(header), valueOrRewrite);
-    } else if (utils$1.isHeaders(header)) {
-      for (const [key, value] of header.entries()) {
-        setHeader(value, key, rewrite);
+    } else if (utils$1.isObject(header) && utils$1.isIterable(header)) {
+      let obj = {}, dest, key;
+      for (const entry of header) {
+        if (!utils$1.isArray(entry)) {
+          throw TypeError('Object iterator must return a key-value pair');
+        }
+
+        obj[key = entry[0]] = (dest = obj[key]) ?
+          (utils$1.isArray(dest) ? [...dest, entry[1]] : [dest, entry[1]]) : entry[1];
       }
+
+      setHeaders(obj, valueOrRewrite);
     } else {
       header != null && setHeader(valueOrRewrite, header, rewrite);
     }
@@ -78482,6 +79258,10 @@ class AxiosHeaders {
 
   toString() {
     return Object.entries(this.toJSON()).map(([header, value]) => header + ': ' + value).join('\n');
+  }
+
+  getSetCookie() {
+    return this.get("set-cookie") || [];
   }
 
   get [Symbol.toStringTag]() {
@@ -78648,14 +79428,15 @@ function combineURLs(baseURL, relativeURL) {
  *
  * @returns {string} The combined full path
  */
-function buildFullPath(baseURL, requestedURL) {
-  if (baseURL && !isAbsoluteURL(requestedURL)) {
+function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls) {
+  let isRelativeUrl = !isAbsoluteURL(requestedURL);
+  if (baseURL && (isRelativeUrl || allowAbsoluteUrls == false)) {
     return combineURLs(baseURL, requestedURL);
   }
   return requestedURL;
 }
 
-const VERSION = "1.7.9";
+const VERSION = "1.10.0";
 
 function parseProtocol(url) {
   const match = /^([-+\w]{1,25})(:?\/\/|:)/.exec(url);
@@ -78865,7 +79646,7 @@ const readBlob = async function* (blob) {
 
 const readBlob$1 = readBlob;
 
-const BOUNDARY_ALPHABET = utils$1.ALPHABET.ALPHA_DIGIT + '-_';
+const BOUNDARY_ALPHABET = platform.ALPHABET.ALPHA_DIGIT + '-_';
 
 const textEncoder = typeof TextEncoder === 'function' ? new TextEncoder() : new util__default["default"].TextEncoder();
 
@@ -78925,7 +79706,7 @@ const formDataToStream = (form, headersHandler, options) => {
   const {
     tag = 'form-data-boundary',
     size = 25,
-    boundary = tag + '-' + utils$1.generateString(size, BOUNDARY_ALPHABET)
+    boundary = tag + '-' + platform.generateString(size, BOUNDARY_ALPHABET)
   } = options || {};
 
   if(!utils$1.isFormData(form)) {
@@ -78937,7 +79718,7 @@ const formDataToStream = (form, headersHandler, options) => {
   }
 
   const boundaryBytes = textEncoder.encode('--' + boundary + CRLF);
-  const footerBytes = textEncoder.encode('--' + boundary + '--' + CRLF + CRLF);
+  const footerBytes = textEncoder.encode('--' + boundary + '--' + CRLF);
   let contentLength = footerBytes.byteLength;
 
   const parts = Array.from(form.entries()).map(([name, value]) => {
@@ -79350,7 +80131,7 @@ const httpAdapter = isHttpAdapterSupported && function httpAdapter(config) {
     }
 
     // Parse url
-    const fullPath = buildFullPath(config.baseURL, config.url);
+    const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     const parsed = new URL(fullPath, platform.hasBrowserEnv ? platform.origin : undefined);
     const protocol = parsed.protocol || supportedProtocols[0];
 
@@ -79973,7 +80754,7 @@ const resolveConfig = (config) => {
 
   newConfig.headers = headers = AxiosHeaders$1.from(headers);
 
-  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url), config.params, config.paramsSerializer);
+  newConfig.url = buildURL(buildFullPath(newConfig.baseURL, newConfig.url, newConfig.allowAbsoluteUrls), config.params, config.paramsSerializer);
 
   // HTTP basic authentication
   if (auth) {
@@ -80492,7 +81273,7 @@ const fetchAdapter = isFetchSupported && (async (config) => {
       credentials: isCredentialsSupported ? withCredentials : undefined
     });
 
-    let response = await fetch(request);
+    let response = await fetch(request, fetchOptions);
 
     const isStreamResponse = supportsResponseStream && (responseType === 'stream' || responseType === 'response');
 
@@ -80538,7 +81319,7 @@ const fetchAdapter = isFetchSupported && (async (config) => {
   } catch (err) {
     unsubscribe && unsubscribe();
 
-    if (err && err.name === 'TypeError' && /fetch/i.test(err.message)) {
+    if (err && err.name === 'TypeError' && /Load failed|fetch/i.test(err.message)) {
       throw Object.assign(
         new AxiosError('Network Error', AxiosError.ERR_NETWORK, config, request),
         {
@@ -80804,7 +81585,7 @@ const validators = validator.validators;
  */
 class Axios {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
       response: new InterceptorManager$1()
@@ -80879,6 +81660,13 @@ class Axios {
           serialize: validators.function
         }, true);
       }
+    }
+
+    // Set config.allowAbsoluteUrls
+    if (config.allowAbsoluteUrls !== undefined) ; else if (this.defaults.allowAbsoluteUrls !== undefined) {
+      config.allowAbsoluteUrls = this.defaults.allowAbsoluteUrls;
+    } else {
+      config.allowAbsoluteUrls = true;
     }
 
     validator.assertOptions(config, {
@@ -80976,7 +81764,7 @@ class Axios {
 
   getUri(config) {
     config = mergeConfig(this.defaults, config);
-    const fullPath = buildFullPath(config.baseURL, config.url);
+    const fullPath = buildFullPath(config.baseURL, config.url, config.allowAbsoluteUrls);
     return buildURL(fullPath, config.params, config.paramsSerializer);
   }
 }
@@ -81329,13 +82117,13 @@ module.exports = axios;
 //# sourceMappingURL=axios.cjs.map
 
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/node_modules/lru-cache/dist/commonjs/index.js":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/node_modules/lru-cache/dist/commonjs/index.js"
 /*!**************************************************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/node_modules/lru-cache/dist/commonjs/index.js ***!
   \**************************************************************************************************/
-/***/ ((__unused_webpack_module, exports) => {
+(__unused_webpack_module, exports) {
 
 "use strict";
 
@@ -82885,61 +83673,67 @@ class LRUCache {
 exports.LRUCache = LRUCache;
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mime-db/db.json":
+/***/ "../scrypted-apocaliss-base/node_modules/mime-db/db.json"
 /*!***************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mime-db/db.json ***!
   \***************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = /*#__PURE__*/JSON.parse('{"application/1d-interleaved-parityfec":{"source":"iana"},"application/3gpdash-qoe-report+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/3gpp-ims+xml":{"source":"iana","compressible":true},"application/3gpphal+json":{"source":"iana","compressible":true},"application/3gpphalforms+json":{"source":"iana","compressible":true},"application/a2l":{"source":"iana"},"application/ace+cbor":{"source":"iana"},"application/activemessage":{"source":"iana"},"application/activity+json":{"source":"iana","compressible":true},"application/alto-costmap+json":{"source":"iana","compressible":true},"application/alto-costmapfilter+json":{"source":"iana","compressible":true},"application/alto-directory+json":{"source":"iana","compressible":true},"application/alto-endpointcost+json":{"source":"iana","compressible":true},"application/alto-endpointcostparams+json":{"source":"iana","compressible":true},"application/alto-endpointprop+json":{"source":"iana","compressible":true},"application/alto-endpointpropparams+json":{"source":"iana","compressible":true},"application/alto-error+json":{"source":"iana","compressible":true},"application/alto-networkmap+json":{"source":"iana","compressible":true},"application/alto-networkmapfilter+json":{"source":"iana","compressible":true},"application/alto-updatestreamcontrol+json":{"source":"iana","compressible":true},"application/alto-updatestreamparams+json":{"source":"iana","compressible":true},"application/aml":{"source":"iana"},"application/andrew-inset":{"source":"iana","extensions":["ez"]},"application/applefile":{"source":"iana"},"application/applixware":{"source":"apache","extensions":["aw"]},"application/at+jwt":{"source":"iana"},"application/atf":{"source":"iana"},"application/atfx":{"source":"iana"},"application/atom+xml":{"source":"iana","compressible":true,"extensions":["atom"]},"application/atomcat+xml":{"source":"iana","compressible":true,"extensions":["atomcat"]},"application/atomdeleted+xml":{"source":"iana","compressible":true,"extensions":["atomdeleted"]},"application/atomicmail":{"source":"iana"},"application/atomsvc+xml":{"source":"iana","compressible":true,"extensions":["atomsvc"]},"application/atsc-dwd+xml":{"source":"iana","compressible":true,"extensions":["dwd"]},"application/atsc-dynamic-event-message":{"source":"iana"},"application/atsc-held+xml":{"source":"iana","compressible":true,"extensions":["held"]},"application/atsc-rdt+json":{"source":"iana","compressible":true},"application/atsc-rsat+xml":{"source":"iana","compressible":true,"extensions":["rsat"]},"application/atxml":{"source":"iana"},"application/auth-policy+xml":{"source":"iana","compressible":true},"application/bacnet-xdd+zip":{"source":"iana","compressible":false},"application/batch-smtp":{"source":"iana"},"application/bdoc":{"compressible":false,"extensions":["bdoc"]},"application/beep+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/calendar+json":{"source":"iana","compressible":true},"application/calendar+xml":{"source":"iana","compressible":true,"extensions":["xcs"]},"application/call-completion":{"source":"iana"},"application/cals-1840":{"source":"iana"},"application/captive+json":{"source":"iana","compressible":true},"application/cbor":{"source":"iana"},"application/cbor-seq":{"source":"iana"},"application/cccex":{"source":"iana"},"application/ccmp+xml":{"source":"iana","compressible":true},"application/ccxml+xml":{"source":"iana","compressible":true,"extensions":["ccxml"]},"application/cdfx+xml":{"source":"iana","compressible":true,"extensions":["cdfx"]},"application/cdmi-capability":{"source":"iana","extensions":["cdmia"]},"application/cdmi-container":{"source":"iana","extensions":["cdmic"]},"application/cdmi-domain":{"source":"iana","extensions":["cdmid"]},"application/cdmi-object":{"source":"iana","extensions":["cdmio"]},"application/cdmi-queue":{"source":"iana","extensions":["cdmiq"]},"application/cdni":{"source":"iana"},"application/cea":{"source":"iana"},"application/cea-2018+xml":{"source":"iana","compressible":true},"application/cellml+xml":{"source":"iana","compressible":true},"application/cfw":{"source":"iana"},"application/city+json":{"source":"iana","compressible":true},"application/clr":{"source":"iana"},"application/clue+xml":{"source":"iana","compressible":true},"application/clue_info+xml":{"source":"iana","compressible":true},"application/cms":{"source":"iana"},"application/cnrp+xml":{"source":"iana","compressible":true},"application/coap-group+json":{"source":"iana","compressible":true},"application/coap-payload":{"source":"iana"},"application/commonground":{"source":"iana"},"application/conference-info+xml":{"source":"iana","compressible":true},"application/cose":{"source":"iana"},"application/cose-key":{"source":"iana"},"application/cose-key-set":{"source":"iana"},"application/cpl+xml":{"source":"iana","compressible":true,"extensions":["cpl"]},"application/csrattrs":{"source":"iana"},"application/csta+xml":{"source":"iana","compressible":true},"application/cstadata+xml":{"source":"iana","compressible":true},"application/csvm+json":{"source":"iana","compressible":true},"application/cu-seeme":{"source":"apache","extensions":["cu"]},"application/cwt":{"source":"iana"},"application/cybercash":{"source":"iana"},"application/dart":{"compressible":true},"application/dash+xml":{"source":"iana","compressible":true,"extensions":["mpd"]},"application/dash-patch+xml":{"source":"iana","compressible":true,"extensions":["mpp"]},"application/dashdelta":{"source":"iana"},"application/davmount+xml":{"source":"iana","compressible":true,"extensions":["davmount"]},"application/dca-rft":{"source":"iana"},"application/dcd":{"source":"iana"},"application/dec-dx":{"source":"iana"},"application/dialog-info+xml":{"source":"iana","compressible":true},"application/dicom":{"source":"iana"},"application/dicom+json":{"source":"iana","compressible":true},"application/dicom+xml":{"source":"iana","compressible":true},"application/dii":{"source":"iana"},"application/dit":{"source":"iana"},"application/dns":{"source":"iana"},"application/dns+json":{"source":"iana","compressible":true},"application/dns-message":{"source":"iana"},"application/docbook+xml":{"source":"apache","compressible":true,"extensions":["dbk"]},"application/dots+cbor":{"source":"iana"},"application/dskpp+xml":{"source":"iana","compressible":true},"application/dssc+der":{"source":"iana","extensions":["dssc"]},"application/dssc+xml":{"source":"iana","compressible":true,"extensions":["xdssc"]},"application/dvcs":{"source":"iana"},"application/ecmascript":{"source":"iana","compressible":true,"extensions":["es","ecma"]},"application/edi-consent":{"source":"iana"},"application/edi-x12":{"source":"iana","compressible":false},"application/edifact":{"source":"iana","compressible":false},"application/efi":{"source":"iana"},"application/elm+json":{"source":"iana","charset":"UTF-8","compressible":true},"application/elm+xml":{"source":"iana","compressible":true},"application/emergencycalldata.cap+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/emergencycalldata.comment+xml":{"source":"iana","compressible":true},"application/emergencycalldata.control+xml":{"source":"iana","compressible":true},"application/emergencycalldata.deviceinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.ecall.msd":{"source":"iana"},"application/emergencycalldata.providerinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.serviceinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.subscriberinfo+xml":{"source":"iana","compressible":true},"application/emergencycalldata.veds+xml":{"source":"iana","compressible":true},"application/emma+xml":{"source":"iana","compressible":true,"extensions":["emma"]},"application/emotionml+xml":{"source":"iana","compressible":true,"extensions":["emotionml"]},"application/encaprtp":{"source":"iana"},"application/epp+xml":{"source":"iana","compressible":true},"application/epub+zip":{"source":"iana","compressible":false,"extensions":["epub"]},"application/eshop":{"source":"iana"},"application/exi":{"source":"iana","extensions":["exi"]},"application/expect-ct-report+json":{"source":"iana","compressible":true},"application/express":{"source":"iana","extensions":["exp"]},"application/fastinfoset":{"source":"iana"},"application/fastsoap":{"source":"iana"},"application/fdt+xml":{"source":"iana","compressible":true,"extensions":["fdt"]},"application/fhir+json":{"source":"iana","charset":"UTF-8","compressible":true},"application/fhir+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/fido.trusted-apps+json":{"compressible":true},"application/fits":{"source":"iana"},"application/flexfec":{"source":"iana"},"application/font-sfnt":{"source":"iana"},"application/font-tdpfr":{"source":"iana","extensions":["pfr"]},"application/font-woff":{"source":"iana","compressible":false},"application/framework-attributes+xml":{"source":"iana","compressible":true},"application/geo+json":{"source":"iana","compressible":true,"extensions":["geojson"]},"application/geo+json-seq":{"source":"iana"},"application/geopackage+sqlite3":{"source":"iana"},"application/geoxacml+xml":{"source":"iana","compressible":true},"application/gltf-buffer":{"source":"iana"},"application/gml+xml":{"source":"iana","compressible":true,"extensions":["gml"]},"application/gpx+xml":{"source":"apache","compressible":true,"extensions":["gpx"]},"application/gxf":{"source":"apache","extensions":["gxf"]},"application/gzip":{"source":"iana","compressible":false,"extensions":["gz"]},"application/h224":{"source":"iana"},"application/held+xml":{"source":"iana","compressible":true},"application/hjson":{"extensions":["hjson"]},"application/http":{"source":"iana"},"application/hyperstudio":{"source":"iana","extensions":["stk"]},"application/ibe-key-request+xml":{"source":"iana","compressible":true},"application/ibe-pkg-reply+xml":{"source":"iana","compressible":true},"application/ibe-pp-data":{"source":"iana"},"application/iges":{"source":"iana"},"application/im-iscomposing+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/index":{"source":"iana"},"application/index.cmd":{"source":"iana"},"application/index.obj":{"source":"iana"},"application/index.response":{"source":"iana"},"application/index.vnd":{"source":"iana"},"application/inkml+xml":{"source":"iana","compressible":true,"extensions":["ink","inkml"]},"application/iotp":{"source":"iana"},"application/ipfix":{"source":"iana","extensions":["ipfix"]},"application/ipp":{"source":"iana"},"application/isup":{"source":"iana"},"application/its+xml":{"source":"iana","compressible":true,"extensions":["its"]},"application/java-archive":{"source":"apache","compressible":false,"extensions":["jar","war","ear"]},"application/java-serialized-object":{"source":"apache","compressible":false,"extensions":["ser"]},"application/java-vm":{"source":"apache","compressible":false,"extensions":["class"]},"application/javascript":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["js","mjs"]},"application/jf2feed+json":{"source":"iana","compressible":true},"application/jose":{"source":"iana"},"application/jose+json":{"source":"iana","compressible":true},"application/jrd+json":{"source":"iana","compressible":true},"application/jscalendar+json":{"source":"iana","compressible":true},"application/json":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["json","map"]},"application/json-patch+json":{"source":"iana","compressible":true},"application/json-seq":{"source":"iana"},"application/json5":{"extensions":["json5"]},"application/jsonml+json":{"source":"apache","compressible":true,"extensions":["jsonml"]},"application/jwk+json":{"source":"iana","compressible":true},"application/jwk-set+json":{"source":"iana","compressible":true},"application/jwt":{"source":"iana"},"application/kpml-request+xml":{"source":"iana","compressible":true},"application/kpml-response+xml":{"source":"iana","compressible":true},"application/ld+json":{"source":"iana","compressible":true,"extensions":["jsonld"]},"application/lgr+xml":{"source":"iana","compressible":true,"extensions":["lgr"]},"application/link-format":{"source":"iana"},"application/load-control+xml":{"source":"iana","compressible":true},"application/lost+xml":{"source":"iana","compressible":true,"extensions":["lostxml"]},"application/lostsync+xml":{"source":"iana","compressible":true},"application/lpf+zip":{"source":"iana","compressible":false},"application/lxf":{"source":"iana"},"application/mac-binhex40":{"source":"iana","extensions":["hqx"]},"application/mac-compactpro":{"source":"apache","extensions":["cpt"]},"application/macwriteii":{"source":"iana"},"application/mads+xml":{"source":"iana","compressible":true,"extensions":["mads"]},"application/manifest+json":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["webmanifest"]},"application/marc":{"source":"iana","extensions":["mrc"]},"application/marcxml+xml":{"source":"iana","compressible":true,"extensions":["mrcx"]},"application/mathematica":{"source":"iana","extensions":["ma","nb","mb"]},"application/mathml+xml":{"source":"iana","compressible":true,"extensions":["mathml"]},"application/mathml-content+xml":{"source":"iana","compressible":true},"application/mathml-presentation+xml":{"source":"iana","compressible":true},"application/mbms-associated-procedure-description+xml":{"source":"iana","compressible":true},"application/mbms-deregister+xml":{"source":"iana","compressible":true},"application/mbms-envelope+xml":{"source":"iana","compressible":true},"application/mbms-msk+xml":{"source":"iana","compressible":true},"application/mbms-msk-response+xml":{"source":"iana","compressible":true},"application/mbms-protection-description+xml":{"source":"iana","compressible":true},"application/mbms-reception-report+xml":{"source":"iana","compressible":true},"application/mbms-register+xml":{"source":"iana","compressible":true},"application/mbms-register-response+xml":{"source":"iana","compressible":true},"application/mbms-schedule+xml":{"source":"iana","compressible":true},"application/mbms-user-service-description+xml":{"source":"iana","compressible":true},"application/mbox":{"source":"iana","extensions":["mbox"]},"application/media-policy-dataset+xml":{"source":"iana","compressible":true,"extensions":["mpf"]},"application/media_control+xml":{"source":"iana","compressible":true},"application/mediaservercontrol+xml":{"source":"iana","compressible":true,"extensions":["mscml"]},"application/merge-patch+json":{"source":"iana","compressible":true},"application/metalink+xml":{"source":"apache","compressible":true,"extensions":["metalink"]},"application/metalink4+xml":{"source":"iana","compressible":true,"extensions":["meta4"]},"application/mets+xml":{"source":"iana","compressible":true,"extensions":["mets"]},"application/mf4":{"source":"iana"},"application/mikey":{"source":"iana"},"application/mipc":{"source":"iana"},"application/missing-blocks+cbor-seq":{"source":"iana"},"application/mmt-aei+xml":{"source":"iana","compressible":true,"extensions":["maei"]},"application/mmt-usd+xml":{"source":"iana","compressible":true,"extensions":["musd"]},"application/mods+xml":{"source":"iana","compressible":true,"extensions":["mods"]},"application/moss-keys":{"source":"iana"},"application/moss-signature":{"source":"iana"},"application/mosskey-data":{"source":"iana"},"application/mosskey-request":{"source":"iana"},"application/mp21":{"source":"iana","extensions":["m21","mp21"]},"application/mp4":{"source":"iana","extensions":["mp4s","m4p"]},"application/mpeg4-generic":{"source":"iana"},"application/mpeg4-iod":{"source":"iana"},"application/mpeg4-iod-xmt":{"source":"iana"},"application/mrb-consumer+xml":{"source":"iana","compressible":true},"application/mrb-publish+xml":{"source":"iana","compressible":true},"application/msc-ivr+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/msc-mixer+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/msword":{"source":"iana","compressible":false,"extensions":["doc","dot"]},"application/mud+json":{"source":"iana","compressible":true},"application/multipart-core":{"source":"iana"},"application/mxf":{"source":"iana","extensions":["mxf"]},"application/n-quads":{"source":"iana","extensions":["nq"]},"application/n-triples":{"source":"iana","extensions":["nt"]},"application/nasdata":{"source":"iana"},"application/news-checkgroups":{"source":"iana","charset":"US-ASCII"},"application/news-groupinfo":{"source":"iana","charset":"US-ASCII"},"application/news-transmission":{"source":"iana"},"application/nlsml+xml":{"source":"iana","compressible":true},"application/node":{"source":"iana","extensions":["cjs"]},"application/nss":{"source":"iana"},"application/oauth-authz-req+jwt":{"source":"iana"},"application/oblivious-dns-message":{"source":"iana"},"application/ocsp-request":{"source":"iana"},"application/ocsp-response":{"source":"iana"},"application/octet-stream":{"source":"iana","compressible":false,"extensions":["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy","exe","dll","deb","dmg","iso","img","msi","msp","msm","buffer"]},"application/oda":{"source":"iana","extensions":["oda"]},"application/odm+xml":{"source":"iana","compressible":true},"application/odx":{"source":"iana"},"application/oebps-package+xml":{"source":"iana","compressible":true,"extensions":["opf"]},"application/ogg":{"source":"iana","compressible":false,"extensions":["ogx"]},"application/omdoc+xml":{"source":"apache","compressible":true,"extensions":["omdoc"]},"application/onenote":{"source":"apache","extensions":["onetoc","onetoc2","onetmp","onepkg"]},"application/opc-nodeset+xml":{"source":"iana","compressible":true},"application/oscore":{"source":"iana"},"application/oxps":{"source":"iana","extensions":["oxps"]},"application/p21":{"source":"iana"},"application/p21+zip":{"source":"iana","compressible":false},"application/p2p-overlay+xml":{"source":"iana","compressible":true,"extensions":["relo"]},"application/parityfec":{"source":"iana"},"application/passport":{"source":"iana"},"application/patch-ops-error+xml":{"source":"iana","compressible":true,"extensions":["xer"]},"application/pdf":{"source":"iana","compressible":false,"extensions":["pdf"]},"application/pdx":{"source":"iana"},"application/pem-certificate-chain":{"source":"iana"},"application/pgp-encrypted":{"source":"iana","compressible":false,"extensions":["pgp"]},"application/pgp-keys":{"source":"iana","extensions":["asc"]},"application/pgp-signature":{"source":"iana","extensions":["asc","sig"]},"application/pics-rules":{"source":"apache","extensions":["prf"]},"application/pidf+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/pidf-diff+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/pkcs10":{"source":"iana","extensions":["p10"]},"application/pkcs12":{"source":"iana"},"application/pkcs7-mime":{"source":"iana","extensions":["p7m","p7c"]},"application/pkcs7-signature":{"source":"iana","extensions":["p7s"]},"application/pkcs8":{"source":"iana","extensions":["p8"]},"application/pkcs8-encrypted":{"source":"iana"},"application/pkix-attr-cert":{"source":"iana","extensions":["ac"]},"application/pkix-cert":{"source":"iana","extensions":["cer"]},"application/pkix-crl":{"source":"iana","extensions":["crl"]},"application/pkix-pkipath":{"source":"iana","extensions":["pkipath"]},"application/pkixcmp":{"source":"iana","extensions":["pki"]},"application/pls+xml":{"source":"iana","compressible":true,"extensions":["pls"]},"application/poc-settings+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/postscript":{"source":"iana","compressible":true,"extensions":["ai","eps","ps"]},"application/ppsp-tracker+json":{"source":"iana","compressible":true},"application/problem+json":{"source":"iana","compressible":true},"application/problem+xml":{"source":"iana","compressible":true},"application/provenance+xml":{"source":"iana","compressible":true,"extensions":["provx"]},"application/prs.alvestrand.titrax-sheet":{"source":"iana"},"application/prs.cww":{"source":"iana","extensions":["cww"]},"application/prs.cyn":{"source":"iana","charset":"7-BIT"},"application/prs.hpub+zip":{"source":"iana","compressible":false},"application/prs.nprend":{"source":"iana"},"application/prs.plucker":{"source":"iana"},"application/prs.rdf-xml-crypt":{"source":"iana"},"application/prs.xsf+xml":{"source":"iana","compressible":true},"application/pskc+xml":{"source":"iana","compressible":true,"extensions":["pskcxml"]},"application/pvd+json":{"source":"iana","compressible":true},"application/qsig":{"source":"iana"},"application/raml+yaml":{"compressible":true,"extensions":["raml"]},"application/raptorfec":{"source":"iana"},"application/rdap+json":{"source":"iana","compressible":true},"application/rdf+xml":{"source":"iana","compressible":true,"extensions":["rdf","owl"]},"application/reginfo+xml":{"source":"iana","compressible":true,"extensions":["rif"]},"application/relax-ng-compact-syntax":{"source":"iana","extensions":["rnc"]},"application/remote-printing":{"source":"iana"},"application/reputon+json":{"source":"iana","compressible":true},"application/resource-lists+xml":{"source":"iana","compressible":true,"extensions":["rl"]},"application/resource-lists-diff+xml":{"source":"iana","compressible":true,"extensions":["rld"]},"application/rfc+xml":{"source":"iana","compressible":true},"application/riscos":{"source":"iana"},"application/rlmi+xml":{"source":"iana","compressible":true},"application/rls-services+xml":{"source":"iana","compressible":true,"extensions":["rs"]},"application/route-apd+xml":{"source":"iana","compressible":true,"extensions":["rapd"]},"application/route-s-tsid+xml":{"source":"iana","compressible":true,"extensions":["sls"]},"application/route-usd+xml":{"source":"iana","compressible":true,"extensions":["rusd"]},"application/rpki-ghostbusters":{"source":"iana","extensions":["gbr"]},"application/rpki-manifest":{"source":"iana","extensions":["mft"]},"application/rpki-publication":{"source":"iana"},"application/rpki-roa":{"source":"iana","extensions":["roa"]},"application/rpki-updown":{"source":"iana"},"application/rsd+xml":{"source":"apache","compressible":true,"extensions":["rsd"]},"application/rss+xml":{"source":"apache","compressible":true,"extensions":["rss"]},"application/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"application/rtploopback":{"source":"iana"},"application/rtx":{"source":"iana"},"application/samlassertion+xml":{"source":"iana","compressible":true},"application/samlmetadata+xml":{"source":"iana","compressible":true},"application/sarif+json":{"source":"iana","compressible":true},"application/sarif-external-properties+json":{"source":"iana","compressible":true},"application/sbe":{"source":"iana"},"application/sbml+xml":{"source":"iana","compressible":true,"extensions":["sbml"]},"application/scaip+xml":{"source":"iana","compressible":true},"application/scim+json":{"source":"iana","compressible":true},"application/scvp-cv-request":{"source":"iana","extensions":["scq"]},"application/scvp-cv-response":{"source":"iana","extensions":["scs"]},"application/scvp-vp-request":{"source":"iana","extensions":["spq"]},"application/scvp-vp-response":{"source":"iana","extensions":["spp"]},"application/sdp":{"source":"iana","extensions":["sdp"]},"application/secevent+jwt":{"source":"iana"},"application/senml+cbor":{"source":"iana"},"application/senml+json":{"source":"iana","compressible":true},"application/senml+xml":{"source":"iana","compressible":true,"extensions":["senmlx"]},"application/senml-etch+cbor":{"source":"iana"},"application/senml-etch+json":{"source":"iana","compressible":true},"application/senml-exi":{"source":"iana"},"application/sensml+cbor":{"source":"iana"},"application/sensml+json":{"source":"iana","compressible":true},"application/sensml+xml":{"source":"iana","compressible":true,"extensions":["sensmlx"]},"application/sensml-exi":{"source":"iana"},"application/sep+xml":{"source":"iana","compressible":true},"application/sep-exi":{"source":"iana"},"application/session-info":{"source":"iana"},"application/set-payment":{"source":"iana"},"application/set-payment-initiation":{"source":"iana","extensions":["setpay"]},"application/set-registration":{"source":"iana"},"application/set-registration-initiation":{"source":"iana","extensions":["setreg"]},"application/sgml":{"source":"iana"},"application/sgml-open-catalog":{"source":"iana"},"application/shf+xml":{"source":"iana","compressible":true,"extensions":["shf"]},"application/sieve":{"source":"iana","extensions":["siv","sieve"]},"application/simple-filter+xml":{"source":"iana","compressible":true},"application/simple-message-summary":{"source":"iana"},"application/simplesymbolcontainer":{"source":"iana"},"application/sipc":{"source":"iana"},"application/slate":{"source":"iana"},"application/smil":{"source":"iana"},"application/smil+xml":{"source":"iana","compressible":true,"extensions":["smi","smil"]},"application/smpte336m":{"source":"iana"},"application/soap+fastinfoset":{"source":"iana"},"application/soap+xml":{"source":"iana","compressible":true},"application/sparql-query":{"source":"iana","extensions":["rq"]},"application/sparql-results+xml":{"source":"iana","compressible":true,"extensions":["srx"]},"application/spdx+json":{"source":"iana","compressible":true},"application/spirits-event+xml":{"source":"iana","compressible":true},"application/sql":{"source":"iana"},"application/srgs":{"source":"iana","extensions":["gram"]},"application/srgs+xml":{"source":"iana","compressible":true,"extensions":["grxml"]},"application/sru+xml":{"source":"iana","compressible":true,"extensions":["sru"]},"application/ssdl+xml":{"source":"apache","compressible":true,"extensions":["ssdl"]},"application/ssml+xml":{"source":"iana","compressible":true,"extensions":["ssml"]},"application/stix+json":{"source":"iana","compressible":true},"application/swid+xml":{"source":"iana","compressible":true,"extensions":["swidtag"]},"application/tamp-apex-update":{"source":"iana"},"application/tamp-apex-update-confirm":{"source":"iana"},"application/tamp-community-update":{"source":"iana"},"application/tamp-community-update-confirm":{"source":"iana"},"application/tamp-error":{"source":"iana"},"application/tamp-sequence-adjust":{"source":"iana"},"application/tamp-sequence-adjust-confirm":{"source":"iana"},"application/tamp-status-query":{"source":"iana"},"application/tamp-status-response":{"source":"iana"},"application/tamp-update":{"source":"iana"},"application/tamp-update-confirm":{"source":"iana"},"application/tar":{"compressible":true},"application/taxii+json":{"source":"iana","compressible":true},"application/td+json":{"source":"iana","compressible":true},"application/tei+xml":{"source":"iana","compressible":true,"extensions":["tei","teicorpus"]},"application/tetra_isi":{"source":"iana"},"application/thraud+xml":{"source":"iana","compressible":true,"extensions":["tfi"]},"application/timestamp-query":{"source":"iana"},"application/timestamp-reply":{"source":"iana"},"application/timestamped-data":{"source":"iana","extensions":["tsd"]},"application/tlsrpt+gzip":{"source":"iana"},"application/tlsrpt+json":{"source":"iana","compressible":true},"application/tnauthlist":{"source":"iana"},"application/token-introspection+jwt":{"source":"iana"},"application/toml":{"compressible":true,"extensions":["toml"]},"application/trickle-ice-sdpfrag":{"source":"iana"},"application/trig":{"source":"iana","extensions":["trig"]},"application/ttml+xml":{"source":"iana","compressible":true,"extensions":["ttml"]},"application/tve-trigger":{"source":"iana"},"application/tzif":{"source":"iana"},"application/tzif-leap":{"source":"iana"},"application/ubjson":{"compressible":false,"extensions":["ubj"]},"application/ulpfec":{"source":"iana"},"application/urc-grpsheet+xml":{"source":"iana","compressible":true},"application/urc-ressheet+xml":{"source":"iana","compressible":true,"extensions":["rsheet"]},"application/urc-targetdesc+xml":{"source":"iana","compressible":true,"extensions":["td"]},"application/urc-uisocketdesc+xml":{"source":"iana","compressible":true},"application/vcard+json":{"source":"iana","compressible":true},"application/vcard+xml":{"source":"iana","compressible":true},"application/vemmi":{"source":"iana"},"application/vividence.scriptfile":{"source":"apache"},"application/vnd.1000minds.decision-model+xml":{"source":"iana","compressible":true,"extensions":["1km"]},"application/vnd.3gpp-prose+xml":{"source":"iana","compressible":true},"application/vnd.3gpp-prose-pc3ch+xml":{"source":"iana","compressible":true},"application/vnd.3gpp-v2x-local-service-information":{"source":"iana"},"application/vnd.3gpp.5gnas":{"source":"iana"},"application/vnd.3gpp.access-transfer-events+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.bsf+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.gmop+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.gtpc":{"source":"iana"},"application/vnd.3gpp.interworking-data":{"source":"iana"},"application/vnd.3gpp.lpp":{"source":"iana"},"application/vnd.3gpp.mc-signalling-ear":{"source":"iana"},"application/vnd.3gpp.mcdata-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-payload":{"source":"iana"},"application/vnd.3gpp.mcdata-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-signalling":{"source":"iana"},"application/vnd.3gpp.mcdata-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcdata-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-floor-request+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-location-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-mbms-usage-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-signed+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-ue-init-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcptt-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-affiliation-command+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-affiliation-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-location-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-mbms-usage-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-service-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-transmission-request+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-ue-config+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mcvideo-user-profile+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.mid-call+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.ngap":{"source":"iana"},"application/vnd.3gpp.pfcp":{"source":"iana"},"application/vnd.3gpp.pic-bw-large":{"source":"iana","extensions":["plb"]},"application/vnd.3gpp.pic-bw-small":{"source":"iana","extensions":["psb"]},"application/vnd.3gpp.pic-bw-var":{"source":"iana","extensions":["pvb"]},"application/vnd.3gpp.s1ap":{"source":"iana"},"application/vnd.3gpp.sms":{"source":"iana"},"application/vnd.3gpp.sms+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.srvcc-ext+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.srvcc-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.state-and-event-info+xml":{"source":"iana","compressible":true},"application/vnd.3gpp.ussd+xml":{"source":"iana","compressible":true},"application/vnd.3gpp2.bcmcsinfo+xml":{"source":"iana","compressible":true},"application/vnd.3gpp2.sms":{"source":"iana"},"application/vnd.3gpp2.tcap":{"source":"iana","extensions":["tcap"]},"application/vnd.3lightssoftware.imagescal":{"source":"iana"},"application/vnd.3m.post-it-notes":{"source":"iana","extensions":["pwn"]},"application/vnd.accpac.simply.aso":{"source":"iana","extensions":["aso"]},"application/vnd.accpac.simply.imp":{"source":"iana","extensions":["imp"]},"application/vnd.acucobol":{"source":"iana","extensions":["acu"]},"application/vnd.acucorp":{"source":"iana","extensions":["atc","acutc"]},"application/vnd.adobe.air-application-installer-package+zip":{"source":"apache","compressible":false,"extensions":["air"]},"application/vnd.adobe.flash.movie":{"source":"iana"},"application/vnd.adobe.formscentral.fcdt":{"source":"iana","extensions":["fcdt"]},"application/vnd.adobe.fxp":{"source":"iana","extensions":["fxp","fxpl"]},"application/vnd.adobe.partial-upload":{"source":"iana"},"application/vnd.adobe.xdp+xml":{"source":"iana","compressible":true,"extensions":["xdp"]},"application/vnd.adobe.xfdf":{"source":"iana","extensions":["xfdf"]},"application/vnd.aether.imp":{"source":"iana"},"application/vnd.afpc.afplinedata":{"source":"iana"},"application/vnd.afpc.afplinedata-pagedef":{"source":"iana"},"application/vnd.afpc.cmoca-cmresource":{"source":"iana"},"application/vnd.afpc.foca-charset":{"source":"iana"},"application/vnd.afpc.foca-codedfont":{"source":"iana"},"application/vnd.afpc.foca-codepage":{"source":"iana"},"application/vnd.afpc.modca":{"source":"iana"},"application/vnd.afpc.modca-cmtable":{"source":"iana"},"application/vnd.afpc.modca-formdef":{"source":"iana"},"application/vnd.afpc.modca-mediummap":{"source":"iana"},"application/vnd.afpc.modca-objectcontainer":{"source":"iana"},"application/vnd.afpc.modca-overlay":{"source":"iana"},"application/vnd.afpc.modca-pagesegment":{"source":"iana"},"application/vnd.age":{"source":"iana","extensions":["age"]},"application/vnd.ah-barcode":{"source":"iana"},"application/vnd.ahead.space":{"source":"iana","extensions":["ahead"]},"application/vnd.airzip.filesecure.azf":{"source":"iana","extensions":["azf"]},"application/vnd.airzip.filesecure.azs":{"source":"iana","extensions":["azs"]},"application/vnd.amadeus+json":{"source":"iana","compressible":true},"application/vnd.amazon.ebook":{"source":"apache","extensions":["azw"]},"application/vnd.amazon.mobi8-ebook":{"source":"iana"},"application/vnd.americandynamics.acc":{"source":"iana","extensions":["acc"]},"application/vnd.amiga.ami":{"source":"iana","extensions":["ami"]},"application/vnd.amundsen.maze+xml":{"source":"iana","compressible":true},"application/vnd.android.ota":{"source":"iana"},"application/vnd.android.package-archive":{"source":"apache","compressible":false,"extensions":["apk"]},"application/vnd.anki":{"source":"iana"},"application/vnd.anser-web-certificate-issue-initiation":{"source":"iana","extensions":["cii"]},"application/vnd.anser-web-funds-transfer-initiation":{"source":"apache","extensions":["fti"]},"application/vnd.antix.game-component":{"source":"iana","extensions":["atx"]},"application/vnd.apache.arrow.file":{"source":"iana"},"application/vnd.apache.arrow.stream":{"source":"iana"},"application/vnd.apache.thrift.binary":{"source":"iana"},"application/vnd.apache.thrift.compact":{"source":"iana"},"application/vnd.apache.thrift.json":{"source":"iana"},"application/vnd.api+json":{"source":"iana","compressible":true},"application/vnd.aplextor.warrp+json":{"source":"iana","compressible":true},"application/vnd.apothekende.reservation+json":{"source":"iana","compressible":true},"application/vnd.apple.installer+xml":{"source":"iana","compressible":true,"extensions":["mpkg"]},"application/vnd.apple.keynote":{"source":"iana","extensions":["key"]},"application/vnd.apple.mpegurl":{"source":"iana","extensions":["m3u8"]},"application/vnd.apple.numbers":{"source":"iana","extensions":["numbers"]},"application/vnd.apple.pages":{"source":"iana","extensions":["pages"]},"application/vnd.apple.pkpass":{"compressible":false,"extensions":["pkpass"]},"application/vnd.arastra.swi":{"source":"iana"},"application/vnd.aristanetworks.swi":{"source":"iana","extensions":["swi"]},"application/vnd.artisan+json":{"source":"iana","compressible":true},"application/vnd.artsquare":{"source":"iana"},"application/vnd.astraea-software.iota":{"source":"iana","extensions":["iota"]},"application/vnd.audiograph":{"source":"iana","extensions":["aep"]},"application/vnd.autopackage":{"source":"iana"},"application/vnd.avalon+json":{"source":"iana","compressible":true},"application/vnd.avistar+xml":{"source":"iana","compressible":true},"application/vnd.balsamiq.bmml+xml":{"source":"iana","compressible":true,"extensions":["bmml"]},"application/vnd.balsamiq.bmpr":{"source":"iana"},"application/vnd.banana-accounting":{"source":"iana"},"application/vnd.bbf.usp.error":{"source":"iana"},"application/vnd.bbf.usp.msg":{"source":"iana"},"application/vnd.bbf.usp.msg+json":{"source":"iana","compressible":true},"application/vnd.bekitzur-stech+json":{"source":"iana","compressible":true},"application/vnd.bint.med-content":{"source":"iana"},"application/vnd.biopax.rdf+xml":{"source":"iana","compressible":true},"application/vnd.blink-idb-value-wrapper":{"source":"iana"},"application/vnd.blueice.multipass":{"source":"iana","extensions":["mpm"]},"application/vnd.bluetooth.ep.oob":{"source":"iana"},"application/vnd.bluetooth.le.oob":{"source":"iana"},"application/vnd.bmi":{"source":"iana","extensions":["bmi"]},"application/vnd.bpf":{"source":"iana"},"application/vnd.bpf3":{"source":"iana"},"application/vnd.businessobjects":{"source":"iana","extensions":["rep"]},"application/vnd.byu.uapi+json":{"source":"iana","compressible":true},"application/vnd.cab-jscript":{"source":"iana"},"application/vnd.canon-cpdl":{"source":"iana"},"application/vnd.canon-lips":{"source":"iana"},"application/vnd.capasystems-pg+json":{"source":"iana","compressible":true},"application/vnd.cendio.thinlinc.clientconf":{"source":"iana"},"application/vnd.century-systems.tcp_stream":{"source":"iana"},"application/vnd.chemdraw+xml":{"source":"iana","compressible":true,"extensions":["cdxml"]},"application/vnd.chess-pgn":{"source":"iana"},"application/vnd.chipnuts.karaoke-mmd":{"source":"iana","extensions":["mmd"]},"application/vnd.ciedi":{"source":"iana"},"application/vnd.cinderella":{"source":"iana","extensions":["cdy"]},"application/vnd.cirpack.isdn-ext":{"source":"iana"},"application/vnd.citationstyles.style+xml":{"source":"iana","compressible":true,"extensions":["csl"]},"application/vnd.claymore":{"source":"iana","extensions":["cla"]},"application/vnd.cloanto.rp9":{"source":"iana","extensions":["rp9"]},"application/vnd.clonk.c4group":{"source":"iana","extensions":["c4g","c4d","c4f","c4p","c4u"]},"application/vnd.cluetrust.cartomobile-config":{"source":"iana","extensions":["c11amc"]},"application/vnd.cluetrust.cartomobile-config-pkg":{"source":"iana","extensions":["c11amz"]},"application/vnd.coffeescript":{"source":"iana"},"application/vnd.collabio.xodocuments.document":{"source":"iana"},"application/vnd.collabio.xodocuments.document-template":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation-template":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet-template":{"source":"iana"},"application/vnd.collection+json":{"source":"iana","compressible":true},"application/vnd.collection.doc+json":{"source":"iana","compressible":true},"application/vnd.collection.next+json":{"source":"iana","compressible":true},"application/vnd.comicbook+zip":{"source":"iana","compressible":false},"application/vnd.comicbook-rar":{"source":"iana"},"application/vnd.commerce-battelle":{"source":"iana"},"application/vnd.commonspace":{"source":"iana","extensions":["csp"]},"application/vnd.contact.cmsg":{"source":"iana","extensions":["cdbcmsg"]},"application/vnd.coreos.ignition+json":{"source":"iana","compressible":true},"application/vnd.cosmocaller":{"source":"iana","extensions":["cmc"]},"application/vnd.crick.clicker":{"source":"iana","extensions":["clkx"]},"application/vnd.crick.clicker.keyboard":{"source":"iana","extensions":["clkk"]},"application/vnd.crick.clicker.palette":{"source":"iana","extensions":["clkp"]},"application/vnd.crick.clicker.template":{"source":"iana","extensions":["clkt"]},"application/vnd.crick.clicker.wordbank":{"source":"iana","extensions":["clkw"]},"application/vnd.criticaltools.wbs+xml":{"source":"iana","compressible":true,"extensions":["wbs"]},"application/vnd.cryptii.pipe+json":{"source":"iana","compressible":true},"application/vnd.crypto-shade-file":{"source":"iana"},"application/vnd.cryptomator.encrypted":{"source":"iana"},"application/vnd.cryptomator.vault":{"source":"iana"},"application/vnd.ctc-posml":{"source":"iana","extensions":["pml"]},"application/vnd.ctct.ws+xml":{"source":"iana","compressible":true},"application/vnd.cups-pdf":{"source":"iana"},"application/vnd.cups-postscript":{"source":"iana"},"application/vnd.cups-ppd":{"source":"iana","extensions":["ppd"]},"application/vnd.cups-raster":{"source":"iana"},"application/vnd.cups-raw":{"source":"iana"},"application/vnd.curl":{"source":"iana"},"application/vnd.curl.car":{"source":"apache","extensions":["car"]},"application/vnd.curl.pcurl":{"source":"apache","extensions":["pcurl"]},"application/vnd.cyan.dean.root+xml":{"source":"iana","compressible":true},"application/vnd.cybank":{"source":"iana"},"application/vnd.cyclonedx+json":{"source":"iana","compressible":true},"application/vnd.cyclonedx+xml":{"source":"iana","compressible":true},"application/vnd.d2l.coursepackage1p0+zip":{"source":"iana","compressible":false},"application/vnd.d3m-dataset":{"source":"iana"},"application/vnd.d3m-problem":{"source":"iana"},"application/vnd.dart":{"source":"iana","compressible":true,"extensions":["dart"]},"application/vnd.data-vision.rdz":{"source":"iana","extensions":["rdz"]},"application/vnd.datapackage+json":{"source":"iana","compressible":true},"application/vnd.dataresource+json":{"source":"iana","compressible":true},"application/vnd.dbf":{"source":"iana","extensions":["dbf"]},"application/vnd.debian.binary-package":{"source":"iana"},"application/vnd.dece.data":{"source":"iana","extensions":["uvf","uvvf","uvd","uvvd"]},"application/vnd.dece.ttml+xml":{"source":"iana","compressible":true,"extensions":["uvt","uvvt"]},"application/vnd.dece.unspecified":{"source":"iana","extensions":["uvx","uvvx"]},"application/vnd.dece.zip":{"source":"iana","extensions":["uvz","uvvz"]},"application/vnd.denovo.fcselayout-link":{"source":"iana","extensions":["fe_launch"]},"application/vnd.desmume.movie":{"source":"iana"},"application/vnd.dir-bi.plate-dl-nosuffix":{"source":"iana"},"application/vnd.dm.delegation+xml":{"source":"iana","compressible":true},"application/vnd.dna":{"source":"iana","extensions":["dna"]},"application/vnd.document+json":{"source":"iana","compressible":true},"application/vnd.dolby.mlp":{"source":"apache","extensions":["mlp"]},"application/vnd.dolby.mobile.1":{"source":"iana"},"application/vnd.dolby.mobile.2":{"source":"iana"},"application/vnd.doremir.scorecloud-binary-document":{"source":"iana"},"application/vnd.dpgraph":{"source":"iana","extensions":["dpg"]},"application/vnd.dreamfactory":{"source":"iana","extensions":["dfac"]},"application/vnd.drive+json":{"source":"iana","compressible":true},"application/vnd.ds-keypoint":{"source":"apache","extensions":["kpxx"]},"application/vnd.dtg.local":{"source":"iana"},"application/vnd.dtg.local.flash":{"source":"iana"},"application/vnd.dtg.local.html":{"source":"iana"},"application/vnd.dvb.ait":{"source":"iana","extensions":["ait"]},"application/vnd.dvb.dvbisl+xml":{"source":"iana","compressible":true},"application/vnd.dvb.dvbj":{"source":"iana"},"application/vnd.dvb.esgcontainer":{"source":"iana"},"application/vnd.dvb.ipdcdftnotifaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess2":{"source":"iana"},"application/vnd.dvb.ipdcesgpdd":{"source":"iana"},"application/vnd.dvb.ipdcroaming":{"source":"iana"},"application/vnd.dvb.iptv.alfec-base":{"source":"iana"},"application/vnd.dvb.iptv.alfec-enhancement":{"source":"iana"},"application/vnd.dvb.notif-aggregate-root+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-container+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-generic+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-msglist+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-registration-request+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-ia-registration-response+xml":{"source":"iana","compressible":true},"application/vnd.dvb.notif-init+xml":{"source":"iana","compressible":true},"application/vnd.dvb.pfr":{"source":"iana"},"application/vnd.dvb.service":{"source":"iana","extensions":["svc"]},"application/vnd.dxr":{"source":"iana"},"application/vnd.dynageo":{"source":"iana","extensions":["geo"]},"application/vnd.dzr":{"source":"iana"},"application/vnd.easykaraoke.cdgdownload":{"source":"iana"},"application/vnd.ecdis-update":{"source":"iana"},"application/vnd.ecip.rlp":{"source":"iana"},"application/vnd.eclipse.ditto+json":{"source":"iana","compressible":true},"application/vnd.ecowin.chart":{"source":"iana","extensions":["mag"]},"application/vnd.ecowin.filerequest":{"source":"iana"},"application/vnd.ecowin.fileupdate":{"source":"iana"},"application/vnd.ecowin.series":{"source":"iana"},"application/vnd.ecowin.seriesrequest":{"source":"iana"},"application/vnd.ecowin.seriesupdate":{"source":"iana"},"application/vnd.efi.img":{"source":"iana"},"application/vnd.efi.iso":{"source":"iana"},"application/vnd.emclient.accessrequest+xml":{"source":"iana","compressible":true},"application/vnd.enliven":{"source":"iana","extensions":["nml"]},"application/vnd.enphase.envoy":{"source":"iana"},"application/vnd.eprints.data+xml":{"source":"iana","compressible":true},"application/vnd.epson.esf":{"source":"iana","extensions":["esf"]},"application/vnd.epson.msf":{"source":"iana","extensions":["msf"]},"application/vnd.epson.quickanime":{"source":"iana","extensions":["qam"]},"application/vnd.epson.salt":{"source":"iana","extensions":["slt"]},"application/vnd.epson.ssf":{"source":"iana","extensions":["ssf"]},"application/vnd.ericsson.quickcall":{"source":"iana"},"application/vnd.espass-espass+zip":{"source":"iana","compressible":false},"application/vnd.eszigno3+xml":{"source":"iana","compressible":true,"extensions":["es3","et3"]},"application/vnd.etsi.aoc+xml":{"source":"iana","compressible":true},"application/vnd.etsi.asic-e+zip":{"source":"iana","compressible":false},"application/vnd.etsi.asic-s+zip":{"source":"iana","compressible":false},"application/vnd.etsi.cug+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvcommand+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvdiscovery+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvprofile+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-bc+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-cod+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsad-npvr+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvservice+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvsync+xml":{"source":"iana","compressible":true},"application/vnd.etsi.iptvueprofile+xml":{"source":"iana","compressible":true},"application/vnd.etsi.mcid+xml":{"source":"iana","compressible":true},"application/vnd.etsi.mheg5":{"source":"iana"},"application/vnd.etsi.overload-control-policy-dataset+xml":{"source":"iana","compressible":true},"application/vnd.etsi.pstn+xml":{"source":"iana","compressible":true},"application/vnd.etsi.sci+xml":{"source":"iana","compressible":true},"application/vnd.etsi.simservs+xml":{"source":"iana","compressible":true},"application/vnd.etsi.timestamp-token":{"source":"iana"},"application/vnd.etsi.tsl+xml":{"source":"iana","compressible":true},"application/vnd.etsi.tsl.der":{"source":"iana"},"application/vnd.eu.kasparian.car+json":{"source":"iana","compressible":true},"application/vnd.eudora.data":{"source":"iana"},"application/vnd.evolv.ecig.profile":{"source":"iana"},"application/vnd.evolv.ecig.settings":{"source":"iana"},"application/vnd.evolv.ecig.theme":{"source":"iana"},"application/vnd.exstream-empower+zip":{"source":"iana","compressible":false},"application/vnd.exstream-package":{"source":"iana"},"application/vnd.ezpix-album":{"source":"iana","extensions":["ez2"]},"application/vnd.ezpix-package":{"source":"iana","extensions":["ez3"]},"application/vnd.f-secure.mobile":{"source":"iana"},"application/vnd.familysearch.gedcom+zip":{"source":"iana","compressible":false},"application/vnd.fastcopy-disk-image":{"source":"iana"},"application/vnd.fdf":{"source":"iana","extensions":["fdf"]},"application/vnd.fdsn.mseed":{"source":"iana","extensions":["mseed"]},"application/vnd.fdsn.seed":{"source":"iana","extensions":["seed","dataless"]},"application/vnd.ffsns":{"source":"iana"},"application/vnd.ficlab.flb+zip":{"source":"iana","compressible":false},"application/vnd.filmit.zfc":{"source":"iana"},"application/vnd.fints":{"source":"iana"},"application/vnd.firemonkeys.cloudcell":{"source":"iana"},"application/vnd.flographit":{"source":"iana","extensions":["gph"]},"application/vnd.fluxtime.clip":{"source":"iana","extensions":["ftc"]},"application/vnd.font-fontforge-sfd":{"source":"iana"},"application/vnd.framemaker":{"source":"iana","extensions":["fm","frame","maker","book"]},"application/vnd.frogans.fnc":{"source":"iana","extensions":["fnc"]},"application/vnd.frogans.ltf":{"source":"iana","extensions":["ltf"]},"application/vnd.fsc.weblaunch":{"source":"iana","extensions":["fsc"]},"application/vnd.fujifilm.fb.docuworks":{"source":"iana"},"application/vnd.fujifilm.fb.docuworks.binder":{"source":"iana"},"application/vnd.fujifilm.fb.docuworks.container":{"source":"iana"},"application/vnd.fujifilm.fb.jfi+xml":{"source":"iana","compressible":true},"application/vnd.fujitsu.oasys":{"source":"iana","extensions":["oas"]},"application/vnd.fujitsu.oasys2":{"source":"iana","extensions":["oa2"]},"application/vnd.fujitsu.oasys3":{"source":"iana","extensions":["oa3"]},"application/vnd.fujitsu.oasysgp":{"source":"iana","extensions":["fg5"]},"application/vnd.fujitsu.oasysprs":{"source":"iana","extensions":["bh2"]},"application/vnd.fujixerox.art-ex":{"source":"iana"},"application/vnd.fujixerox.art4":{"source":"iana"},"application/vnd.fujixerox.ddd":{"source":"iana","extensions":["ddd"]},"application/vnd.fujixerox.docuworks":{"source":"iana","extensions":["xdw"]},"application/vnd.fujixerox.docuworks.binder":{"source":"iana","extensions":["xbd"]},"application/vnd.fujixerox.docuworks.container":{"source":"iana"},"application/vnd.fujixerox.hbpl":{"source":"iana"},"application/vnd.fut-misnet":{"source":"iana"},"application/vnd.futoin+cbor":{"source":"iana"},"application/vnd.futoin+json":{"source":"iana","compressible":true},"application/vnd.fuzzysheet":{"source":"iana","extensions":["fzs"]},"application/vnd.genomatix.tuxedo":{"source":"iana","extensions":["txd"]},"application/vnd.gentics.grd+json":{"source":"iana","compressible":true},"application/vnd.geo+json":{"source":"iana","compressible":true},"application/vnd.geocube+xml":{"source":"iana","compressible":true},"application/vnd.geogebra.file":{"source":"iana","extensions":["ggb"]},"application/vnd.geogebra.slides":{"source":"iana"},"application/vnd.geogebra.tool":{"source":"iana","extensions":["ggt"]},"application/vnd.geometry-explorer":{"source":"iana","extensions":["gex","gre"]},"application/vnd.geonext":{"source":"iana","extensions":["gxt"]},"application/vnd.geoplan":{"source":"iana","extensions":["g2w"]},"application/vnd.geospace":{"source":"iana","extensions":["g3w"]},"application/vnd.gerber":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt-response":{"source":"iana"},"application/vnd.gmx":{"source":"iana","extensions":["gmx"]},"application/vnd.google-apps.document":{"compressible":false,"extensions":["gdoc"]},"application/vnd.google-apps.presentation":{"compressible":false,"extensions":["gslides"]},"application/vnd.google-apps.spreadsheet":{"compressible":false,"extensions":["gsheet"]},"application/vnd.google-earth.kml+xml":{"source":"iana","compressible":true,"extensions":["kml"]},"application/vnd.google-earth.kmz":{"source":"iana","compressible":false,"extensions":["kmz"]},"application/vnd.gov.sk.e-form+xml":{"source":"iana","compressible":true},"application/vnd.gov.sk.e-form+zip":{"source":"iana","compressible":false},"application/vnd.gov.sk.xmldatacontainer+xml":{"source":"iana","compressible":true},"application/vnd.grafeq":{"source":"iana","extensions":["gqf","gqs"]},"application/vnd.gridmp":{"source":"iana"},"application/vnd.groove-account":{"source":"iana","extensions":["gac"]},"application/vnd.groove-help":{"source":"iana","extensions":["ghf"]},"application/vnd.groove-identity-message":{"source":"iana","extensions":["gim"]},"application/vnd.groove-injector":{"source":"iana","extensions":["grv"]},"application/vnd.groove-tool-message":{"source":"iana","extensions":["gtm"]},"application/vnd.groove-tool-template":{"source":"iana","extensions":["tpl"]},"application/vnd.groove-vcard":{"source":"iana","extensions":["vcg"]},"application/vnd.hal+json":{"source":"iana","compressible":true},"application/vnd.hal+xml":{"source":"iana","compressible":true,"extensions":["hal"]},"application/vnd.handheld-entertainment+xml":{"source":"iana","compressible":true,"extensions":["zmm"]},"application/vnd.hbci":{"source":"iana","extensions":["hbci"]},"application/vnd.hc+json":{"source":"iana","compressible":true},"application/vnd.hcl-bireports":{"source":"iana"},"application/vnd.hdt":{"source":"iana"},"application/vnd.heroku+json":{"source":"iana","compressible":true},"application/vnd.hhe.lesson-player":{"source":"iana","extensions":["les"]},"application/vnd.hl7cda+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.hl7v2+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.hp-hpgl":{"source":"iana","extensions":["hpgl"]},"application/vnd.hp-hpid":{"source":"iana","extensions":["hpid"]},"application/vnd.hp-hps":{"source":"iana","extensions":["hps"]},"application/vnd.hp-jlyt":{"source":"iana","extensions":["jlt"]},"application/vnd.hp-pcl":{"source":"iana","extensions":["pcl"]},"application/vnd.hp-pclxl":{"source":"iana","extensions":["pclxl"]},"application/vnd.httphone":{"source":"iana"},"application/vnd.hydrostatix.sof-data":{"source":"iana","extensions":["sfd-hdstx"]},"application/vnd.hyper+json":{"source":"iana","compressible":true},"application/vnd.hyper-item+json":{"source":"iana","compressible":true},"application/vnd.hyperdrive+json":{"source":"iana","compressible":true},"application/vnd.hzn-3d-crossword":{"source":"iana"},"application/vnd.ibm.afplinedata":{"source":"iana"},"application/vnd.ibm.electronic-media":{"source":"iana"},"application/vnd.ibm.minipay":{"source":"iana","extensions":["mpy"]},"application/vnd.ibm.modcap":{"source":"iana","extensions":["afp","listafp","list3820"]},"application/vnd.ibm.rights-management":{"source":"iana","extensions":["irm"]},"application/vnd.ibm.secure-container":{"source":"iana","extensions":["sc"]},"application/vnd.iccprofile":{"source":"iana","extensions":["icc","icm"]},"application/vnd.ieee.1905":{"source":"iana"},"application/vnd.igloader":{"source":"iana","extensions":["igl"]},"application/vnd.imagemeter.folder+zip":{"source":"iana","compressible":false},"application/vnd.imagemeter.image+zip":{"source":"iana","compressible":false},"application/vnd.immervision-ivp":{"source":"iana","extensions":["ivp"]},"application/vnd.immervision-ivu":{"source":"iana","extensions":["ivu"]},"application/vnd.ims.imsccv1p1":{"source":"iana"},"application/vnd.ims.imsccv1p2":{"source":"iana"},"application/vnd.ims.imsccv1p3":{"source":"iana"},"application/vnd.ims.lis.v2.result+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolconsumerprofile+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy.id+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings.simple+json":{"source":"iana","compressible":true},"application/vnd.informedcontrol.rms+xml":{"source":"iana","compressible":true},"application/vnd.informix-visionary":{"source":"iana"},"application/vnd.infotech.project":{"source":"iana"},"application/vnd.infotech.project+xml":{"source":"iana","compressible":true},"application/vnd.innopath.wamp.notification":{"source":"iana"},"application/vnd.insors.igm":{"source":"iana","extensions":["igm"]},"application/vnd.intercon.formnet":{"source":"iana","extensions":["xpw","xpx"]},"application/vnd.intergeo":{"source":"iana","extensions":["i2g"]},"application/vnd.intertrust.digibox":{"source":"iana"},"application/vnd.intertrust.nncp":{"source":"iana"},"application/vnd.intu.qbo":{"source":"iana","extensions":["qbo"]},"application/vnd.intu.qfx":{"source":"iana","extensions":["qfx"]},"application/vnd.iptc.g2.catalogitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.conceptitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.knowledgeitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.newsitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.newsmessage+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.packageitem+xml":{"source":"iana","compressible":true},"application/vnd.iptc.g2.planningitem+xml":{"source":"iana","compressible":true},"application/vnd.ipunplugged.rcprofile":{"source":"iana","extensions":["rcprofile"]},"application/vnd.irepository.package+xml":{"source":"iana","compressible":true,"extensions":["irp"]},"application/vnd.is-xpr":{"source":"iana","extensions":["xpr"]},"application/vnd.isac.fcs":{"source":"iana","extensions":["fcs"]},"application/vnd.iso11783-10+zip":{"source":"iana","compressible":false},"application/vnd.jam":{"source":"iana","extensions":["jam"]},"application/vnd.japannet-directory-service":{"source":"iana"},"application/vnd.japannet-jpnstore-wakeup":{"source":"iana"},"application/vnd.japannet-payment-wakeup":{"source":"iana"},"application/vnd.japannet-registration":{"source":"iana"},"application/vnd.japannet-registration-wakeup":{"source":"iana"},"application/vnd.japannet-setstore-wakeup":{"source":"iana"},"application/vnd.japannet-verification":{"source":"iana"},"application/vnd.japannet-verification-wakeup":{"source":"iana"},"application/vnd.jcp.javame.midlet-rms":{"source":"iana","extensions":["rms"]},"application/vnd.jisp":{"source":"iana","extensions":["jisp"]},"application/vnd.joost.joda-archive":{"source":"iana","extensions":["joda"]},"application/vnd.jsk.isdn-ngn":{"source":"iana"},"application/vnd.kahootz":{"source":"iana","extensions":["ktz","ktr"]},"application/vnd.kde.karbon":{"source":"iana","extensions":["karbon"]},"application/vnd.kde.kchart":{"source":"iana","extensions":["chrt"]},"application/vnd.kde.kformula":{"source":"iana","extensions":["kfo"]},"application/vnd.kde.kivio":{"source":"iana","extensions":["flw"]},"application/vnd.kde.kontour":{"source":"iana","extensions":["kon"]},"application/vnd.kde.kpresenter":{"source":"iana","extensions":["kpr","kpt"]},"application/vnd.kde.kspread":{"source":"iana","extensions":["ksp"]},"application/vnd.kde.kword":{"source":"iana","extensions":["kwd","kwt"]},"application/vnd.kenameaapp":{"source":"iana","extensions":["htke"]},"application/vnd.kidspiration":{"source":"iana","extensions":["kia"]},"application/vnd.kinar":{"source":"iana","extensions":["kne","knp"]},"application/vnd.koan":{"source":"iana","extensions":["skp","skd","skt","skm"]},"application/vnd.kodak-descriptor":{"source":"iana","extensions":["sse"]},"application/vnd.las":{"source":"iana"},"application/vnd.las.las+json":{"source":"iana","compressible":true},"application/vnd.las.las+xml":{"source":"iana","compressible":true,"extensions":["lasxml"]},"application/vnd.laszip":{"source":"iana"},"application/vnd.leap+json":{"source":"iana","compressible":true},"application/vnd.liberty-request+xml":{"source":"iana","compressible":true},"application/vnd.llamagraphics.life-balance.desktop":{"source":"iana","extensions":["lbd"]},"application/vnd.llamagraphics.life-balance.exchange+xml":{"source":"iana","compressible":true,"extensions":["lbe"]},"application/vnd.logipipe.circuit+zip":{"source":"iana","compressible":false},"application/vnd.loom":{"source":"iana"},"application/vnd.lotus-1-2-3":{"source":"iana","extensions":["123"]},"application/vnd.lotus-approach":{"source":"iana","extensions":["apr"]},"application/vnd.lotus-freelance":{"source":"iana","extensions":["pre"]},"application/vnd.lotus-notes":{"source":"iana","extensions":["nsf"]},"application/vnd.lotus-organizer":{"source":"iana","extensions":["org"]},"application/vnd.lotus-screencam":{"source":"iana","extensions":["scm"]},"application/vnd.lotus-wordpro":{"source":"iana","extensions":["lwp"]},"application/vnd.macports.portpkg":{"source":"iana","extensions":["portpkg"]},"application/vnd.mapbox-vector-tile":{"source":"iana","extensions":["mvt"]},"application/vnd.marlin.drm.actiontoken+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.conftoken+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.license+xml":{"source":"iana","compressible":true},"application/vnd.marlin.drm.mdcf":{"source":"iana"},"application/vnd.mason+json":{"source":"iana","compressible":true},"application/vnd.maxar.archive.3tz+zip":{"source":"iana","compressible":false},"application/vnd.maxmind.maxmind-db":{"source":"iana"},"application/vnd.mcd":{"source":"iana","extensions":["mcd"]},"application/vnd.medcalcdata":{"source":"iana","extensions":["mc1"]},"application/vnd.mediastation.cdkey":{"source":"iana","extensions":["cdkey"]},"application/vnd.meridian-slingshot":{"source":"iana"},"application/vnd.mfer":{"source":"iana","extensions":["mwf"]},"application/vnd.mfmp":{"source":"iana","extensions":["mfm"]},"application/vnd.micro+json":{"source":"iana","compressible":true},"application/vnd.micrografx.flo":{"source":"iana","extensions":["flo"]},"application/vnd.micrografx.igx":{"source":"iana","extensions":["igx"]},"application/vnd.microsoft.portable-executable":{"source":"iana"},"application/vnd.microsoft.windows.thumbnail-cache":{"source":"iana"},"application/vnd.miele+json":{"source":"iana","compressible":true},"application/vnd.mif":{"source":"iana","extensions":["mif"]},"application/vnd.minisoft-hp3000-save":{"source":"iana"},"application/vnd.mitsubishi.misty-guard.trustweb":{"source":"iana"},"application/vnd.mobius.daf":{"source":"iana","extensions":["daf"]},"application/vnd.mobius.dis":{"source":"iana","extensions":["dis"]},"application/vnd.mobius.mbk":{"source":"iana","extensions":["mbk"]},"application/vnd.mobius.mqy":{"source":"iana","extensions":["mqy"]},"application/vnd.mobius.msl":{"source":"iana","extensions":["msl"]},"application/vnd.mobius.plc":{"source":"iana","extensions":["plc"]},"application/vnd.mobius.txf":{"source":"iana","extensions":["txf"]},"application/vnd.mophun.application":{"source":"iana","extensions":["mpn"]},"application/vnd.mophun.certificate":{"source":"iana","extensions":["mpc"]},"application/vnd.motorola.flexsuite":{"source":"iana"},"application/vnd.motorola.flexsuite.adsi":{"source":"iana"},"application/vnd.motorola.flexsuite.fis":{"source":"iana"},"application/vnd.motorola.flexsuite.gotap":{"source":"iana"},"application/vnd.motorola.flexsuite.kmr":{"source":"iana"},"application/vnd.motorola.flexsuite.ttc":{"source":"iana"},"application/vnd.motorola.flexsuite.wem":{"source":"iana"},"application/vnd.motorola.iprm":{"source":"iana"},"application/vnd.mozilla.xul+xml":{"source":"iana","compressible":true,"extensions":["xul"]},"application/vnd.ms-3mfdocument":{"source":"iana"},"application/vnd.ms-artgalry":{"source":"iana","extensions":["cil"]},"application/vnd.ms-asf":{"source":"iana"},"application/vnd.ms-cab-compressed":{"source":"iana","extensions":["cab"]},"application/vnd.ms-color.iccprofile":{"source":"apache"},"application/vnd.ms-excel":{"source":"iana","compressible":false,"extensions":["xls","xlm","xla","xlc","xlt","xlw"]},"application/vnd.ms-excel.addin.macroenabled.12":{"source":"iana","extensions":["xlam"]},"application/vnd.ms-excel.sheet.binary.macroenabled.12":{"source":"iana","extensions":["xlsb"]},"application/vnd.ms-excel.sheet.macroenabled.12":{"source":"iana","extensions":["xlsm"]},"application/vnd.ms-excel.template.macroenabled.12":{"source":"iana","extensions":["xltm"]},"application/vnd.ms-fontobject":{"source":"iana","compressible":true,"extensions":["eot"]},"application/vnd.ms-htmlhelp":{"source":"iana","extensions":["chm"]},"application/vnd.ms-ims":{"source":"iana","extensions":["ims"]},"application/vnd.ms-lrm":{"source":"iana","extensions":["lrm"]},"application/vnd.ms-office.activex+xml":{"source":"iana","compressible":true},"application/vnd.ms-officetheme":{"source":"iana","extensions":["thmx"]},"application/vnd.ms-opentype":{"source":"apache","compressible":true},"application/vnd.ms-outlook":{"compressible":false,"extensions":["msg"]},"application/vnd.ms-package.obfuscated-opentype":{"source":"apache"},"application/vnd.ms-pki.seccat":{"source":"apache","extensions":["cat"]},"application/vnd.ms-pki.stl":{"source":"apache","extensions":["stl"]},"application/vnd.ms-playready.initiator+xml":{"source":"iana","compressible":true},"application/vnd.ms-powerpoint":{"source":"iana","compressible":false,"extensions":["ppt","pps","pot"]},"application/vnd.ms-powerpoint.addin.macroenabled.12":{"source":"iana","extensions":["ppam"]},"application/vnd.ms-powerpoint.presentation.macroenabled.12":{"source":"iana","extensions":["pptm"]},"application/vnd.ms-powerpoint.slide.macroenabled.12":{"source":"iana","extensions":["sldm"]},"application/vnd.ms-powerpoint.slideshow.macroenabled.12":{"source":"iana","extensions":["ppsm"]},"application/vnd.ms-powerpoint.template.macroenabled.12":{"source":"iana","extensions":["potm"]},"application/vnd.ms-printdevicecapabilities+xml":{"source":"iana","compressible":true},"application/vnd.ms-printing.printticket+xml":{"source":"apache","compressible":true},"application/vnd.ms-printschematicket+xml":{"source":"iana","compressible":true},"application/vnd.ms-project":{"source":"iana","extensions":["mpp","mpt"]},"application/vnd.ms-tnef":{"source":"iana"},"application/vnd.ms-windows.devicepairing":{"source":"iana"},"application/vnd.ms-windows.nwprinting.oob":{"source":"iana"},"application/vnd.ms-windows.printerpairing":{"source":"iana"},"application/vnd.ms-windows.wsd.oob":{"source":"iana"},"application/vnd.ms-wmdrm.lic-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.lic-resp":{"source":"iana"},"application/vnd.ms-wmdrm.meter-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.meter-resp":{"source":"iana"},"application/vnd.ms-word.document.macroenabled.12":{"source":"iana","extensions":["docm"]},"application/vnd.ms-word.template.macroenabled.12":{"source":"iana","extensions":["dotm"]},"application/vnd.ms-works":{"source":"iana","extensions":["wps","wks","wcm","wdb"]},"application/vnd.ms-wpl":{"source":"iana","extensions":["wpl"]},"application/vnd.ms-xpsdocument":{"source":"iana","compressible":false,"extensions":["xps"]},"application/vnd.msa-disk-image":{"source":"iana"},"application/vnd.mseq":{"source":"iana","extensions":["mseq"]},"application/vnd.msign":{"source":"iana"},"application/vnd.multiad.creator":{"source":"iana"},"application/vnd.multiad.creator.cif":{"source":"iana"},"application/vnd.music-niff":{"source":"iana"},"application/vnd.musician":{"source":"iana","extensions":["mus"]},"application/vnd.muvee.style":{"source":"iana","extensions":["msty"]},"application/vnd.mynfc":{"source":"iana","extensions":["taglet"]},"application/vnd.nacamar.ybrid+json":{"source":"iana","compressible":true},"application/vnd.ncd.control":{"source":"iana"},"application/vnd.ncd.reference":{"source":"iana"},"application/vnd.nearst.inv+json":{"source":"iana","compressible":true},"application/vnd.nebumind.line":{"source":"iana"},"application/vnd.nervana":{"source":"iana"},"application/vnd.netfpx":{"source":"iana"},"application/vnd.neurolanguage.nlu":{"source":"iana","extensions":["nlu"]},"application/vnd.nimn":{"source":"iana"},"application/vnd.nintendo.nitro.rom":{"source":"iana"},"application/vnd.nintendo.snes.rom":{"source":"iana"},"application/vnd.nitf":{"source":"iana","extensions":["ntf","nitf"]},"application/vnd.noblenet-directory":{"source":"iana","extensions":["nnd"]},"application/vnd.noblenet-sealer":{"source":"iana","extensions":["nns"]},"application/vnd.noblenet-web":{"source":"iana","extensions":["nnw"]},"application/vnd.nokia.catalogs":{"source":"iana"},"application/vnd.nokia.conml+wbxml":{"source":"iana"},"application/vnd.nokia.conml+xml":{"source":"iana","compressible":true},"application/vnd.nokia.iptv.config+xml":{"source":"iana","compressible":true},"application/vnd.nokia.isds-radio-presets":{"source":"iana"},"application/vnd.nokia.landmark+wbxml":{"source":"iana"},"application/vnd.nokia.landmark+xml":{"source":"iana","compressible":true},"application/vnd.nokia.landmarkcollection+xml":{"source":"iana","compressible":true},"application/vnd.nokia.n-gage.ac+xml":{"source":"iana","compressible":true,"extensions":["ac"]},"application/vnd.nokia.n-gage.data":{"source":"iana","extensions":["ngdat"]},"application/vnd.nokia.n-gage.symbian.install":{"source":"iana","extensions":["n-gage"]},"application/vnd.nokia.ncd":{"source":"iana"},"application/vnd.nokia.pcd+wbxml":{"source":"iana"},"application/vnd.nokia.pcd+xml":{"source":"iana","compressible":true},"application/vnd.nokia.radio-preset":{"source":"iana","extensions":["rpst"]},"application/vnd.nokia.radio-presets":{"source":"iana","extensions":["rpss"]},"application/vnd.novadigm.edm":{"source":"iana","extensions":["edm"]},"application/vnd.novadigm.edx":{"source":"iana","extensions":["edx"]},"application/vnd.novadigm.ext":{"source":"iana","extensions":["ext"]},"application/vnd.ntt-local.content-share":{"source":"iana"},"application/vnd.ntt-local.file-transfer":{"source":"iana"},"application/vnd.ntt-local.ogw_remote-access":{"source":"iana"},"application/vnd.ntt-local.sip-ta_remote":{"source":"iana"},"application/vnd.ntt-local.sip-ta_tcp_stream":{"source":"iana"},"application/vnd.oasis.opendocument.chart":{"source":"iana","extensions":["odc"]},"application/vnd.oasis.opendocument.chart-template":{"source":"iana","extensions":["otc"]},"application/vnd.oasis.opendocument.database":{"source":"iana","extensions":["odb"]},"application/vnd.oasis.opendocument.formula":{"source":"iana","extensions":["odf"]},"application/vnd.oasis.opendocument.formula-template":{"source":"iana","extensions":["odft"]},"application/vnd.oasis.opendocument.graphics":{"source":"iana","compressible":false,"extensions":["odg"]},"application/vnd.oasis.opendocument.graphics-template":{"source":"iana","extensions":["otg"]},"application/vnd.oasis.opendocument.image":{"source":"iana","extensions":["odi"]},"application/vnd.oasis.opendocument.image-template":{"source":"iana","extensions":["oti"]},"application/vnd.oasis.opendocument.presentation":{"source":"iana","compressible":false,"extensions":["odp"]},"application/vnd.oasis.opendocument.presentation-template":{"source":"iana","extensions":["otp"]},"application/vnd.oasis.opendocument.spreadsheet":{"source":"iana","compressible":false,"extensions":["ods"]},"application/vnd.oasis.opendocument.spreadsheet-template":{"source":"iana","extensions":["ots"]},"application/vnd.oasis.opendocument.text":{"source":"iana","compressible":false,"extensions":["odt"]},"application/vnd.oasis.opendocument.text-master":{"source":"iana","extensions":["odm"]},"application/vnd.oasis.opendocument.text-template":{"source":"iana","extensions":["ott"]},"application/vnd.oasis.opendocument.text-web":{"source":"iana","extensions":["oth"]},"application/vnd.obn":{"source":"iana"},"application/vnd.ocf+cbor":{"source":"iana"},"application/vnd.oci.image.manifest.v1+json":{"source":"iana","compressible":true},"application/vnd.oftn.l10n+json":{"source":"iana","compressible":true},"application/vnd.oipf.contentaccessdownload+xml":{"source":"iana","compressible":true},"application/vnd.oipf.contentaccessstreaming+xml":{"source":"iana","compressible":true},"application/vnd.oipf.cspg-hexbinary":{"source":"iana"},"application/vnd.oipf.dae.svg+xml":{"source":"iana","compressible":true},"application/vnd.oipf.dae.xhtml+xml":{"source":"iana","compressible":true},"application/vnd.oipf.mippvcontrolmessage+xml":{"source":"iana","compressible":true},"application/vnd.oipf.pae.gem":{"source":"iana"},"application/vnd.oipf.spdiscovery+xml":{"source":"iana","compressible":true},"application/vnd.oipf.spdlist+xml":{"source":"iana","compressible":true},"application/vnd.oipf.ueprofile+xml":{"source":"iana","compressible":true},"application/vnd.oipf.userprofile+xml":{"source":"iana","compressible":true},"application/vnd.olpc-sugar":{"source":"iana","extensions":["xo"]},"application/vnd.oma-scws-config":{"source":"iana"},"application/vnd.oma-scws-http-request":{"source":"iana"},"application/vnd.oma-scws-http-response":{"source":"iana"},"application/vnd.oma.bcast.associated-procedure-parameter+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.drm-trigger+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.imd+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.ltkm":{"source":"iana"},"application/vnd.oma.bcast.notification+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.provisioningtrigger":{"source":"iana"},"application/vnd.oma.bcast.sgboot":{"source":"iana"},"application/vnd.oma.bcast.sgdd+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.sgdu":{"source":"iana"},"application/vnd.oma.bcast.simple-symbol-container":{"source":"iana"},"application/vnd.oma.bcast.smartcard-trigger+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.sprov+xml":{"source":"iana","compressible":true},"application/vnd.oma.bcast.stkm":{"source":"iana"},"application/vnd.oma.cab-address-book+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-feature-handler+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-pcc+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-subs-invite+xml":{"source":"iana","compressible":true},"application/vnd.oma.cab-user-prefs+xml":{"source":"iana","compressible":true},"application/vnd.oma.dcd":{"source":"iana"},"application/vnd.oma.dcdc":{"source":"iana"},"application/vnd.oma.dd2+xml":{"source":"iana","compressible":true,"extensions":["dd2"]},"application/vnd.oma.drm.risd+xml":{"source":"iana","compressible":true},"application/vnd.oma.group-usage-list+xml":{"source":"iana","compressible":true},"application/vnd.oma.lwm2m+cbor":{"source":"iana"},"application/vnd.oma.lwm2m+json":{"source":"iana","compressible":true},"application/vnd.oma.lwm2m+tlv":{"source":"iana"},"application/vnd.oma.pal+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.detailed-progress-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.final-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.groups+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.invocation-descriptor+xml":{"source":"iana","compressible":true},"application/vnd.oma.poc.optimized-progress-report+xml":{"source":"iana","compressible":true},"application/vnd.oma.push":{"source":"iana"},"application/vnd.oma.scidm.messages+xml":{"source":"iana","compressible":true},"application/vnd.oma.xcap-directory+xml":{"source":"iana","compressible":true},"application/vnd.omads-email+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omads-file+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omads-folder+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.omaloc-supl-init":{"source":"iana"},"application/vnd.onepager":{"source":"iana"},"application/vnd.onepagertamp":{"source":"iana"},"application/vnd.onepagertamx":{"source":"iana"},"application/vnd.onepagertat":{"source":"iana"},"application/vnd.onepagertatp":{"source":"iana"},"application/vnd.onepagertatx":{"source":"iana"},"application/vnd.openblox.game+xml":{"source":"iana","compressible":true,"extensions":["obgx"]},"application/vnd.openblox.game-binary":{"source":"iana"},"application/vnd.openeye.oeb":{"source":"iana"},"application/vnd.openofficeorg.extension":{"source":"apache","extensions":["oxt"]},"application/vnd.openstreetmap.data+xml":{"source":"iana","compressible":true,"extensions":["osm"]},"application/vnd.opentimestamps.ots":{"source":"iana"},"application/vnd.openxmlformats-officedocument.custom-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.customxmlproperties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawing+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.chart+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.extended-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.presentation":{"source":"iana","compressible":false,"extensions":["pptx"]},"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.presprops+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slide":{"source":"iana","extensions":["sldx"]},"application/vnd.openxmlformats-officedocument.presentationml.slide+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slideshow":{"source":"iana","extensions":["ppsx"]},"application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.tags+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.template":{"source":"iana","extensions":["potx"]},"application/vnd.openxmlformats-officedocument.presentationml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":{"source":"iana","compressible":false,"extensions":["xlsx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.template":{"source":"iana","extensions":["xltx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.theme+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.themeoverride+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.vmldrawing":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.document":{"source":"iana","compressible":false,"extensions":["docx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.template":{"source":"iana","extensions":["dotx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.core-properties+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml":{"source":"iana","compressible":true},"application/vnd.openxmlformats-package.relationships+xml":{"source":"iana","compressible":true},"application/vnd.oracle.resource+json":{"source":"iana","compressible":true},"application/vnd.orange.indata":{"source":"iana"},"application/vnd.osa.netdeploy":{"source":"iana"},"application/vnd.osgeo.mapguide.package":{"source":"iana","extensions":["mgp"]},"application/vnd.osgi.bundle":{"source":"iana"},"application/vnd.osgi.dp":{"source":"iana","extensions":["dp"]},"application/vnd.osgi.subsystem":{"source":"iana","extensions":["esa"]},"application/vnd.otps.ct-kip+xml":{"source":"iana","compressible":true},"application/vnd.oxli.countgraph":{"source":"iana"},"application/vnd.pagerduty+json":{"source":"iana","compressible":true},"application/vnd.palm":{"source":"iana","extensions":["pdb","pqa","oprc"]},"application/vnd.panoply":{"source":"iana"},"application/vnd.paos.xml":{"source":"iana"},"application/vnd.patentdive":{"source":"iana"},"application/vnd.patientecommsdoc":{"source":"iana"},"application/vnd.pawaafile":{"source":"iana","extensions":["paw"]},"application/vnd.pcos":{"source":"iana"},"application/vnd.pg.format":{"source":"iana","extensions":["str"]},"application/vnd.pg.osasli":{"source":"iana","extensions":["ei6"]},"application/vnd.piaccess.application-licence":{"source":"iana"},"application/vnd.picsel":{"source":"iana","extensions":["efif"]},"application/vnd.pmi.widget":{"source":"iana","extensions":["wg"]},"application/vnd.poc.group-advertisement+xml":{"source":"iana","compressible":true},"application/vnd.pocketlearn":{"source":"iana","extensions":["plf"]},"application/vnd.powerbuilder6":{"source":"iana","extensions":["pbd"]},"application/vnd.powerbuilder6-s":{"source":"iana"},"application/vnd.powerbuilder7":{"source":"iana"},"application/vnd.powerbuilder7-s":{"source":"iana"},"application/vnd.powerbuilder75":{"source":"iana"},"application/vnd.powerbuilder75-s":{"source":"iana"},"application/vnd.preminet":{"source":"iana"},"application/vnd.previewsystems.box":{"source":"iana","extensions":["box"]},"application/vnd.proteus.magazine":{"source":"iana","extensions":["mgz"]},"application/vnd.psfs":{"source":"iana"},"application/vnd.publishare-delta-tree":{"source":"iana","extensions":["qps"]},"application/vnd.pvi.ptid1":{"source":"iana","extensions":["ptid"]},"application/vnd.pwg-multiplexed":{"source":"iana"},"application/vnd.pwg-xhtml-print+xml":{"source":"iana","compressible":true},"application/vnd.qualcomm.brew-app-res":{"source":"iana"},"application/vnd.quarantainenet":{"source":"iana"},"application/vnd.quark.quarkxpress":{"source":"iana","extensions":["qxd","qxt","qwd","qwt","qxl","qxb"]},"application/vnd.quobject-quoxdocument":{"source":"iana"},"application/vnd.radisys.moml+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-conf+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-conn+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-dialog+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-audit-stream+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-conf+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-base+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-fax-detect+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-fax-sendrecv+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-group+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-speech+xml":{"source":"iana","compressible":true},"application/vnd.radisys.msml-dialog-transform+xml":{"source":"iana","compressible":true},"application/vnd.rainstor.data":{"source":"iana"},"application/vnd.rapid":{"source":"iana"},"application/vnd.rar":{"source":"iana","extensions":["rar"]},"application/vnd.realvnc.bed":{"source":"iana","extensions":["bed"]},"application/vnd.recordare.musicxml":{"source":"iana","extensions":["mxl"]},"application/vnd.recordare.musicxml+xml":{"source":"iana","compressible":true,"extensions":["musicxml"]},"application/vnd.renlearn.rlprint":{"source":"iana"},"application/vnd.resilient.logic":{"source":"iana"},"application/vnd.restful+json":{"source":"iana","compressible":true},"application/vnd.rig.cryptonote":{"source":"iana","extensions":["cryptonote"]},"application/vnd.rim.cod":{"source":"apache","extensions":["cod"]},"application/vnd.rn-realmedia":{"source":"apache","extensions":["rm"]},"application/vnd.rn-realmedia-vbr":{"source":"apache","extensions":["rmvb"]},"application/vnd.route66.link66+xml":{"source":"iana","compressible":true,"extensions":["link66"]},"application/vnd.rs-274x":{"source":"iana"},"application/vnd.ruckus.download":{"source":"iana"},"application/vnd.s3sms":{"source":"iana"},"application/vnd.sailingtracker.track":{"source":"iana","extensions":["st"]},"application/vnd.sar":{"source":"iana"},"application/vnd.sbm.cid":{"source":"iana"},"application/vnd.sbm.mid2":{"source":"iana"},"application/vnd.scribus":{"source":"iana"},"application/vnd.sealed.3df":{"source":"iana"},"application/vnd.sealed.csf":{"source":"iana"},"application/vnd.sealed.doc":{"source":"iana"},"application/vnd.sealed.eml":{"source":"iana"},"application/vnd.sealed.mht":{"source":"iana"},"application/vnd.sealed.net":{"source":"iana"},"application/vnd.sealed.ppt":{"source":"iana"},"application/vnd.sealed.tiff":{"source":"iana"},"application/vnd.sealed.xls":{"source":"iana"},"application/vnd.sealedmedia.softseal.html":{"source":"iana"},"application/vnd.sealedmedia.softseal.pdf":{"source":"iana"},"application/vnd.seemail":{"source":"iana","extensions":["see"]},"application/vnd.seis+json":{"source":"iana","compressible":true},"application/vnd.sema":{"source":"iana","extensions":["sema"]},"application/vnd.semd":{"source":"iana","extensions":["semd"]},"application/vnd.semf":{"source":"iana","extensions":["semf"]},"application/vnd.shade-save-file":{"source":"iana"},"application/vnd.shana.informed.formdata":{"source":"iana","extensions":["ifm"]},"application/vnd.shana.informed.formtemplate":{"source":"iana","extensions":["itp"]},"application/vnd.shana.informed.interchange":{"source":"iana","extensions":["iif"]},"application/vnd.shana.informed.package":{"source":"iana","extensions":["ipk"]},"application/vnd.shootproof+json":{"source":"iana","compressible":true},"application/vnd.shopkick+json":{"source":"iana","compressible":true},"application/vnd.shp":{"source":"iana"},"application/vnd.shx":{"source":"iana"},"application/vnd.sigrok.session":{"source":"iana"},"application/vnd.simtech-mindmapper":{"source":"iana","extensions":["twd","twds"]},"application/vnd.siren+json":{"source":"iana","compressible":true},"application/vnd.smaf":{"source":"iana","extensions":["mmf"]},"application/vnd.smart.notebook":{"source":"iana"},"application/vnd.smart.teacher":{"source":"iana","extensions":["teacher"]},"application/vnd.snesdev-page-table":{"source":"iana"},"application/vnd.software602.filler.form+xml":{"source":"iana","compressible":true,"extensions":["fo"]},"application/vnd.software602.filler.form-xml-zip":{"source":"iana"},"application/vnd.solent.sdkm+xml":{"source":"iana","compressible":true,"extensions":["sdkm","sdkd"]},"application/vnd.spotfire.dxp":{"source":"iana","extensions":["dxp"]},"application/vnd.spotfire.sfs":{"source":"iana","extensions":["sfs"]},"application/vnd.sqlite3":{"source":"iana"},"application/vnd.sss-cod":{"source":"iana"},"application/vnd.sss-dtf":{"source":"iana"},"application/vnd.sss-ntf":{"source":"iana"},"application/vnd.stardivision.calc":{"source":"apache","extensions":["sdc"]},"application/vnd.stardivision.draw":{"source":"apache","extensions":["sda"]},"application/vnd.stardivision.impress":{"source":"apache","extensions":["sdd"]},"application/vnd.stardivision.math":{"source":"apache","extensions":["smf"]},"application/vnd.stardivision.writer":{"source":"apache","extensions":["sdw","vor"]},"application/vnd.stardivision.writer-global":{"source":"apache","extensions":["sgl"]},"application/vnd.stepmania.package":{"source":"iana","extensions":["smzip"]},"application/vnd.stepmania.stepchart":{"source":"iana","extensions":["sm"]},"application/vnd.street-stream":{"source":"iana"},"application/vnd.sun.wadl+xml":{"source":"iana","compressible":true,"extensions":["wadl"]},"application/vnd.sun.xml.calc":{"source":"apache","extensions":["sxc"]},"application/vnd.sun.xml.calc.template":{"source":"apache","extensions":["stc"]},"application/vnd.sun.xml.draw":{"source":"apache","extensions":["sxd"]},"application/vnd.sun.xml.draw.template":{"source":"apache","extensions":["std"]},"application/vnd.sun.xml.impress":{"source":"apache","extensions":["sxi"]},"application/vnd.sun.xml.impress.template":{"source":"apache","extensions":["sti"]},"application/vnd.sun.xml.math":{"source":"apache","extensions":["sxm"]},"application/vnd.sun.xml.writer":{"source":"apache","extensions":["sxw"]},"application/vnd.sun.xml.writer.global":{"source":"apache","extensions":["sxg"]},"application/vnd.sun.xml.writer.template":{"source":"apache","extensions":["stw"]},"application/vnd.sus-calendar":{"source":"iana","extensions":["sus","susp"]},"application/vnd.svd":{"source":"iana","extensions":["svd"]},"application/vnd.swiftview-ics":{"source":"iana"},"application/vnd.sycle+xml":{"source":"iana","compressible":true},"application/vnd.syft+json":{"source":"iana","compressible":true},"application/vnd.symbian.install":{"source":"apache","extensions":["sis","sisx"]},"application/vnd.syncml+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["xsm"]},"application/vnd.syncml.dm+wbxml":{"source":"iana","charset":"UTF-8","extensions":["bdm"]},"application/vnd.syncml.dm+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["xdm"]},"application/vnd.syncml.dm.notification":{"source":"iana"},"application/vnd.syncml.dmddf+wbxml":{"source":"iana"},"application/vnd.syncml.dmddf+xml":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["ddf"]},"application/vnd.syncml.dmtnds+wbxml":{"source":"iana"},"application/vnd.syncml.dmtnds+xml":{"source":"iana","charset":"UTF-8","compressible":true},"application/vnd.syncml.ds.notification":{"source":"iana"},"application/vnd.tableschema+json":{"source":"iana","compressible":true},"application/vnd.tao.intent-module-archive":{"source":"iana","extensions":["tao"]},"application/vnd.tcpdump.pcap":{"source":"iana","extensions":["pcap","cap","dmp"]},"application/vnd.think-cell.ppttc+json":{"source":"iana","compressible":true},"application/vnd.tmd.mediaflex.api+xml":{"source":"iana","compressible":true},"application/vnd.tml":{"source":"iana"},"application/vnd.tmobile-livetv":{"source":"iana","extensions":["tmo"]},"application/vnd.tri.onesource":{"source":"iana"},"application/vnd.trid.tpt":{"source":"iana","extensions":["tpt"]},"application/vnd.triscape.mxs":{"source":"iana","extensions":["mxs"]},"application/vnd.trueapp":{"source":"iana","extensions":["tra"]},"application/vnd.truedoc":{"source":"iana"},"application/vnd.ubisoft.webplayer":{"source":"iana"},"application/vnd.ufdl":{"source":"iana","extensions":["ufd","ufdl"]},"application/vnd.uiq.theme":{"source":"iana","extensions":["utz"]},"application/vnd.umajin":{"source":"iana","extensions":["umj"]},"application/vnd.unity":{"source":"iana","extensions":["unityweb"]},"application/vnd.uoml+xml":{"source":"iana","compressible":true,"extensions":["uoml"]},"application/vnd.uplanet.alert":{"source":"iana"},"application/vnd.uplanet.alert-wbxml":{"source":"iana"},"application/vnd.uplanet.bearer-choice":{"source":"iana"},"application/vnd.uplanet.bearer-choice-wbxml":{"source":"iana"},"application/vnd.uplanet.cacheop":{"source":"iana"},"application/vnd.uplanet.cacheop-wbxml":{"source":"iana"},"application/vnd.uplanet.channel":{"source":"iana"},"application/vnd.uplanet.channel-wbxml":{"source":"iana"},"application/vnd.uplanet.list":{"source":"iana"},"application/vnd.uplanet.list-wbxml":{"source":"iana"},"application/vnd.uplanet.listcmd":{"source":"iana"},"application/vnd.uplanet.listcmd-wbxml":{"source":"iana"},"application/vnd.uplanet.signal":{"source":"iana"},"application/vnd.uri-map":{"source":"iana"},"application/vnd.valve.source.material":{"source":"iana"},"application/vnd.vcx":{"source":"iana","extensions":["vcx"]},"application/vnd.vd-study":{"source":"iana"},"application/vnd.vectorworks":{"source":"iana"},"application/vnd.vel+json":{"source":"iana","compressible":true},"application/vnd.verimatrix.vcas":{"source":"iana"},"application/vnd.veritone.aion+json":{"source":"iana","compressible":true},"application/vnd.veryant.thin":{"source":"iana"},"application/vnd.ves.encrypted":{"source":"iana"},"application/vnd.vidsoft.vidconference":{"source":"iana"},"application/vnd.visio":{"source":"iana","extensions":["vsd","vst","vss","vsw"]},"application/vnd.visionary":{"source":"iana","extensions":["vis"]},"application/vnd.vividence.scriptfile":{"source":"iana"},"application/vnd.vsf":{"source":"iana","extensions":["vsf"]},"application/vnd.wap.sic":{"source":"iana"},"application/vnd.wap.slc":{"source":"iana"},"application/vnd.wap.wbxml":{"source":"iana","charset":"UTF-8","extensions":["wbxml"]},"application/vnd.wap.wmlc":{"source":"iana","extensions":["wmlc"]},"application/vnd.wap.wmlscriptc":{"source":"iana","extensions":["wmlsc"]},"application/vnd.webturbo":{"source":"iana","extensions":["wtb"]},"application/vnd.wfa.dpp":{"source":"iana"},"application/vnd.wfa.p2p":{"source":"iana"},"application/vnd.wfa.wsc":{"source":"iana"},"application/vnd.windows.devicepairing":{"source":"iana"},"application/vnd.wmc":{"source":"iana"},"application/vnd.wmf.bootstrap":{"source":"iana"},"application/vnd.wolfram.mathematica":{"source":"iana"},"application/vnd.wolfram.mathematica.package":{"source":"iana"},"application/vnd.wolfram.player":{"source":"iana","extensions":["nbp"]},"application/vnd.wordperfect":{"source":"iana","extensions":["wpd"]},"application/vnd.wqd":{"source":"iana","extensions":["wqd"]},"application/vnd.wrq-hp3000-labelled":{"source":"iana"},"application/vnd.wt.stf":{"source":"iana","extensions":["stf"]},"application/vnd.wv.csp+wbxml":{"source":"iana"},"application/vnd.wv.csp+xml":{"source":"iana","compressible":true},"application/vnd.wv.ssp+xml":{"source":"iana","compressible":true},"application/vnd.xacml+json":{"source":"iana","compressible":true},"application/vnd.xara":{"source":"iana","extensions":["xar"]},"application/vnd.xfdl":{"source":"iana","extensions":["xfdl"]},"application/vnd.xfdl.webform":{"source":"iana"},"application/vnd.xmi+xml":{"source":"iana","compressible":true},"application/vnd.xmpie.cpkg":{"source":"iana"},"application/vnd.xmpie.dpkg":{"source":"iana"},"application/vnd.xmpie.plan":{"source":"iana"},"application/vnd.xmpie.ppkg":{"source":"iana"},"application/vnd.xmpie.xlim":{"source":"iana"},"application/vnd.yamaha.hv-dic":{"source":"iana","extensions":["hvd"]},"application/vnd.yamaha.hv-script":{"source":"iana","extensions":["hvs"]},"application/vnd.yamaha.hv-voice":{"source":"iana","extensions":["hvp"]},"application/vnd.yamaha.openscoreformat":{"source":"iana","extensions":["osf"]},"application/vnd.yamaha.openscoreformat.osfpvg+xml":{"source":"iana","compressible":true,"extensions":["osfpvg"]},"application/vnd.yamaha.remote-setup":{"source":"iana"},"application/vnd.yamaha.smaf-audio":{"source":"iana","extensions":["saf"]},"application/vnd.yamaha.smaf-phrase":{"source":"iana","extensions":["spf"]},"application/vnd.yamaha.through-ngn":{"source":"iana"},"application/vnd.yamaha.tunnel-udpencap":{"source":"iana"},"application/vnd.yaoweme":{"source":"iana"},"application/vnd.yellowriver-custom-menu":{"source":"iana","extensions":["cmp"]},"application/vnd.youtube.yt":{"source":"iana"},"application/vnd.zul":{"source":"iana","extensions":["zir","zirz"]},"application/vnd.zzazz.deck+xml":{"source":"iana","compressible":true,"extensions":["zaz"]},"application/voicexml+xml":{"source":"iana","compressible":true,"extensions":["vxml"]},"application/voucher-cms+json":{"source":"iana","compressible":true},"application/vq-rtcpxr":{"source":"iana"},"application/wasm":{"source":"iana","compressible":true,"extensions":["wasm"]},"application/watcherinfo+xml":{"source":"iana","compressible":true,"extensions":["wif"]},"application/webpush-options+json":{"source":"iana","compressible":true},"application/whoispp-query":{"source":"iana"},"application/whoispp-response":{"source":"iana"},"application/widget":{"source":"iana","extensions":["wgt"]},"application/winhlp":{"source":"apache","extensions":["hlp"]},"application/wita":{"source":"iana"},"application/wordperfect5.1":{"source":"iana"},"application/wsdl+xml":{"source":"iana","compressible":true,"extensions":["wsdl"]},"application/wspolicy+xml":{"source":"iana","compressible":true,"extensions":["wspolicy"]},"application/x-7z-compressed":{"source":"apache","compressible":false,"extensions":["7z"]},"application/x-abiword":{"source":"apache","extensions":["abw"]},"application/x-ace-compressed":{"source":"apache","extensions":["ace"]},"application/x-amf":{"source":"apache"},"application/x-apple-diskimage":{"source":"apache","extensions":["dmg"]},"application/x-arj":{"compressible":false,"extensions":["arj"]},"application/x-authorware-bin":{"source":"apache","extensions":["aab","x32","u32","vox"]},"application/x-authorware-map":{"source":"apache","extensions":["aam"]},"application/x-authorware-seg":{"source":"apache","extensions":["aas"]},"application/x-bcpio":{"source":"apache","extensions":["bcpio"]},"application/x-bdoc":{"compressible":false,"extensions":["bdoc"]},"application/x-bittorrent":{"source":"apache","extensions":["torrent"]},"application/x-blorb":{"source":"apache","extensions":["blb","blorb"]},"application/x-bzip":{"source":"apache","compressible":false,"extensions":["bz"]},"application/x-bzip2":{"source":"apache","compressible":false,"extensions":["bz2","boz"]},"application/x-cbr":{"source":"apache","extensions":["cbr","cba","cbt","cbz","cb7"]},"application/x-cdlink":{"source":"apache","extensions":["vcd"]},"application/x-cfs-compressed":{"source":"apache","extensions":["cfs"]},"application/x-chat":{"source":"apache","extensions":["chat"]},"application/x-chess-pgn":{"source":"apache","extensions":["pgn"]},"application/x-chrome-extension":{"extensions":["crx"]},"application/x-cocoa":{"source":"nginx","extensions":["cco"]},"application/x-compress":{"source":"apache"},"application/x-conference":{"source":"apache","extensions":["nsc"]},"application/x-cpio":{"source":"apache","extensions":["cpio"]},"application/x-csh":{"source":"apache","extensions":["csh"]},"application/x-deb":{"compressible":false},"application/x-debian-package":{"source":"apache","extensions":["deb","udeb"]},"application/x-dgc-compressed":{"source":"apache","extensions":["dgc"]},"application/x-director":{"source":"apache","extensions":["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"]},"application/x-doom":{"source":"apache","extensions":["wad"]},"application/x-dtbncx+xml":{"source":"apache","compressible":true,"extensions":["ncx"]},"application/x-dtbook+xml":{"source":"apache","compressible":true,"extensions":["dtb"]},"application/x-dtbresource+xml":{"source":"apache","compressible":true,"extensions":["res"]},"application/x-dvi":{"source":"apache","compressible":false,"extensions":["dvi"]},"application/x-envoy":{"source":"apache","extensions":["evy"]},"application/x-eva":{"source":"apache","extensions":["eva"]},"application/x-font-bdf":{"source":"apache","extensions":["bdf"]},"application/x-font-dos":{"source":"apache"},"application/x-font-framemaker":{"source":"apache"},"application/x-font-ghostscript":{"source":"apache","extensions":["gsf"]},"application/x-font-libgrx":{"source":"apache"},"application/x-font-linux-psf":{"source":"apache","extensions":["psf"]},"application/x-font-pcf":{"source":"apache","extensions":["pcf"]},"application/x-font-snf":{"source":"apache","extensions":["snf"]},"application/x-font-speedo":{"source":"apache"},"application/x-font-sunos-news":{"source":"apache"},"application/x-font-type1":{"source":"apache","extensions":["pfa","pfb","pfm","afm"]},"application/x-font-vfont":{"source":"apache"},"application/x-freearc":{"source":"apache","extensions":["arc"]},"application/x-futuresplash":{"source":"apache","extensions":["spl"]},"application/x-gca-compressed":{"source":"apache","extensions":["gca"]},"application/x-glulx":{"source":"apache","extensions":["ulx"]},"application/x-gnumeric":{"source":"apache","extensions":["gnumeric"]},"application/x-gramps-xml":{"source":"apache","extensions":["gramps"]},"application/x-gtar":{"source":"apache","extensions":["gtar"]},"application/x-gzip":{"source":"apache"},"application/x-hdf":{"source":"apache","extensions":["hdf"]},"application/x-httpd-php":{"compressible":true,"extensions":["php"]},"application/x-install-instructions":{"source":"apache","extensions":["install"]},"application/x-iso9660-image":{"source":"apache","extensions":["iso"]},"application/x-iwork-keynote-sffkey":{"extensions":["key"]},"application/x-iwork-numbers-sffnumbers":{"extensions":["numbers"]},"application/x-iwork-pages-sffpages":{"extensions":["pages"]},"application/x-java-archive-diff":{"source":"nginx","extensions":["jardiff"]},"application/x-java-jnlp-file":{"source":"apache","compressible":false,"extensions":["jnlp"]},"application/x-javascript":{"compressible":true},"application/x-keepass2":{"extensions":["kdbx"]},"application/x-latex":{"source":"apache","compressible":false,"extensions":["latex"]},"application/x-lua-bytecode":{"extensions":["luac"]},"application/x-lzh-compressed":{"source":"apache","extensions":["lzh","lha"]},"application/x-makeself":{"source":"nginx","extensions":["run"]},"application/x-mie":{"source":"apache","extensions":["mie"]},"application/x-mobipocket-ebook":{"source":"apache","extensions":["prc","mobi"]},"application/x-mpegurl":{"compressible":false},"application/x-ms-application":{"source":"apache","extensions":["application"]},"application/x-ms-shortcut":{"source":"apache","extensions":["lnk"]},"application/x-ms-wmd":{"source":"apache","extensions":["wmd"]},"application/x-ms-wmz":{"source":"apache","extensions":["wmz"]},"application/x-ms-xbap":{"source":"apache","extensions":["xbap"]},"application/x-msaccess":{"source":"apache","extensions":["mdb"]},"application/x-msbinder":{"source":"apache","extensions":["obd"]},"application/x-mscardfile":{"source":"apache","extensions":["crd"]},"application/x-msclip":{"source":"apache","extensions":["clp"]},"application/x-msdos-program":{"extensions":["exe"]},"application/x-msdownload":{"source":"apache","extensions":["exe","dll","com","bat","msi"]},"application/x-msmediaview":{"source":"apache","extensions":["mvb","m13","m14"]},"application/x-msmetafile":{"source":"apache","extensions":["wmf","wmz","emf","emz"]},"application/x-msmoney":{"source":"apache","extensions":["mny"]},"application/x-mspublisher":{"source":"apache","extensions":["pub"]},"application/x-msschedule":{"source":"apache","extensions":["scd"]},"application/x-msterminal":{"source":"apache","extensions":["trm"]},"application/x-mswrite":{"source":"apache","extensions":["wri"]},"application/x-netcdf":{"source":"apache","extensions":["nc","cdf"]},"application/x-ns-proxy-autoconfig":{"compressible":true,"extensions":["pac"]},"application/x-nzb":{"source":"apache","extensions":["nzb"]},"application/x-perl":{"source":"nginx","extensions":["pl","pm"]},"application/x-pilot":{"source":"nginx","extensions":["prc","pdb"]},"application/x-pkcs12":{"source":"apache","compressible":false,"extensions":["p12","pfx"]},"application/x-pkcs7-certificates":{"source":"apache","extensions":["p7b","spc"]},"application/x-pkcs7-certreqresp":{"source":"apache","extensions":["p7r"]},"application/x-pki-message":{"source":"iana"},"application/x-rar-compressed":{"source":"apache","compressible":false,"extensions":["rar"]},"application/x-redhat-package-manager":{"source":"nginx","extensions":["rpm"]},"application/x-research-info-systems":{"source":"apache","extensions":["ris"]},"application/x-sea":{"source":"nginx","extensions":["sea"]},"application/x-sh":{"source":"apache","compressible":true,"extensions":["sh"]},"application/x-shar":{"source":"apache","extensions":["shar"]},"application/x-shockwave-flash":{"source":"apache","compressible":false,"extensions":["swf"]},"application/x-silverlight-app":{"source":"apache","extensions":["xap"]},"application/x-sql":{"source":"apache","extensions":["sql"]},"application/x-stuffit":{"source":"apache","compressible":false,"extensions":["sit"]},"application/x-stuffitx":{"source":"apache","extensions":["sitx"]},"application/x-subrip":{"source":"apache","extensions":["srt"]},"application/x-sv4cpio":{"source":"apache","extensions":["sv4cpio"]},"application/x-sv4crc":{"source":"apache","extensions":["sv4crc"]},"application/x-t3vm-image":{"source":"apache","extensions":["t3"]},"application/x-tads":{"source":"apache","extensions":["gam"]},"application/x-tar":{"source":"apache","compressible":true,"extensions":["tar"]},"application/x-tcl":{"source":"apache","extensions":["tcl","tk"]},"application/x-tex":{"source":"apache","extensions":["tex"]},"application/x-tex-tfm":{"source":"apache","extensions":["tfm"]},"application/x-texinfo":{"source":"apache","extensions":["texinfo","texi"]},"application/x-tgif":{"source":"apache","extensions":["obj"]},"application/x-ustar":{"source":"apache","extensions":["ustar"]},"application/x-virtualbox-hdd":{"compressible":true,"extensions":["hdd"]},"application/x-virtualbox-ova":{"compressible":true,"extensions":["ova"]},"application/x-virtualbox-ovf":{"compressible":true,"extensions":["ovf"]},"application/x-virtualbox-vbox":{"compressible":true,"extensions":["vbox"]},"application/x-virtualbox-vbox-extpack":{"compressible":false,"extensions":["vbox-extpack"]},"application/x-virtualbox-vdi":{"compressible":true,"extensions":["vdi"]},"application/x-virtualbox-vhd":{"compressible":true,"extensions":["vhd"]},"application/x-virtualbox-vmdk":{"compressible":true,"extensions":["vmdk"]},"application/x-wais-source":{"source":"apache","extensions":["src"]},"application/x-web-app-manifest+json":{"compressible":true,"extensions":["webapp"]},"application/x-www-form-urlencoded":{"source":"iana","compressible":true},"application/x-x509-ca-cert":{"source":"iana","extensions":["der","crt","pem"]},"application/x-x509-ca-ra-cert":{"source":"iana"},"application/x-x509-next-ca-cert":{"source":"iana"},"application/x-xfig":{"source":"apache","extensions":["fig"]},"application/x-xliff+xml":{"source":"apache","compressible":true,"extensions":["xlf"]},"application/x-xpinstall":{"source":"apache","compressible":false,"extensions":["xpi"]},"application/x-xz":{"source":"apache","extensions":["xz"]},"application/x-zmachine":{"source":"apache","extensions":["z1","z2","z3","z4","z5","z6","z7","z8"]},"application/x400-bp":{"source":"iana"},"application/xacml+xml":{"source":"iana","compressible":true},"application/xaml+xml":{"source":"apache","compressible":true,"extensions":["xaml"]},"application/xcap-att+xml":{"source":"iana","compressible":true,"extensions":["xav"]},"application/xcap-caps+xml":{"source":"iana","compressible":true,"extensions":["xca"]},"application/xcap-diff+xml":{"source":"iana","compressible":true,"extensions":["xdf"]},"application/xcap-el+xml":{"source":"iana","compressible":true,"extensions":["xel"]},"application/xcap-error+xml":{"source":"iana","compressible":true},"application/xcap-ns+xml":{"source":"iana","compressible":true,"extensions":["xns"]},"application/xcon-conference-info+xml":{"source":"iana","compressible":true},"application/xcon-conference-info-diff+xml":{"source":"iana","compressible":true},"application/xenc+xml":{"source":"iana","compressible":true,"extensions":["xenc"]},"application/xhtml+xml":{"source":"iana","compressible":true,"extensions":["xhtml","xht"]},"application/xhtml-voice+xml":{"source":"apache","compressible":true},"application/xliff+xml":{"source":"iana","compressible":true,"extensions":["xlf"]},"application/xml":{"source":"iana","compressible":true,"extensions":["xml","xsl","xsd","rng"]},"application/xml-dtd":{"source":"iana","compressible":true,"extensions":["dtd"]},"application/xml-external-parsed-entity":{"source":"iana"},"application/xml-patch+xml":{"source":"iana","compressible":true},"application/xmpp+xml":{"source":"iana","compressible":true},"application/xop+xml":{"source":"iana","compressible":true,"extensions":["xop"]},"application/xproc+xml":{"source":"apache","compressible":true,"extensions":["xpl"]},"application/xslt+xml":{"source":"iana","compressible":true,"extensions":["xsl","xslt"]},"application/xspf+xml":{"source":"apache","compressible":true,"extensions":["xspf"]},"application/xv+xml":{"source":"iana","compressible":true,"extensions":["mxml","xhvml","xvml","xvm"]},"application/yang":{"source":"iana","extensions":["yang"]},"application/yang-data+json":{"source":"iana","compressible":true},"application/yang-data+xml":{"source":"iana","compressible":true},"application/yang-patch+json":{"source":"iana","compressible":true},"application/yang-patch+xml":{"source":"iana","compressible":true},"application/yin+xml":{"source":"iana","compressible":true,"extensions":["yin"]},"application/zip":{"source":"iana","compressible":false,"extensions":["zip"]},"application/zlib":{"source":"iana"},"application/zstd":{"source":"iana"},"audio/1d-interleaved-parityfec":{"source":"iana"},"audio/32kadpcm":{"source":"iana"},"audio/3gpp":{"source":"iana","compressible":false,"extensions":["3gpp"]},"audio/3gpp2":{"source":"iana"},"audio/aac":{"source":"iana"},"audio/ac3":{"source":"iana"},"audio/adpcm":{"source":"apache","extensions":["adp"]},"audio/amr":{"source":"iana","extensions":["amr"]},"audio/amr-wb":{"source":"iana"},"audio/amr-wb+":{"source":"iana"},"audio/aptx":{"source":"iana"},"audio/asc":{"source":"iana"},"audio/atrac-advanced-lossless":{"source":"iana"},"audio/atrac-x":{"source":"iana"},"audio/atrac3":{"source":"iana"},"audio/basic":{"source":"iana","compressible":false,"extensions":["au","snd"]},"audio/bv16":{"source":"iana"},"audio/bv32":{"source":"iana"},"audio/clearmode":{"source":"iana"},"audio/cn":{"source":"iana"},"audio/dat12":{"source":"iana"},"audio/dls":{"source":"iana"},"audio/dsr-es201108":{"source":"iana"},"audio/dsr-es202050":{"source":"iana"},"audio/dsr-es202211":{"source":"iana"},"audio/dsr-es202212":{"source":"iana"},"audio/dv":{"source":"iana"},"audio/dvi4":{"source":"iana"},"audio/eac3":{"source":"iana"},"audio/encaprtp":{"source":"iana"},"audio/evrc":{"source":"iana"},"audio/evrc-qcp":{"source":"iana"},"audio/evrc0":{"source":"iana"},"audio/evrc1":{"source":"iana"},"audio/evrcb":{"source":"iana"},"audio/evrcb0":{"source":"iana"},"audio/evrcb1":{"source":"iana"},"audio/evrcnw":{"source":"iana"},"audio/evrcnw0":{"source":"iana"},"audio/evrcnw1":{"source":"iana"},"audio/evrcwb":{"source":"iana"},"audio/evrcwb0":{"source":"iana"},"audio/evrcwb1":{"source":"iana"},"audio/evs":{"source":"iana"},"audio/flexfec":{"source":"iana"},"audio/fwdred":{"source":"iana"},"audio/g711-0":{"source":"iana"},"audio/g719":{"source":"iana"},"audio/g722":{"source":"iana"},"audio/g7221":{"source":"iana"},"audio/g723":{"source":"iana"},"audio/g726-16":{"source":"iana"},"audio/g726-24":{"source":"iana"},"audio/g726-32":{"source":"iana"},"audio/g726-40":{"source":"iana"},"audio/g728":{"source":"iana"},"audio/g729":{"source":"iana"},"audio/g7291":{"source":"iana"},"audio/g729d":{"source":"iana"},"audio/g729e":{"source":"iana"},"audio/gsm":{"source":"iana"},"audio/gsm-efr":{"source":"iana"},"audio/gsm-hr-08":{"source":"iana"},"audio/ilbc":{"source":"iana"},"audio/ip-mr_v2.5":{"source":"iana"},"audio/isac":{"source":"apache"},"audio/l16":{"source":"iana"},"audio/l20":{"source":"iana"},"audio/l24":{"source":"iana","compressible":false},"audio/l8":{"source":"iana"},"audio/lpc":{"source":"iana"},"audio/melp":{"source":"iana"},"audio/melp1200":{"source":"iana"},"audio/melp2400":{"source":"iana"},"audio/melp600":{"source":"iana"},"audio/mhas":{"source":"iana"},"audio/midi":{"source":"apache","extensions":["mid","midi","kar","rmi"]},"audio/mobile-xmf":{"source":"iana","extensions":["mxmf"]},"audio/mp3":{"compressible":false,"extensions":["mp3"]},"audio/mp4":{"source":"iana","compressible":false,"extensions":["m4a","mp4a"]},"audio/mp4a-latm":{"source":"iana"},"audio/mpa":{"source":"iana"},"audio/mpa-robust":{"source":"iana"},"audio/mpeg":{"source":"iana","compressible":false,"extensions":["mpga","mp2","mp2a","mp3","m2a","m3a"]},"audio/mpeg4-generic":{"source":"iana"},"audio/musepack":{"source":"apache"},"audio/ogg":{"source":"iana","compressible":false,"extensions":["oga","ogg","spx","opus"]},"audio/opus":{"source":"iana"},"audio/parityfec":{"source":"iana"},"audio/pcma":{"source":"iana"},"audio/pcma-wb":{"source":"iana"},"audio/pcmu":{"source":"iana"},"audio/pcmu-wb":{"source":"iana"},"audio/prs.sid":{"source":"iana"},"audio/qcelp":{"source":"iana"},"audio/raptorfec":{"source":"iana"},"audio/red":{"source":"iana"},"audio/rtp-enc-aescm128":{"source":"iana"},"audio/rtp-midi":{"source":"iana"},"audio/rtploopback":{"source":"iana"},"audio/rtx":{"source":"iana"},"audio/s3m":{"source":"apache","extensions":["s3m"]},"audio/scip":{"source":"iana"},"audio/silk":{"source":"apache","extensions":["sil"]},"audio/smv":{"source":"iana"},"audio/smv-qcp":{"source":"iana"},"audio/smv0":{"source":"iana"},"audio/sofa":{"source":"iana"},"audio/sp-midi":{"source":"iana"},"audio/speex":{"source":"iana"},"audio/t140c":{"source":"iana"},"audio/t38":{"source":"iana"},"audio/telephone-event":{"source":"iana"},"audio/tetra_acelp":{"source":"iana"},"audio/tetra_acelp_bb":{"source":"iana"},"audio/tone":{"source":"iana"},"audio/tsvcis":{"source":"iana"},"audio/uemclip":{"source":"iana"},"audio/ulpfec":{"source":"iana"},"audio/usac":{"source":"iana"},"audio/vdvi":{"source":"iana"},"audio/vmr-wb":{"source":"iana"},"audio/vnd.3gpp.iufp":{"source":"iana"},"audio/vnd.4sb":{"source":"iana"},"audio/vnd.audiokoz":{"source":"iana"},"audio/vnd.celp":{"source":"iana"},"audio/vnd.cisco.nse":{"source":"iana"},"audio/vnd.cmles.radio-events":{"source":"iana"},"audio/vnd.cns.anp1":{"source":"iana"},"audio/vnd.cns.inf1":{"source":"iana"},"audio/vnd.dece.audio":{"source":"iana","extensions":["uva","uvva"]},"audio/vnd.digital-winds":{"source":"iana","extensions":["eol"]},"audio/vnd.dlna.adts":{"source":"iana"},"audio/vnd.dolby.heaac.1":{"source":"iana"},"audio/vnd.dolby.heaac.2":{"source":"iana"},"audio/vnd.dolby.mlp":{"source":"iana"},"audio/vnd.dolby.mps":{"source":"iana"},"audio/vnd.dolby.pl2":{"source":"iana"},"audio/vnd.dolby.pl2x":{"source":"iana"},"audio/vnd.dolby.pl2z":{"source":"iana"},"audio/vnd.dolby.pulse.1":{"source":"iana"},"audio/vnd.dra":{"source":"iana","extensions":["dra"]},"audio/vnd.dts":{"source":"iana","extensions":["dts"]},"audio/vnd.dts.hd":{"source":"iana","extensions":["dtshd"]},"audio/vnd.dts.uhd":{"source":"iana"},"audio/vnd.dvb.file":{"source":"iana"},"audio/vnd.everad.plj":{"source":"iana"},"audio/vnd.hns.audio":{"source":"iana"},"audio/vnd.lucent.voice":{"source":"iana","extensions":["lvp"]},"audio/vnd.ms-playready.media.pya":{"source":"iana","extensions":["pya"]},"audio/vnd.nokia.mobile-xmf":{"source":"iana"},"audio/vnd.nortel.vbk":{"source":"iana"},"audio/vnd.nuera.ecelp4800":{"source":"iana","extensions":["ecelp4800"]},"audio/vnd.nuera.ecelp7470":{"source":"iana","extensions":["ecelp7470"]},"audio/vnd.nuera.ecelp9600":{"source":"iana","extensions":["ecelp9600"]},"audio/vnd.octel.sbc":{"source":"iana"},"audio/vnd.presonus.multitrack":{"source":"iana"},"audio/vnd.qcelp":{"source":"iana"},"audio/vnd.rhetorex.32kadpcm":{"source":"iana"},"audio/vnd.rip":{"source":"iana","extensions":["rip"]},"audio/vnd.rn-realaudio":{"compressible":false},"audio/vnd.sealedmedia.softseal.mpeg":{"source":"iana"},"audio/vnd.vmx.cvsd":{"source":"iana"},"audio/vnd.wave":{"compressible":false},"audio/vorbis":{"source":"iana","compressible":false},"audio/vorbis-config":{"source":"iana"},"audio/wav":{"compressible":false,"extensions":["wav"]},"audio/wave":{"compressible":false,"extensions":["wav"]},"audio/webm":{"source":"apache","compressible":false,"extensions":["weba"]},"audio/x-aac":{"source":"apache","compressible":false,"extensions":["aac"]},"audio/x-aiff":{"source":"apache","extensions":["aif","aiff","aifc"]},"audio/x-caf":{"source":"apache","compressible":false,"extensions":["caf"]},"audio/x-flac":{"source":"apache","extensions":["flac"]},"audio/x-m4a":{"source":"nginx","extensions":["m4a"]},"audio/x-matroska":{"source":"apache","extensions":["mka"]},"audio/x-mpegurl":{"source":"apache","extensions":["m3u"]},"audio/x-ms-wax":{"source":"apache","extensions":["wax"]},"audio/x-ms-wma":{"source":"apache","extensions":["wma"]},"audio/x-pn-realaudio":{"source":"apache","extensions":["ram","ra"]},"audio/x-pn-realaudio-plugin":{"source":"apache","extensions":["rmp"]},"audio/x-realaudio":{"source":"nginx","extensions":["ra"]},"audio/x-tta":{"source":"apache"},"audio/x-wav":{"source":"apache","extensions":["wav"]},"audio/xm":{"source":"apache","extensions":["xm"]},"chemical/x-cdx":{"source":"apache","extensions":["cdx"]},"chemical/x-cif":{"source":"apache","extensions":["cif"]},"chemical/x-cmdf":{"source":"apache","extensions":["cmdf"]},"chemical/x-cml":{"source":"apache","extensions":["cml"]},"chemical/x-csml":{"source":"apache","extensions":["csml"]},"chemical/x-pdb":{"source":"apache"},"chemical/x-xyz":{"source":"apache","extensions":["xyz"]},"font/collection":{"source":"iana","extensions":["ttc"]},"font/otf":{"source":"iana","compressible":true,"extensions":["otf"]},"font/sfnt":{"source":"iana"},"font/ttf":{"source":"iana","compressible":true,"extensions":["ttf"]},"font/woff":{"source":"iana","extensions":["woff"]},"font/woff2":{"source":"iana","extensions":["woff2"]},"image/aces":{"source":"iana","extensions":["exr"]},"image/apng":{"compressible":false,"extensions":["apng"]},"image/avci":{"source":"iana","extensions":["avci"]},"image/avcs":{"source":"iana","extensions":["avcs"]},"image/avif":{"source":"iana","compressible":false,"extensions":["avif"]},"image/bmp":{"source":"iana","compressible":true,"extensions":["bmp"]},"image/cgm":{"source":"iana","extensions":["cgm"]},"image/dicom-rle":{"source":"iana","extensions":["drle"]},"image/emf":{"source":"iana","extensions":["emf"]},"image/fits":{"source":"iana","extensions":["fits"]},"image/g3fax":{"source":"iana","extensions":["g3"]},"image/gif":{"source":"iana","compressible":false,"extensions":["gif"]},"image/heic":{"source":"iana","extensions":["heic"]},"image/heic-sequence":{"source":"iana","extensions":["heics"]},"image/heif":{"source":"iana","extensions":["heif"]},"image/heif-sequence":{"source":"iana","extensions":["heifs"]},"image/hej2k":{"source":"iana","extensions":["hej2"]},"image/hsj2":{"source":"iana","extensions":["hsj2"]},"image/ief":{"source":"iana","extensions":["ief"]},"image/jls":{"source":"iana","extensions":["jls"]},"image/jp2":{"source":"iana","compressible":false,"extensions":["jp2","jpg2"]},"image/jpeg":{"source":"iana","compressible":false,"extensions":["jpeg","jpg","jpe"]},"image/jph":{"source":"iana","extensions":["jph"]},"image/jphc":{"source":"iana","extensions":["jhc"]},"image/jpm":{"source":"iana","compressible":false,"extensions":["jpm"]},"image/jpx":{"source":"iana","compressible":false,"extensions":["jpx","jpf"]},"image/jxr":{"source":"iana","extensions":["jxr"]},"image/jxra":{"source":"iana","extensions":["jxra"]},"image/jxrs":{"source":"iana","extensions":["jxrs"]},"image/jxs":{"source":"iana","extensions":["jxs"]},"image/jxsc":{"source":"iana","extensions":["jxsc"]},"image/jxsi":{"source":"iana","extensions":["jxsi"]},"image/jxss":{"source":"iana","extensions":["jxss"]},"image/ktx":{"source":"iana","extensions":["ktx"]},"image/ktx2":{"source":"iana","extensions":["ktx2"]},"image/naplps":{"source":"iana"},"image/pjpeg":{"compressible":false},"image/png":{"source":"iana","compressible":false,"extensions":["png"]},"image/prs.btif":{"source":"iana","extensions":["btif"]},"image/prs.pti":{"source":"iana","extensions":["pti"]},"image/pwg-raster":{"source":"iana"},"image/sgi":{"source":"apache","extensions":["sgi"]},"image/svg+xml":{"source":"iana","compressible":true,"extensions":["svg","svgz"]},"image/t38":{"source":"iana","extensions":["t38"]},"image/tiff":{"source":"iana","compressible":false,"extensions":["tif","tiff"]},"image/tiff-fx":{"source":"iana","extensions":["tfx"]},"image/vnd.adobe.photoshop":{"source":"iana","compressible":true,"extensions":["psd"]},"image/vnd.airzip.accelerator.azv":{"source":"iana","extensions":["azv"]},"image/vnd.cns.inf2":{"source":"iana"},"image/vnd.dece.graphic":{"source":"iana","extensions":["uvi","uvvi","uvg","uvvg"]},"image/vnd.djvu":{"source":"iana","extensions":["djvu","djv"]},"image/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"image/vnd.dwg":{"source":"iana","extensions":["dwg"]},"image/vnd.dxf":{"source":"iana","extensions":["dxf"]},"image/vnd.fastbidsheet":{"source":"iana","extensions":["fbs"]},"image/vnd.fpx":{"source":"iana","extensions":["fpx"]},"image/vnd.fst":{"source":"iana","extensions":["fst"]},"image/vnd.fujixerox.edmics-mmr":{"source":"iana","extensions":["mmr"]},"image/vnd.fujixerox.edmics-rlc":{"source":"iana","extensions":["rlc"]},"image/vnd.globalgraphics.pgb":{"source":"iana"},"image/vnd.microsoft.icon":{"source":"iana","compressible":true,"extensions":["ico"]},"image/vnd.mix":{"source":"iana"},"image/vnd.mozilla.apng":{"source":"iana"},"image/vnd.ms-dds":{"compressible":true,"extensions":["dds"]},"image/vnd.ms-modi":{"source":"iana","extensions":["mdi"]},"image/vnd.ms-photo":{"source":"apache","extensions":["wdp"]},"image/vnd.net-fpx":{"source":"iana","extensions":["npx"]},"image/vnd.pco.b16":{"source":"iana","extensions":["b16"]},"image/vnd.radiance":{"source":"iana"},"image/vnd.sealed.png":{"source":"iana"},"image/vnd.sealedmedia.softseal.gif":{"source":"iana"},"image/vnd.sealedmedia.softseal.jpg":{"source":"iana"},"image/vnd.svf":{"source":"iana"},"image/vnd.tencent.tap":{"source":"iana","extensions":["tap"]},"image/vnd.valve.source.texture":{"source":"iana","extensions":["vtf"]},"image/vnd.wap.wbmp":{"source":"iana","extensions":["wbmp"]},"image/vnd.xiff":{"source":"iana","extensions":["xif"]},"image/vnd.zbrush.pcx":{"source":"iana","extensions":["pcx"]},"image/webp":{"source":"apache","extensions":["webp"]},"image/wmf":{"source":"iana","extensions":["wmf"]},"image/x-3ds":{"source":"apache","extensions":["3ds"]},"image/x-cmu-raster":{"source":"apache","extensions":["ras"]},"image/x-cmx":{"source":"apache","extensions":["cmx"]},"image/x-freehand":{"source":"apache","extensions":["fh","fhc","fh4","fh5","fh7"]},"image/x-icon":{"source":"apache","compressible":true,"extensions":["ico"]},"image/x-jng":{"source":"nginx","extensions":["jng"]},"image/x-mrsid-image":{"source":"apache","extensions":["sid"]},"image/x-ms-bmp":{"source":"nginx","compressible":true,"extensions":["bmp"]},"image/x-pcx":{"source":"apache","extensions":["pcx"]},"image/x-pict":{"source":"apache","extensions":["pic","pct"]},"image/x-portable-anymap":{"source":"apache","extensions":["pnm"]},"image/x-portable-bitmap":{"source":"apache","extensions":["pbm"]},"image/x-portable-graymap":{"source":"apache","extensions":["pgm"]},"image/x-portable-pixmap":{"source":"apache","extensions":["ppm"]},"image/x-rgb":{"source":"apache","extensions":["rgb"]},"image/x-tga":{"source":"apache","extensions":["tga"]},"image/x-xbitmap":{"source":"apache","extensions":["xbm"]},"image/x-xcf":{"compressible":false},"image/x-xpixmap":{"source":"apache","extensions":["xpm"]},"image/x-xwindowdump":{"source":"apache","extensions":["xwd"]},"message/cpim":{"source":"iana"},"message/delivery-status":{"source":"iana"},"message/disposition-notification":{"source":"iana","extensions":["disposition-notification"]},"message/external-body":{"source":"iana"},"message/feedback-report":{"source":"iana"},"message/global":{"source":"iana","extensions":["u8msg"]},"message/global-delivery-status":{"source":"iana","extensions":["u8dsn"]},"message/global-disposition-notification":{"source":"iana","extensions":["u8mdn"]},"message/global-headers":{"source":"iana","extensions":["u8hdr"]},"message/http":{"source":"iana","compressible":false},"message/imdn+xml":{"source":"iana","compressible":true},"message/news":{"source":"iana"},"message/partial":{"source":"iana","compressible":false},"message/rfc822":{"source":"iana","compressible":true,"extensions":["eml","mime"]},"message/s-http":{"source":"iana"},"message/sip":{"source":"iana"},"message/sipfrag":{"source":"iana"},"message/tracking-status":{"source":"iana"},"message/vnd.si.simp":{"source":"iana"},"message/vnd.wfa.wsc":{"source":"iana","extensions":["wsc"]},"model/3mf":{"source":"iana","extensions":["3mf"]},"model/e57":{"source":"iana"},"model/gltf+json":{"source":"iana","compressible":true,"extensions":["gltf"]},"model/gltf-binary":{"source":"iana","compressible":true,"extensions":["glb"]},"model/iges":{"source":"iana","compressible":false,"extensions":["igs","iges"]},"model/mesh":{"source":"iana","compressible":false,"extensions":["msh","mesh","silo"]},"model/mtl":{"source":"iana","extensions":["mtl"]},"model/obj":{"source":"iana","extensions":["obj"]},"model/step":{"source":"iana"},"model/step+xml":{"source":"iana","compressible":true,"extensions":["stpx"]},"model/step+zip":{"source":"iana","compressible":false,"extensions":["stpz"]},"model/step-xml+zip":{"source":"iana","compressible":false,"extensions":["stpxz"]},"model/stl":{"source":"iana","extensions":["stl"]},"model/vnd.collada+xml":{"source":"iana","compressible":true,"extensions":["dae"]},"model/vnd.dwf":{"source":"iana","extensions":["dwf"]},"model/vnd.flatland.3dml":{"source":"iana"},"model/vnd.gdl":{"source":"iana","extensions":["gdl"]},"model/vnd.gs-gdl":{"source":"apache"},"model/vnd.gs.gdl":{"source":"iana"},"model/vnd.gtw":{"source":"iana","extensions":["gtw"]},"model/vnd.moml+xml":{"source":"iana","compressible":true},"model/vnd.mts":{"source":"iana","extensions":["mts"]},"model/vnd.opengex":{"source":"iana","extensions":["ogex"]},"model/vnd.parasolid.transmit.binary":{"source":"iana","extensions":["x_b"]},"model/vnd.parasolid.transmit.text":{"source":"iana","extensions":["x_t"]},"model/vnd.pytha.pyox":{"source":"iana"},"model/vnd.rosette.annotated-data-model":{"source":"iana"},"model/vnd.sap.vds":{"source":"iana","extensions":["vds"]},"model/vnd.usdz+zip":{"source":"iana","compressible":false,"extensions":["usdz"]},"model/vnd.valve.source.compiled-map":{"source":"iana","extensions":["bsp"]},"model/vnd.vtu":{"source":"iana","extensions":["vtu"]},"model/vrml":{"source":"iana","compressible":false,"extensions":["wrl","vrml"]},"model/x3d+binary":{"source":"apache","compressible":false,"extensions":["x3db","x3dbz"]},"model/x3d+fastinfoset":{"source":"iana","extensions":["x3db"]},"model/x3d+vrml":{"source":"apache","compressible":false,"extensions":["x3dv","x3dvz"]},"model/x3d+xml":{"source":"iana","compressible":true,"extensions":["x3d","x3dz"]},"model/x3d-vrml":{"source":"iana","extensions":["x3dv"]},"multipart/alternative":{"source":"iana","compressible":false},"multipart/appledouble":{"source":"iana"},"multipart/byteranges":{"source":"iana"},"multipart/digest":{"source":"iana"},"multipart/encrypted":{"source":"iana","compressible":false},"multipart/form-data":{"source":"iana","compressible":false},"multipart/header-set":{"source":"iana"},"multipart/mixed":{"source":"iana"},"multipart/multilingual":{"source":"iana"},"multipart/parallel":{"source":"iana"},"multipart/related":{"source":"iana","compressible":false},"multipart/report":{"source":"iana"},"multipart/signed":{"source":"iana","compressible":false},"multipart/vnd.bint.med-plus":{"source":"iana"},"multipart/voice-message":{"source":"iana"},"multipart/x-mixed-replace":{"source":"iana"},"text/1d-interleaved-parityfec":{"source":"iana"},"text/cache-manifest":{"source":"iana","compressible":true,"extensions":["appcache","manifest"]},"text/calendar":{"source":"iana","extensions":["ics","ifb"]},"text/calender":{"compressible":true},"text/cmd":{"compressible":true},"text/coffeescript":{"extensions":["coffee","litcoffee"]},"text/cql":{"source":"iana"},"text/cql-expression":{"source":"iana"},"text/cql-identifier":{"source":"iana"},"text/css":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["css"]},"text/csv":{"source":"iana","compressible":true,"extensions":["csv"]},"text/csv-schema":{"source":"iana"},"text/directory":{"source":"iana"},"text/dns":{"source":"iana"},"text/ecmascript":{"source":"iana"},"text/encaprtp":{"source":"iana"},"text/enriched":{"source":"iana"},"text/fhirpath":{"source":"iana"},"text/flexfec":{"source":"iana"},"text/fwdred":{"source":"iana"},"text/gff3":{"source":"iana"},"text/grammar-ref-list":{"source":"iana"},"text/html":{"source":"iana","compressible":true,"extensions":["html","htm","shtml"]},"text/jade":{"extensions":["jade"]},"text/javascript":{"source":"iana","compressible":true},"text/jcr-cnd":{"source":"iana"},"text/jsx":{"compressible":true,"extensions":["jsx"]},"text/less":{"compressible":true,"extensions":["less"]},"text/markdown":{"source":"iana","compressible":true,"extensions":["markdown","md"]},"text/mathml":{"source":"nginx","extensions":["mml"]},"text/mdx":{"compressible":true,"extensions":["mdx"]},"text/mizar":{"source":"iana"},"text/n3":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["n3"]},"text/parameters":{"source":"iana","charset":"UTF-8"},"text/parityfec":{"source":"iana"},"text/plain":{"source":"iana","compressible":true,"extensions":["txt","text","conf","def","list","log","in","ini"]},"text/provenance-notation":{"source":"iana","charset":"UTF-8"},"text/prs.fallenstein.rst":{"source":"iana"},"text/prs.lines.tag":{"source":"iana","extensions":["dsc"]},"text/prs.prop.logic":{"source":"iana"},"text/raptorfec":{"source":"iana"},"text/red":{"source":"iana"},"text/rfc822-headers":{"source":"iana"},"text/richtext":{"source":"iana","compressible":true,"extensions":["rtx"]},"text/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"text/rtp-enc-aescm128":{"source":"iana"},"text/rtploopback":{"source":"iana"},"text/rtx":{"source":"iana"},"text/sgml":{"source":"iana","extensions":["sgml","sgm"]},"text/shaclc":{"source":"iana"},"text/shex":{"source":"iana","extensions":["shex"]},"text/slim":{"extensions":["slim","slm"]},"text/spdx":{"source":"iana","extensions":["spdx"]},"text/strings":{"source":"iana"},"text/stylus":{"extensions":["stylus","styl"]},"text/t140":{"source":"iana"},"text/tab-separated-values":{"source":"iana","compressible":true,"extensions":["tsv"]},"text/troff":{"source":"iana","extensions":["t","tr","roff","man","me","ms"]},"text/turtle":{"source":"iana","charset":"UTF-8","extensions":["ttl"]},"text/ulpfec":{"source":"iana"},"text/uri-list":{"source":"iana","compressible":true,"extensions":["uri","uris","urls"]},"text/vcard":{"source":"iana","compressible":true,"extensions":["vcard"]},"text/vnd.a":{"source":"iana"},"text/vnd.abc":{"source":"iana"},"text/vnd.ascii-art":{"source":"iana"},"text/vnd.curl":{"source":"iana","extensions":["curl"]},"text/vnd.curl.dcurl":{"source":"apache","extensions":["dcurl"]},"text/vnd.curl.mcurl":{"source":"apache","extensions":["mcurl"]},"text/vnd.curl.scurl":{"source":"apache","extensions":["scurl"]},"text/vnd.debian.copyright":{"source":"iana","charset":"UTF-8"},"text/vnd.dmclientscript":{"source":"iana"},"text/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"text/vnd.esmertec.theme-descriptor":{"source":"iana","charset":"UTF-8"},"text/vnd.familysearch.gedcom":{"source":"iana","extensions":["ged"]},"text/vnd.ficlab.flt":{"source":"iana"},"text/vnd.fly":{"source":"iana","extensions":["fly"]},"text/vnd.fmi.flexstor":{"source":"iana","extensions":["flx"]},"text/vnd.gml":{"source":"iana"},"text/vnd.graphviz":{"source":"iana","extensions":["gv"]},"text/vnd.hans":{"source":"iana"},"text/vnd.hgl":{"source":"iana"},"text/vnd.in3d.3dml":{"source":"iana","extensions":["3dml"]},"text/vnd.in3d.spot":{"source":"iana","extensions":["spot"]},"text/vnd.iptc.newsml":{"source":"iana"},"text/vnd.iptc.nitf":{"source":"iana"},"text/vnd.latex-z":{"source":"iana"},"text/vnd.motorola.reflex":{"source":"iana"},"text/vnd.ms-mediapackage":{"source":"iana"},"text/vnd.net2phone.commcenter.command":{"source":"iana"},"text/vnd.radisys.msml-basic-layout":{"source":"iana"},"text/vnd.senx.warpscript":{"source":"iana"},"text/vnd.si.uricatalogue":{"source":"iana"},"text/vnd.sosi":{"source":"iana"},"text/vnd.sun.j2me.app-descriptor":{"source":"iana","charset":"UTF-8","extensions":["jad"]},"text/vnd.trolltech.linguist":{"source":"iana","charset":"UTF-8"},"text/vnd.wap.si":{"source":"iana"},"text/vnd.wap.sl":{"source":"iana"},"text/vnd.wap.wml":{"source":"iana","extensions":["wml"]},"text/vnd.wap.wmlscript":{"source":"iana","extensions":["wmls"]},"text/vtt":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["vtt"]},"text/x-asm":{"source":"apache","extensions":["s","asm"]},"text/x-c":{"source":"apache","extensions":["c","cc","cxx","cpp","h","hh","dic"]},"text/x-component":{"source":"nginx","extensions":["htc"]},"text/x-fortran":{"source":"apache","extensions":["f","for","f77","f90"]},"text/x-gwt-rpc":{"compressible":true},"text/x-handlebars-template":{"extensions":["hbs"]},"text/x-java-source":{"source":"apache","extensions":["java"]},"text/x-jquery-tmpl":{"compressible":true},"text/x-lua":{"extensions":["lua"]},"text/x-markdown":{"compressible":true,"extensions":["mkd"]},"text/x-nfo":{"source":"apache","extensions":["nfo"]},"text/x-opml":{"source":"apache","extensions":["opml"]},"text/x-org":{"compressible":true,"extensions":["org"]},"text/x-pascal":{"source":"apache","extensions":["p","pas"]},"text/x-processing":{"compressible":true,"extensions":["pde"]},"text/x-sass":{"extensions":["sass"]},"text/x-scss":{"extensions":["scss"]},"text/x-setext":{"source":"apache","extensions":["etx"]},"text/x-sfv":{"source":"apache","extensions":["sfv"]},"text/x-suse-ymp":{"compressible":true,"extensions":["ymp"]},"text/x-uuencode":{"source":"apache","extensions":["uu"]},"text/x-vcalendar":{"source":"apache","extensions":["vcs"]},"text/x-vcard":{"source":"apache","extensions":["vcf"]},"text/xml":{"source":"iana","compressible":true,"extensions":["xml"]},"text/xml-external-parsed-entity":{"source":"iana"},"text/yaml":{"compressible":true,"extensions":["yaml","yml"]},"video/1d-interleaved-parityfec":{"source":"iana"},"video/3gpp":{"source":"iana","extensions":["3gp","3gpp"]},"video/3gpp-tt":{"source":"iana"},"video/3gpp2":{"source":"iana","extensions":["3g2"]},"video/av1":{"source":"iana"},"video/bmpeg":{"source":"iana"},"video/bt656":{"source":"iana"},"video/celb":{"source":"iana"},"video/dv":{"source":"iana"},"video/encaprtp":{"source":"iana"},"video/ffv1":{"source":"iana"},"video/flexfec":{"source":"iana"},"video/h261":{"source":"iana","extensions":["h261"]},"video/h263":{"source":"iana","extensions":["h263"]},"video/h263-1998":{"source":"iana"},"video/h263-2000":{"source":"iana"},"video/h264":{"source":"iana","extensions":["h264"]},"video/h264-rcdo":{"source":"iana"},"video/h264-svc":{"source":"iana"},"video/h265":{"source":"iana"},"video/iso.segment":{"source":"iana","extensions":["m4s"]},"video/jpeg":{"source":"iana","extensions":["jpgv"]},"video/jpeg2000":{"source":"iana"},"video/jpm":{"source":"apache","extensions":["jpm","jpgm"]},"video/jxsv":{"source":"iana"},"video/mj2":{"source":"iana","extensions":["mj2","mjp2"]},"video/mp1s":{"source":"iana"},"video/mp2p":{"source":"iana"},"video/mp2t":{"source":"iana","extensions":["ts"]},"video/mp4":{"source":"iana","compressible":false,"extensions":["mp4","mp4v","mpg4"]},"video/mp4v-es":{"source":"iana"},"video/mpeg":{"source":"iana","compressible":false,"extensions":["mpeg","mpg","mpe","m1v","m2v"]},"video/mpeg4-generic":{"source":"iana"},"video/mpv":{"source":"iana"},"video/nv":{"source":"iana"},"video/ogg":{"source":"iana","compressible":false,"extensions":["ogv"]},"video/parityfec":{"source":"iana"},"video/pointer":{"source":"iana"},"video/quicktime":{"source":"iana","compressible":false,"extensions":["qt","mov"]},"video/raptorfec":{"source":"iana"},"video/raw":{"source":"iana"},"video/rtp-enc-aescm128":{"source":"iana"},"video/rtploopback":{"source":"iana"},"video/rtx":{"source":"iana"},"video/scip":{"source":"iana"},"video/smpte291":{"source":"iana"},"video/smpte292m":{"source":"iana"},"video/ulpfec":{"source":"iana"},"video/vc1":{"source":"iana"},"video/vc2":{"source":"iana"},"video/vnd.cctv":{"source":"iana"},"video/vnd.dece.hd":{"source":"iana","extensions":["uvh","uvvh"]},"video/vnd.dece.mobile":{"source":"iana","extensions":["uvm","uvvm"]},"video/vnd.dece.mp4":{"source":"iana"},"video/vnd.dece.pd":{"source":"iana","extensions":["uvp","uvvp"]},"video/vnd.dece.sd":{"source":"iana","extensions":["uvs","uvvs"]},"video/vnd.dece.video":{"source":"iana","extensions":["uvv","uvvv"]},"video/vnd.directv.mpeg":{"source":"iana"},"video/vnd.directv.mpeg-tts":{"source":"iana"},"video/vnd.dlna.mpeg-tts":{"source":"iana"},"video/vnd.dvb.file":{"source":"iana","extensions":["dvb"]},"video/vnd.fvt":{"source":"iana","extensions":["fvt"]},"video/vnd.hns.video":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.ttsavc":{"source":"iana"},"video/vnd.iptvforum.ttsmpeg2":{"source":"iana"},"video/vnd.motorola.video":{"source":"iana"},"video/vnd.motorola.videop":{"source":"iana"},"video/vnd.mpegurl":{"source":"iana","extensions":["mxu","m4u"]},"video/vnd.ms-playready.media.pyv":{"source":"iana","extensions":["pyv"]},"video/vnd.nokia.interleaved-multimedia":{"source":"iana"},"video/vnd.nokia.mp4vr":{"source":"iana"},"video/vnd.nokia.videovoip":{"source":"iana"},"video/vnd.objectvideo":{"source":"iana"},"video/vnd.radgamettools.bink":{"source":"iana"},"video/vnd.radgamettools.smacker":{"source":"iana"},"video/vnd.sealed.mpeg1":{"source":"iana"},"video/vnd.sealed.mpeg4":{"source":"iana"},"video/vnd.sealed.swf":{"source":"iana"},"video/vnd.sealedmedia.softseal.mov":{"source":"iana"},"video/vnd.uvvu.mp4":{"source":"iana","extensions":["uvu","uvvu"]},"video/vnd.vivo":{"source":"iana","extensions":["viv"]},"video/vnd.youtube.yt":{"source":"iana"},"video/vp8":{"source":"iana"},"video/vp9":{"source":"iana"},"video/webm":{"source":"apache","compressible":false,"extensions":["webm"]},"video/x-f4v":{"source":"apache","extensions":["f4v"]},"video/x-fli":{"source":"apache","extensions":["fli"]},"video/x-flv":{"source":"apache","compressible":false,"extensions":["flv"]},"video/x-m4v":{"source":"apache","extensions":["m4v"]},"video/x-matroska":{"source":"apache","compressible":false,"extensions":["mkv","mk3d","mks"]},"video/x-mng":{"source":"apache","extensions":["mng"]},"video/x-ms-asf":{"source":"apache","extensions":["asf","asx"]},"video/x-ms-vob":{"source":"apache","extensions":["vob"]},"video/x-ms-wm":{"source":"apache","extensions":["wm"]},"video/x-ms-wmv":{"source":"apache","compressible":false,"extensions":["wmv"]},"video/x-ms-wmx":{"source":"apache","extensions":["wmx"]},"video/x-ms-wvx":{"source":"apache","extensions":["wvx"]},"video/x-msvideo":{"source":"apache","extensions":["avi"]},"video/x-sgi-movie":{"source":"apache","extensions":["movie"]},"video/x-smv":{"source":"apache","extensions":["smv"]},"x-conference/x-cooltalk":{"source":"apache","extensions":["ice"]},"x-shader/x-fragment":{"compressible":true},"x-shader/x-vertex":{"compressible":true}}');
 
-/***/ }),
+/***/ },
 
-/***/ "../scrypted-apocaliss-base/node_modules/mqtt/package.json":
+/***/ "../scrypted-apocaliss-base/node_modules/mqtt/package.json"
 /*!*****************************************************************!*\
   !*** ../scrypted-apocaliss-base/node_modules/mqtt/package.json ***!
   \*****************************************************************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
 module.exports = /*#__PURE__*/JSON.parse('{"name":"mqtt","description":"A library for the MQTT protocol","version":"5.10.2","contributors":["Adam Rudd <adamvrr@gmail.com>","Matteo Collina <matteo.collina@gmail.com> (https://github.com/mcollina)","Siarhei Buntsevich <scarry0506@gmail.com> (https://github.com/scarry1992)","Yoseph Maguire <yomaguir@microsoft.com> (https://github.com/YoDaMa)","Daniel Lando <daniel.sorridi@gmail.com> (https://github.com/robertsLando)"],"keywords":["mqtt","publish/subscribe","publish","subscribe"],"license":"MIT","repository":{"type":"git","url":"git://github.com/mqttjs/MQTT.js.git"},"main":"./build/index.js","module":"./dist/mqtt.esm.js","bin":{"mqtt_pub":"./build/bin/pub.js","mqtt_sub":"./build/bin/sub.js","mqtt":"./build/bin/mqtt.js"},"files":["dist/","CONTRIBUTING.md","LICENSE.md","help/","build/","src/"],"exports":{".":{"browser":{"import":"./dist/mqtt.esm.js","default":"./dist/mqtt.min.js"},"default":"./build/index.js"},"./package.json":"./package.json","./*.map":"./build/*.js.map","./dist/*":"./dist/*.js","./*":"./build/*.js"},"types":"build/index.d.ts","typesVersions":{"*":{"*":["./build/index.d.ts"]}},"scripts":{"lint":"eslint --ext .ts .","lint-fix":"eslint --fix --ext .ts .","build:ts":"rimraf build/ && tsc -p tsconfig.build.json","build:browser":"node esbuild.js","build":"npm run build:ts && npm run build:browser","prepare":"npm run build","unit-test:node":"node_modules/.bin/nyc node -r esbuild-register test/runTests.ts","unit-test:browser":"wtr","test:node":"npm run unit-test:node && codecov","test:browser":"npm run build && npm run unit-test:browser","test":"npm run test:node","changelog":"conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md","changelog-init":"conventional-changelog -p angular -i CHANGELOG.md -s -r 0","release":"read -p \'GITHUB_TOKEN: \' GITHUB_TOKEN && export GITHUB_TOKEN=$GITHUB_TOKEN && release-it"},"release-it":{"github":{"release":true},"git":{"tagName":"v${version}","commitMessage":"chore(release): ${version}"},"hooks":{"before:init":["npm run test"]},"npm":{"publish":true},"plugins":{"@release-it/conventional-changelog":{"preset":"angular","infile":"CHANGELOG.md"}}},"publishConfig":{"provenance":true},"pre-commit":["lint"],"engines":{"node":">=16.0.0"},"browser":{"./mqtt.js":"./dist/mqtt.js","fs":false,"tls":false,"net":false},"dependencies":{"@types/readable-stream":"^4.0.5","@types/ws":"^8.5.9","commist":"^3.2.0","concat-stream":"^2.0.0","debug":"^4.3.4","help-me":"^5.0.0","lru-cache":"^10.0.1","minimist":"^1.2.8","mqtt-packet":"^9.0.1","number-allocator":"^1.0.14","readable-stream":"^4.4.2","reinterval":"^1.1.0","rfdc":"^1.3.0","split2":"^4.2.0","worker-timers":"^7.1.4","ws":"^8.17.1"},"devDependencies":{"@esm-bundle/chai":"^4.3.4-fix.0","@release-it/conventional-changelog":"^7.0.2","@types/chai":"^4.3.10","@types/node":"^20.9.0","@types/sinon":"^17.0.1","@types/tape":"^5.6.4","@typescript-eslint/eslint-plugin":"^6.10.0","@typescript-eslint/parser":"^6.10.0","@web/test-runner":"^0.18.0","@web/test-runner-playwright":"^0.11.0","aedes-cli":"^0.8.0","chai":"^4.3.10","chokidar":"^3.5.3","codecov":"^3.8.2","conventional-changelog-cli":"^4.1.0","end-of-stream":"^1.4.4","esbuild":"^0.19.5","esbuild-plugin-polyfill-node":"^0.3.0","esbuild-register":"^3.5.0","eslint":"^8.53.0","eslint-config-airbnb-base":"^15.0.0","eslint-config-airbnb-typescript":"^17.1.0","eslint-config-prettier":"^9.0.0","eslint-plugin-import":"^2.29.0","eslint-plugin-prettier":"^5.0.1","global":"^4.4.0","leaked-handles":"^5.2.0","mkdirp":"^3.0.1","mqtt-connection":"^4.1.0","mqtt-level-store":"^3.1.0","nyc":"^15.1.0","pre-commit":"^1.2.2","prettier":"^3.0.3","release-it":"^16.2.1","rimraf":"^5.0.5","should":"^13.2.3","sinon":"^17.0.1","snazzy":"^9.0.0","tape":"^5.7.2","ts-node":"^10.9.1","typescript":"^5.2.2"}}');
 
-/***/ }),
+/***/ },
 
-/***/ "./package.json":
+/***/ "./package.json"
 /*!**********************!*\
   !*** ./package.json ***!
   \**********************/
-/***/ ((module) => {
+(module) {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.47","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"^0.3.124","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-recorder","description":"Record events on detections or motion on a mounted volume","repository":{"type":"git","url":"https://github.com/apocaliss92/scrypted-events-recorder"},"version":"0.0.52","scripts":{"scrypted-setup-project":"scrypted-setup-project","prescrypted-setup-project":"scrypted-package-json","build":"scrypted-webpack","prepublishOnly":"NODE_ENV=production scrypted-webpack","prescrypted-vscode-launch":"scrypted-webpack","scrypted-vscode-launch":"scrypted-deploy-debug","scrypted-deploy-debug":"scrypted-deploy-debug","scrypted-debug":"scrypted-debug","scrypted-deploy":"scrypted-deploy","scrypted-readme":"scrypted-readme","scrypted-package-json":"scrypted-package-json"},"keywords":["scrypted","plugin","detect","events","recorder","motion","storage","clips","videoclips"],"scrypted":{"name":"Events recorder","type":"API","interfaces":["ScryptedSystemDevice","Settings","MixinProvider","HttpRequestHandler"]},"dependencies":{"@scrypted/common":"file:../scrypted/common","@scrypted/sdk":"0.5.55","@types/lodash":"^4.17.14","lodash":"^4.17.21","moment":"^2.30.1"},"devDependencies":{"@types/moment":"^2.11.29","@types/node":"^20.11.0"}}');
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
+/******/ 	const __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 		const module = __webpack_module_cache__[moduleId] = {
 /******/ 			id: moduleId,
 /******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
+/******/ 		if (!(moduleId in __webpack_modules__)) {
+/******/ 			delete __webpack_module_cache__[moduleId];
+/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			e.code = 'MODULE_NOT_FOUND';
+/******/ 			throw e;
+/******/ 		}
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Flag the module as loaded
@@ -82951,49 +83745,39 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@apocaliss92/scrypted-events-
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
+/******/ 	// define getter/value functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 			}
-/******/ 		};
-/******/ 	})();
+/******/ 		}
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop));
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
 /******/ 	
 /******/ 	/* webpack/runtime/node module decorator */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nmd = (module) => {
-/******/ 			module.paths = [];
-/******/ 			if (!module.children) module.children = [];
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
+/******/ 	__webpack_require__.nmd = (module) => {
+/******/ 		module.paths = [];
+/******/ 		if (!module.children) module.children = [];
+/******/ 		return module;
+/******/ 	};
 /******/ 	
 /************************************************************************/
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/main.ts");
-/******/ 	var __webpack_export_target__ = (exports = typeof exports === "undefined" ? {} : exports);
+/******/ 	let __webpack_exports__ = __webpack_require__("./src/main.ts");
+/******/ 	const __webpack_export_target__ = (exports = typeof exports === "undefined" ? {} : exports);
 /******/ 	for(var __webpack_i__ in __webpack_exports__) __webpack_export_target__[__webpack_i__] = __webpack_exports__[__webpack_i__];
 /******/ 	if(__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, "__esModule", { value: true });
 /******/ 	
